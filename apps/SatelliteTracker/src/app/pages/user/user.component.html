@@ -1,0 +1,27 @@
+<p>user works!</p>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Id</th>
+      <th scope="col">Name</th>
+      <th scope="col">Location</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let user of users; let i = index">
+      <th scope="row">{{ i }}</th>
+      <td>{{ user.id }}</td>
+      <td>
+        <a
+          routerLink="{{ user.id }}"
+          routerLinkActive="active"
+          ariaCurrentWhenActive="page"
+          >{{ user.name }}</a
+        >
+      </td>
+      <td>{{ user.location }}</td>
+    </tr>
+  </tbody>
+</table>

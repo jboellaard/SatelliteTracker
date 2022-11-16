@@ -1,0 +1,8 @@
+<div *ngIf="componentExists">
+  <h1>Editing component {{ componentId }}</h1>
+</div>
+<div *ngIf="!componentExists">
+  <h1>Creating new component</h1>
+</div>
+
+<p>ComponentId = {{ componentId }}</p>
