@@ -17,11 +17,11 @@
     "importHelpers": true,
     "target": "es2020",
     "module": "es2020",
-    "lib": [
-      "es2020",
-      "dom"
-    ],
-    "paths": {},
+    "lib": ["es2020", "dom"],
+    "paths": {
+      "shared/auth": ["libs/shared/auth/src/index.ts"],
+      "shared/domain": ["libs/shared/domain/src/index.ts"]
+    },
     "rootDir": "."
   },
   "angularCompilerOptions": {
@@ -30,8 +30,5 @@
     "strictInputAccessModifiers": true,
     "strictTemplates": true
   },
-  "exclude": [
-    "node_modules",
-    "tmp"
-  ]
+  "exclude": ["node_modules", "tmp"]
 }

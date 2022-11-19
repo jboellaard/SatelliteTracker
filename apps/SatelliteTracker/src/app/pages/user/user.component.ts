@@ -8,10 +8,20 @@ import { UserService } from './user.service';
   styleUrls: ['./user.component.scss'],
 })
 export class UserComponent implements OnInit {
-  users: User[] | undefined;
+  users: User[] = [];
+  displayedColumns: string[] = ['id', 'name', 'location', 'edit', 'delete'];
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {
+    this.users = this.userService.getAllUsers();
+  }
+  addUser(user: User) {
+    this.userService.addUser(user);
+  }
+
+  removeUser(id: number) {
+    //remove data from the table
+    this.userService.removeUser(id);
     this.users = this.userService.getAllUsers();
   }
 }

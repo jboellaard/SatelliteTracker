@@ -1,8 +1,8 @@
 export class User {
-  id: string | undefined;
+  id: number | undefined;
   name: string | undefined;
   email: string | undefined;
-  location: string | undefined;
+  location: number[] | undefined;
 
   constructor(values: any) {
     this.id = values.id;

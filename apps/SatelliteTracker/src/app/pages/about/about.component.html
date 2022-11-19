@@ -1,0 +1,166 @@
+<div class="row">
+  <div class="col-sm-6 col-md-8 col-lg-9">
+    <h3 id="aboutTitle">About this application</h3>
+    <p>
+      This application was made for the course 'Clientside web frameworks' at
+      Avans Hogeschool Breda.
+    </p>
+    <h1>Satellite Tracker</h1>
+    <p>
+      Hier beschrijft je wat je project inhoudt. Beschrijf ook de
+      entiteiten/domeinobjecten die je gebruikt, en benoem per entiteit de
+      attributen met hun datatype.
+    </p>
+  </div>
+  <div class="col-sm-6 col-md-4 col-lg-3">
+    <div class="card">
+      <div class="d-flex justify-content-center align-items-center px-3 py-3">
+        <!-- Je mag een foto van jezelf toevoegen, maar dat is niet verplicht. -->
+        <img
+          src="assets/images/person.png"
+          class="card-img-top rounded-circle border profile-pic px-4 py-4"
+          alt="..."
+        />
+      </div>
+      <div class="card-body">
+        <h5 class="card-title">Joy Boellaard</h5>
+        <p class="card-text">Studentnummer: 2182556</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3>Entiteiten</h3>
+<p>
+  Hier geef je een toelichting op je entiteiten. Voeg ook een afbeelding van je
+  model toe zoals dat bij NoSql gevraagd wordt.
+</p>
+
+<img src="assets/images/erd.png" class="px-5 py-5" alt="..." />
+
+<div class="row">
+  <div class="col-sm-12 col-md-4">
+    <p>user</p>
+    <ul>
+      <li>id: string</li>
+      <li>userName: string</li>
+      <li>email: string</li>
+      <li>password: string</li>
+      <li>location: location</li>
+      <li>createDate: date</li>
+      <li>updateDate: date</li>
+    </ul>
+  </div>
+  <div class="col-sm-12 col-md-4">
+    <p>location</p>
+    <ul>
+      <li>type: string</li>
+      <li>coordinates: number[]</li>
+    </ul>
+  </div>
+  <div class="col-sm-12 col-md-4">
+    <p>satellite</p>
+    <ul>
+      <li>id: string</li>
+      <li>name: string</li>
+      <li>mass: number</li>
+      <li>radiusOfBase: number</li>
+      <li>colourOfBase: string</li>
+      <li>radiusOfParts: number</li>
+      <li>purpose: string</li>
+      <li>satelliteParts: satellitePart[]</li>
+      <li>orbit: orbit</li>
+      <li>launch: launch</li>
+      <li>createDate: date</li>
+      <li>updateDate: date</li>
+    </ul>
+  </div>
+  <div class="col-sm-12 col-md-4">
+    <p>satellitePart</p>
+    <ul>
+      <li>id: string</li>
+      <li>name: string</li>
+      <li>function: string</li>
+      <li>material: string</li>
+      <li>colour: string</li>
+      <li>amount: number</li>
+      <li>createDate: date</li>
+      <li>updateDate: date</li>
+    </ul>
+  </div>
+  <div class="col-sm-12 col-md-4">
+    <p>orbit</p>
+    <ul>
+      <li>id: string</li>
+      <li>type: string</li>
+      <li>inclination: number</li>
+      <li>semiMajorAxis: number</li>
+      <li>period: number</li>
+      <li>eccentricity: number</li>
+      <li>createDate: date</li>
+      <li>updateDate: date</li>
+    </ul>
+  </div>
+  <div class="col-sm-12 col-md-4">
+    <p>launch</p>
+    <ul>
+      <li>id: string</li>
+      <li>dateOfLaunch: date</li>
+      <li>location: location</li>
+      <li>succeeded: boolean</li>
+      <li>createDate: date</li>
+      <li>updateDate: date</li>
+    </ul>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col">
+    <h3>User stories</h3>
+    <p>
+      Hier verwoord je in de vorm van userstories de functionaliteit van jouw
+      applicatie.
+    </p>
+
+    <table class="table table-bordered">
+      <thead>
+        <th>Nr</th>
+        <th class="col-6">Userstory</th>
+        <th>Evt toelichting</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>
+            Als gebruiker wil ik een overzicht van movies kunnen raadplegen,
+            zodat ik kan zien welke movies op dit moment beschikbaar zijn.
+          </td>
+          <td>Overzicht is een grid.</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>
+            Als ingelogde gebruiker wil ik zelf een movie kunnen toevoegen,
+            zodat ik mijn movies in het systeem kan invoeren.
+          </td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>
+            Als ingelogde gebruiker wil ik mijn eigen movies kunnen bewerken en
+            verwijderen, zodat ik mijn informatie up-to-date kan houden.
+          </td>
+          <td></td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>
+            <p>Voeg zelf meer userstories toe.</p>
+          </td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

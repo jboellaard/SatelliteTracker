@@ -7,22 +7,22 @@ import { User } from './user.model';
 export class UserService {
   users: User[] = [
     {
-      id: '12345-123-12',
+      id: 1,
       name: 'John',
       email: 'Johnsemail@mail.com',
-      location: 'Amsterdam',
+      location: [52.370216, 4.895168],
     },
     {
-      id: '12345-123-13',
+      id: 2,
       name: 'Jane',
       email: 'Janesemail@mail.com',
-      location: 'Amsterdam',
+      location: [44.5, 11.34],
     },
     {
-      id: '12345-123-14',
+      id: 3,
       name: 'Joy',
       email: 'Joysemail@mail.com',
-      location: 'Papendrecht',
+      location: [51.813297, 4.690093],
     },
   ];
   constructor() {
@@ -31,5 +31,13 @@ export class UserService {
 
   getAllUsers(): User[] {
     return this.users;
+  }
+
+  addUser(user: User) {
+    this.users.push(user);
+  }
+
+  removeUser(id: number) {
+    this.users = this.users.filter((user) => user.id !== id);
   }
 }

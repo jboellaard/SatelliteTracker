@@ -23,8 +23,12 @@
           "apps/SatelliteTracker/src/assets",
           "apps/SatelliteTracker/src/_redirects"
         ],
-        "styles": ["apps/SatelliteTracker/src/styles.scss"],
-        "scripts": []
+        "styles": [
+          "apps/SatelliteTracker/src/styles.scss"
+        ],
+        "scripts": [
+          "node_modules/chart.js/dist/chart.js"
+        ]
       },
       "configurations": {
         "production": {
@@ -89,7 +93,9 @@
           "apps/SatelliteTracker/src/favicon.ico",
           "apps/SatelliteTracker/src/assets"
         ],
-        "styles": ["apps/SatelliteTracker/src/styles.scss"],
+        "styles": [
+          "apps/SatelliteTracker/src/styles.scss"
+        ],
         "scripts": []
       }
     }

@@ -8,8 +8,11 @@ import { UserDetailComponent } from './pages/user/detail/detail.component';
 import { UserListComponent } from './pages/user/list/list.component';
 import { UserEditComponent } from './pages/user/edit/edit.component';
 
+import { AboutComponent } from './pages/about/about.component';
+
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'users' },
+  { path: 'about', pathMatch: 'full', component: AboutComponent },
   { path: 'satellite-detail', component: SatelliteDetailComponent },
   {
     path: 'satellite-list',
@@ -34,12 +37,12 @@ const routes: Routes = [
     component: UserListComponent,
   },
   {
-    path: 'user/:id',
+    path: 'users/:id',
     pathMatch: 'full',
     component: UserDetailComponent,
   },
   {
-    path: 'user/:id/edit',
+    path: 'users/:id/edit',
     pathMatch: 'full',
     component: UserListComponent,
   },
