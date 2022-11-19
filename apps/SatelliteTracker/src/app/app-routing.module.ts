@@ -1,8 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { SatelliteDetailComponent } from './pages/satellite/detail/detail.component';
-import { SatelliteListComponent } from './pages/satellite/list/list.component';
-// import { SatelliteEditComponent } from './pages/satellite/edit/edit.component';
+
 import { UserComponent } from './pages/user/user.component';
 import { UserDetailComponent } from './pages/user/detail/detail.component';
 import { UserListComponent } from './pages/user/list/list.component';
