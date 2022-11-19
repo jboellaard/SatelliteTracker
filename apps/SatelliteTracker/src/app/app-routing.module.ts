@@ -13,28 +13,16 @@ import { AboutComponent } from './pages/about/about.component';
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'users' },
   { path: 'about', pathMatch: 'full', component: AboutComponent },
-  { path: 'satellite-detail', component: SatelliteDetailComponent },
-  {
-    path: 'satellite-list',
-    pathMatch: 'full',
-    component: SatelliteListComponent,
-  },
-  {
-    path: 'satellite/:id',
-    pathMatch: 'full',
-    component: SatelliteDetailComponent,
-  },
-  {
-    path: 'satellite/:id/edit',
-    pathMatch: 'full',
-    component: SatelliteListComponent,
-  },
   { path: 'users', pathMatch: 'full', component: UserComponent },
-  { path: 'user-detail', component: UserDetailComponent },
   {
     path: 'user-list',
     pathMatch: 'full',
     component: UserListComponent,
+  },
+  {
+    path: 'users/new',
+    pathMatch: 'full',
+    component: UserEditComponent,
   },
   {
     path: 'users/:id',
@@ -44,14 +32,8 @@ const routes: Routes = [
   {
     path: 'users/:id/edit',
     pathMatch: 'full',
-    component: UserListComponent,
+    component: UserEditComponent,
   },
-  // { path: 'users', pathMatch: 'full', component: ListComponent },
-  // users/new moet voor users/:id, omdat new anders als de id wordt gezien.
-  // Volgorde is belangrijk in routing.
-  // { path: 'users/new', pathMatch: 'full', component: EditComponent },
-  // { path: 'users/:id', pathMatch: 'full', component: DetailComponent },
-  // { path: 'users/:id/edit', pathMatch: 'full', component: EditComponent },
   // {
   //   path: 'columns',
   //   component: ColumnsComponent,

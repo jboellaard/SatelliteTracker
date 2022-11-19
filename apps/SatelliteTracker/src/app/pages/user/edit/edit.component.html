@@ -1,1 +1,123 @@
-<p>edit works!</p>
+<div *ngIf="componentExists && user">
+  <h1>Editing {{ userName }}</h1>
+</div>
+<div *ngIf="!componentExists">
+  <h1>Creating new User</h1>
+</div>
+
+<!-- Edit form for user model -->
+
+<form #userEditForm="ngForm" name="form" (ngSubmit)="onSubmit()" novalidate>
+  <div class="row">
+    <div class="col-5">
+      <!-- name -->
+      <div class="form-group">
+        <label for="username">User name</label>
+        <input
+          type="text"
+          name="username"
+          class="form-control"
+          [(ngModel)]="user!.name"
+          #name="ngModel"
+          minlength="3"
+          required
+          [ngClass]="{
+            'is-invalid': name.invalid && name.touched
+          }"
+        />
+        <div *ngIf="name.invalid && name.touched" class="invalid-feedback">
+          <div *ngIf="name.errors!['required']">Username is required</div>
+          <div *ngIf="name.errors!['minlength']">Username must be at least 3 chars long.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-7">
+      <!-- email -->
+      <div class="form-group">
+        <label for="username">User name</label>
+        <input
+          type="text"
+          name="email"
+          class="form-control"
+          [(ngModel)]="user!.email"
+          #email="ngModel"
+          email
+          required
+          [ngClass]="{
+            'is-invalid': email.invalid && email.touched
+          }"
+        />
+        <div *ngIf="email.invalid && email.touched" class="invalid-feedback">
+          <div *ngIf="email.errors!['required']">Email address is required</div>
+          <div *ngIf="email.errors!['email']">Please enter a valid email address.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- location -->
+    <!-- <div class="col-6">
+      
+      <div class="form-group">
+        <label for="longitude">Longitude</label>
+        <input
+          type="number"
+          name="longitude"
+          class="form-control"
+          [(ngModel)]="user!.location.longitude"
+          #longitude="ngModel"
+          min="-180"
+          max="180"
+          required
+          [ngClass]="{
+            'is-invalid': longitude.invalid && longitude.touched
+          }"
+        />
+        <div *ngIf="longitude.invalid && longitude.touched" class="invalid-feedback">
+          <div *ngIf="longitude.errors!['required']">Longitude is required</div>
+          <div *ngIf="longitude.errors!['type']">Please enter a number.</div>
+          <div *ngIf="longitude.errors!['min'] || longitude.errors!['max']">
+            Longitude must be between -180 and 180.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-6">
+      
+      <div class="form-group">
+        <label for="latitude">Latitude</label>
+        <input
+          type="number"
+          name="latitude"
+          class="form-control"
+          [(ngModel)]="user!.location.latitude"
+          #longitude="ngModel"
+          min="-90"
+          max="90"
+          required
+          [ngClass]="{
+            'is-invalid': latitude.invalid && latitude.touched
+          }"
+        />
+        <div *ngIf="latitude.invalid && latitude.touched" class="invalid-feedback">
+          <div *ngIf="latitude.errors!['required']">Latitude is required</div>
+          <div *ngIf="latitude.errors!['type']">Please enter a number.</div>
+          <div *ngIf="latitude.errors!['min'] || latitude.errors!['max']">Latitude must be between -90 and 90.</div>
+        </div>
+      </div>
+    </div> -->
+  </div>
+
+  <!-- Submit en Cancel buttons -->
+  <div class="row py-3">
+    <div class="col">
+      <button type="submit" class="btn btn-primary mx-2" [disabled]="!userEditForm.valid">Submit</button>
+      <button class="btn btn-warning mx-2" routerLink="..">Cancel</button>
+    </div>
+  </div>
+</form>
+
+<!-- <pre
+  >{{ user | json }}
+</pre> -->
