@@ -23,9 +23,8 @@ const USERSTORY_DATA: UserStory[] = [
   { no: 2, story: 'I want to customise the colour of a satellite part that I add to my satellite.', clarification: '' },
   {
     no: 3,
-    story:
-      'I can create the orbit that I want the satellite to follow. A satellite cannot be launched if it does not have an orbit.',
-    clarification: '',
+    story: 'I can create the orbit that I want the satellite to follow.',
+    clarification: 'A satellite cannot be launched if it does not have an orbit.',
   },
   {
     no: 4,
@@ -35,16 +34,15 @@ const USERSTORY_DATA: UserStory[] = [
   },
   {
     no: 5,
-    story:
-      'I want to be able to edit and delete satellites, orbits and launches that I’ve created. The entities can no longer be edited when a satellite is launched, but they can be deleted. ',
-    clarification: '',
+    story: 'I want to be able to edit and delete satellites, orbits and launches that I’ve created.',
+    clarification: 'The entities can no longer be edited when a satellite is launched, but they can be deleted.',
   },
   { no: 6, story: 'As a user I want to be able to follow satellites made by other people.', clarification: '' },
   { no: 7, story: 'I want to know when the satellites I follow are being launched. ', clarification: '' },
   {
     no: 8,
     story: 'Of the satellites that I`m following, I want to see if they are visible at my location at a given time.',
-    clarification: '',
+    clarification: 'The user can choose the date and time.',
   },
   {
     no: 9,

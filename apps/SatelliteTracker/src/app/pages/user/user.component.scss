@@ -13,7 +13,7 @@ table {
 }
 
 .mat-cell.icon {
-  text-align: center;
+  text-align: end;
 }
 
 .container {
@@ -22,4 +22,8 @@ table {
 
 .smalltext {
   font-size: 9px;
+}
+
+table button {
+  margin-inline: 5px;
 }

@@ -53,20 +53,13 @@
         </td>
       </ng-container>
 
-      <!-- Edit Column -->
-      <ng-container matColumnDef="edit">
+      <!-- Button Column -->
+      <ng-container matColumnDef="buttons">
         <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell class="edit icon" layout-align="center center" *matCellDef="let user">
+        <td mat-cell class="icon" layout-align="center center" *matCellDef="let user">
           <button mat-flat-button color="accent" [routerLink]="user.username + '/edit'">
             <mat-icon>edit</mat-icon>
           </button>
-        </td>
-      </ng-container>
-
-      <!-- Delete Column -->
-      <ng-container matColumnDef="delete">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell class="delete icon" layout-align="center center" *matCellDef="let user">
           <button mat-flat-button color="warn" (click)="removeUser(user.id)">
             <mat-icon>delete</mat-icon>
           </button>
