@@ -1,1 +1,96 @@
-<p>detail works!</p>
+<div class="component-container">
+  <div class="header">
+    <h1>Profile of {{ user?.username }}</h1>
+    <div class="buttons">
+      <button mat-flat-button color="primary" routerLink="edit"><mat-icon>edit</mat-icon> Edit</button>
+      <button mat-flat-button color="warn" (click)="removeUser(user!.id!)"><mat-icon>delete</mat-icon> Remove</button>
+    </div>
+  </div>
+  <div class="text-muted">
+    <p>
+      Member since:
+      {{ user!.createdAt!.getDate() + '-' + (user!.createdAt!.getMonth() + 1) + '-' + user!.createdAt!.getFullYear() }}
+    </p>
+    <p>
+      Profile last changed on:
+      {{ user!.updatedAt!.getDate() + '-' + (user!.updatedAt!.getMonth() + 1) + '-' + user!.updatedAt!.getFullYear() }}
+    </p>
+  </div>
+  <br />
+
+  <p>Email address: {{ user!.email }}</p>
+  <p>Location: [ {{ user!.location!.latitude.toFixed(5) }}, {{ user!.location!.longitude.toFixed(5) }} ]</p>
+
+  <br />
+
+  <p>Satellites:</p>
+  <div class="table-wrapper">
+    <table mat-table [dataSource]="satellites" class="mat-elevation-z8 demo-table">
+      <!-- Position Column -->
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef>Id</th>
+        <td mat-cell *matCellDef="let satellite" [routerLink]="satellite.id">{{ satellite.id }}</td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let satellite" [routerLink]="satellite.id">{{ satellite.satellitename }}</td>
+      </ng-container>
+
+      <!-- CreatedAt Column -->
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef>Created at</th>
+        <td mat-cell *matCellDef="let satellite" [routerLink]="satellite.id">
+          {{
+            satellite.createdAt.getDate() +
+              '-' +
+              (satellite.createdAt.getMonth() + 1) +
+              '-' +
+              satellite.createdAt.getFullYear()
+          }}
+        </td>
+      </ng-container>
+
+      <!-- UpdatedAt Column -->
+      <ng-container matColumnDef="updatedAt">
+        <th mat-header-cell *matHeaderCellDef>Last updated</th>
+        <td mat-cell *matCellDef="let satellite" [routerLink]="satellite.id">
+          {{
+            satellite.updatedAt.getDate() +
+              '-' +
+              (satellite.updatedAt.getMonth() + 1) +
+              '-' +
+              satellite.updatedAt.getFullYear()
+          }}
+        </td>
+      </ng-container>
+
+      <!-- Edit Column -->
+      <ng-container matColumnDef="edit">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td
+          mat-cell
+          class="edit icon"
+          layout-align="center center"
+          *matCellDef="let satellite"
+          [routerLink]="satellite.id + '/edit'"
+        >
+          <mat-icon>edit</mat-icon>
+        </td>
+      </ng-container>
+
+      <!-- Delete Column -->
+      <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell class="delete icon" layout-align="center center" *matCellDef="let satellite" canDeactivate>
+          <!-- (click)="removeSatellite(satellite.id)" -->
+          <mat-icon>delete</mat-icon>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="satelliteColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: satelliteColumns"></tr>
+    </table>
+  </div>
+</div>

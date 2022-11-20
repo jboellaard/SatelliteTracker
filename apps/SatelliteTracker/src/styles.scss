@@ -71,3 +71,15 @@ body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
+
+table {
+  margin-bottom: 20px;
+}
+
+.component-container {
+  padding: 20px;
+}
+
+button:hover {
+  opacity: 0.9;
+}

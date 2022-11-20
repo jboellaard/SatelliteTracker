@@ -9,7 +9,7 @@ import { UserService } from './user.service';
 })
 export class UserComponent implements OnInit {
   users: User[] = [];
-  displayedColumns: string[] = ['id', 'name', 'location', 'edit', 'delete'];
+  displayedColumns: string[] = ['id', 'name', 'latitude', 'longitude', 'createdAt', 'updatedAt', 'edit', 'delete'];
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {

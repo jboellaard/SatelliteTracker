@@ -9,28 +9,30 @@ import { UserService } from '../user.service';
   styleUrls: ['./edit.component.scss'],
 })
 export class UserEditComponent implements OnInit {
-  componentId: string | null | undefined;
+  username: string | null | undefined;
   componentExists: boolean = false;
   user: User | undefined;
-  userName: string | undefined; // lokale kopie van username, voor page titel.
+  passwordCheck: string | undefined;
 
   constructor(private route: ActivatedRoute, private router: Router, private userService: UserService) {}
 
   ngOnInit(): void {
     this.route.paramMap.subscribe((params) => {
-      7;
-      this.componentId = params.get('id');
-      if (this.componentId) {
+      this.username = params.get('username');
+      if (this.username) {
         console.log('existing user');
         this.componentExists = true;
-        this.user = {
-          ...this.userService.getUserById(parseInt(this.componentId)),
-        };
-        this.userName = this.user!.name;
+        var userByUsername = this.userService.getUserByUsername(this.username);
+        if (userByUsername) {
+          this.user = { ...userByUsername };
+        } else {
+          this.componentExists = false;
+          this.user = new User(undefined, '', '', '', '', new Date(), undefined);
+        }
       } else {
         console.log('new user');
         this.componentExists = false;
-        this.user = new User(undefined, '', '', new Date(), undefined);
+        this.user = new User(undefined, '', '', '', '', new Date(), undefined);
       }
     });
   }
@@ -42,9 +44,13 @@ export class UserEditComponent implements OnInit {
       this.userService.updateUser(this.user!);
       this.router.navigate(['..']);
     } else {
-      this.user!.createdAt = new Date();
-      this.userService.addUser(this.user!);
-      this.router.navigate(['..']);
+      if (this.userService.hasUniqueUsername(this.user!.username)) {
+        this.user!.createdAt = new Date();
+        this.userService.addUser(this.user!);
+        this.router.navigate(['..']);
+      } else {
+        alert('Username already exists');
+      }
     }
   }
 }

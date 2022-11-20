@@ -12,18 +12,14 @@ table {
   border-color: currentColor;
 }
 
-.edit:hover {
-  background-color: #3f51b5;
-}
-
-.delete:hover {
-  background-color: #f44336;
-}
-
 .mat-cell.icon {
   text-align: center;
 }
 
 .container {
   padding: 20px;
+}
+
+.smalltext {
+  font-size: 9px;
 }

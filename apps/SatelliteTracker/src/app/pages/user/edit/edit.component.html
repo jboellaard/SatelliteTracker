@@ -1,6 +1,6 @@
 <div class="edit-container">
   <div *ngIf="componentExists && user">
-    <h1>Editing {{ userName }}</h1>
+    <h1>Editing user {{ user.username }}</h1>
   </div>
   <div *ngIf="!componentExists">
     <h1>Creating new User</h1>
@@ -9,31 +9,54 @@
   <!-- Edit form for user model -->
 
   <form #userEditForm="ngForm" name="form" (ngSubmit)="onSubmit()" novalidate>
-    <!-- name -->
-    <mat-form-field class="form-group">
-      <mat-label for="username">User name</mat-label>
-      <input
-        matInput
-        type="text"
-        name="username"
-        class="form-control"
-        [(ngModel)]="user!.name"
-        #name="ngModel"
-        minlength="3"
-        required
-        [ngClass]="{
-          'is-invalid': name.invalid && name.touched
-        }"
-      />
-      <mat-error *ngIf="name.invalid && name.touched" class="invalid-feedback">
-        <mat-error *ngIf="name.errors!['required']">Username is required</mat-error>
-        <mat-error *ngIf="name.errors!['minlength']">Username must be at least 3 chars long.</mat-error>
-      </mat-error>
-    </mat-form-field>
+    <div class="cols-2">
+      <!-- name -->
+      <mat-form-field class="form-group" appearance="fill">
+        <mat-label for="username">User name</mat-label>
+        <input
+          matInput
+          type="text"
+          name="username"
+          class="form-control"
+          [(ngModel)]="user!.username"
+          #name="ngModel"
+          minlength="3"
+          required
+          [ngClass]="{
+            'is-invalid': name.invalid && name.touched
+          }"
+        />
+        <mat-error *ngIf="name.invalid && name.touched" class="invalid-feedback">
+          <mat-error *ngIf="name.errors!['required']">Username is required</mat-error>
+          <mat-error *ngIf="name.errors!['minlength']">Username must be at least 3 chars long.</mat-error>
+        </mat-error>
+      </mat-form-field>
+
+      <!-- password -->
+      <mat-form-field class="form-group password" appearance="fill">
+        <mat-label for="password">Password</mat-label>
+        <input
+          matInput
+          type="password"
+          name="password"
+          class="form-control"
+          [(ngModel)]="user!.password"
+          #password="ngModel"
+          password
+          required
+          [ngClass]="{
+            'is-invalid': password.invalid && password.touched
+          }"
+        />
+        <mat-error *ngIf="password.invalid && password.touched" class="invalid-feedback">
+          <mat-error *ngIf="password.errors!['required']">Password is required</mat-error>
+        </mat-error>
+      </mat-form-field>
+    </div>
 
     <!-- email -->
-    <mat-form-field class="form-group">
-      <mat-label for="username">Email</mat-label>
+    <mat-form-field class="form-group" appearance="fill">
+      <mat-label for="email">Email</mat-label>
       <input
         matInput
         type="text"
@@ -54,78 +77,83 @@
     </mat-form-field>
 
     <!-- location -->
-    <!-- <div class="col-6">
-      
-      <div class="form-group">
-        <label for="longitude">Longitude</label>
-        <input
-          type="number"
-          name="longitude"
-          class="form-control"
-          [(ngModel)]="user!.location.longitude"
-          #longitude="ngModel"
-          min="-180"
-          max="180"
-          required
-          [ngClass]="{
-            'is-invalid': longitude.invalid && longitude.touched
-          }"
-        />
-        <div *ngIf="longitude.invalid && longitude.touched" class="invalid-feedback">
-          <div *ngIf="longitude.errors!['required']">Longitude is required</div>
-          <div *ngIf="longitude.errors!['type']">Please enter a number.</div>
-          <div *ngIf="longitude.errors!['min'] || longitude.errors!['max']">
-            Longitude must be between -180 and 180.
-          </div>
-        </div>
+    <div>
+      <label>Location</label>
+      <div class="cols-2">
+        <mat-form-field class="form-group" appearance="fill">
+          <mat-label for="latitude">Latitude</mat-label>
+          <input
+            matInput
+            type="number"
+            name="latitude"
+            class="form-control"
+            [(ngModel)]="user!.location.latitude"
+            #latitude="ngModel"
+            min="-90"
+            max="90"
+            required
+            [ngClass]="{
+              'is-invalid': latitude.invalid && latitude.touched
+            }"
+          />
+          <mat-error *ngIf="latitude.invalid && latitude.touched" class="invalid-feedback">
+            <div *ngIf="latitude.errors!['required']">Latitude is required</div>
+            <div *ngIf="latitude.errors!['type']">Please enter a number.</div>
+            <div *ngIf="latitude.errors!['min'] || latitude.errors!['max']">Latitude must be between -90 and 90.</div>
+          </mat-error>
+        </mat-form-field>
+        <mat-form-field class="form-group" appearance="fill">
+          <mat-label for="longitude">Longitude</mat-label>
+          <input
+            matInput
+            type="number"
+            name="longitude"
+            class="form-control"
+            [(ngModel)]="user!.location.longitude"
+            #longitude="ngModel"
+            min="-180"
+            max="180"
+            required
+            [ngClass]="{
+              'is-invalid': longitude.invalid && longitude.touched
+            }"
+          />
+          <mat-error *ngIf="longitude.invalid && longitude.touched" class="invalid-feedback">
+            <div *ngIf="longitude.errors!['required']">Longitude is required</div>
+            <div *ngIf="longitude.errors!['type']">Please enter a number.</div>
+            <div *ngIf="longitude.errors!['min'] || longitude.errors!['max']">
+              Longitude must be between -180 and 180.
+            </div>
+          </mat-error>
+        </mat-form-field>
       </div>
     </div>
 
-    <div class="col-6">
-      
-      <div class="form-group">
-        <label for="latitude">Latitude</label>
-        <input
-          type="number"
-          name="latitude"
-          class="form-control"
-          [(ngModel)]="user!.location.latitude"
-          #longitude="ngModel"
-          min="-90"
-          max="90"
-          required
-          [ngClass]="{
-            'is-invalid': latitude.invalid && latitude.touched
-          }"
-        />
-        <div *ngIf="latitude.invalid && latitude.touched" class="invalid-feedback">
-          <div *ngIf="latitude.errors!['required']">Latitude is required</div>
-          <div *ngIf="latitude.errors!['type']">Please enter a number.</div>
-          <div *ngIf="latitude.errors!['min'] || latitude.errors!['max']">Latitude must be between -90 and 90.</div>
-        </div>
-      </div>
-    </div> -->
+    <!-- email -->
+    <mat-form-field class="form-group" appearance="fill">
+      <mat-label for="profiledescription">Profile description</mat-label>
+      <textarea
+        matInput
+        name="profiledescription"
+        class="form-control"
+        [(ngModel)]="user!.profiledescription"
+        #profiledescription="ngModel"
+      ></textarea>
+    </mat-form-field>
 
     <!-- Submit en Cancel buttons -->
-    <div class="row py-3">
-      <div class="col">
-        <button
-          mat-flat-button
-          color="primary"
-          type="submit"
-          class="btn btn-primary mx-2"
-          [disabled]="!userEditForm.valid"
-        >
+    <div class="buttons">
+      <div class="">
+        <button mat-flat-button color="primary" type="submit" class="btn btn-primary" [disabled]="!userEditForm.valid">
           Submit
         </button>
-        <button mat-flat-button class="btn btn-warning mx-2" routerLink="..">Cancel</button>
+        <button mat-flat-button class="btn btn-warning" routerLink="..">Cancel</button>
         <!-- .. = parent route, .... parent of parent -->
       </div>
     </div>
   </form>
 
-  <pre
+  <!-- <pre
     >{{ user | json }}
-</pre
-  >
+</pre> -->
 </div>

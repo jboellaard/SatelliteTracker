@@ -23,12 +23,12 @@ const routes: Routes = [
     component: UserEditComponent,
   },
   {
-    path: 'users/:id',
+    path: 'users/:username',
     pathMatch: 'full',
     component: UserDetailComponent,
   },
   {
-    path: 'users/:id/edit',
+    path: 'users/:username/edit',
     pathMatch: 'full',
     component: UserEditComponent,
   },

@@ -1,0 +1,25 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.header .buttons {
+  justify-self: end;
+}
+
+.buttons button {
+  margin-left: 10px;
+}
+
+.text-muted {
+  color: #a2adb6;
+}
+
+table {
+  width: 100%;
+}
+
+// .component-container {
+//   max-width: 800px;
+//   margin: auto;
+// }

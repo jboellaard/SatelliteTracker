@@ -13,3 +13,16 @@ form {
 mat-form-field {
   width: 100%;
 }
+
+.cols-2 {
+  display: flex;
+  justify-content: space-between;
+}
+
+.cols-2 mat-form-field {
+  width: 49%;
+}
+
+.buttons button {
+  margin-inline: 5px;
+}
