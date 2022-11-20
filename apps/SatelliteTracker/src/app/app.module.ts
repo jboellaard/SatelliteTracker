@@ -11,7 +11,6 @@ import { SatelliteListComponent } from './pages/satellite/list/list.component';
 import { FooterComponent } from './shared/footer/footer.component';
 import { UserComponent } from './pages/user/user.component';
 import { UserDetailComponent } from './pages/user/detail/detail.component';
-import { UserListComponent } from './pages/user/list/list.component';
 import { UserEditComponent } from './pages/user/edit/edit.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavbarComponent } from './shared/navbar/navbar.component';
@@ -39,7 +38,6 @@ import { MatListModule } from '@angular/material/list';
     FooterComponent,
     UserComponent,
     UserDetailComponent,
-    UserListComponent,
     UserEditComponent,
     NavbarComponent,
     AboutComponent,

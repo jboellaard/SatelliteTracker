@@ -3,7 +3,6 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { UserComponent } from './pages/user/user.component';
 import { UserDetailComponent } from './pages/user/detail/detail.component';
-import { UserListComponent } from './pages/user/list/list.component';
 import { UserEditComponent } from './pages/user/edit/edit.component';
 
 import { AboutComponent } from './pages/about/about.component';
@@ -12,11 +11,6 @@ const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: 'users' },
   { path: 'about', pathMatch: 'full', component: AboutComponent },
   { path: 'users', pathMatch: 'full', component: UserComponent },
-  {
-    path: 'user-list',
-    pathMatch: 'full',
-    component: UserListComponent,
-  },
   {
     path: 'users/new',
     pathMatch: 'full',

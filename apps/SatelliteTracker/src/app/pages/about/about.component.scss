@@ -3,10 +3,51 @@ th.mat-header-cell {
 }
 
 mat-card {
-  max-height: 200px;
   max-width: 200px;
 }
 
 #profile-pic {
-  max-height: 100px;
+  max-width: 100%;
+  margin: 0 0;
+  border-radius: 5px;
+}
+
+.cols-2 {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info {
+  margin-right: 20px;
+}
+
+a {
+  color: #4f65e6;
+}
+
+#erd-image {
+  max-width: 800px;
+}
+
+.entities-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  flex-basis: 100%;
+  flex: 1;
+}
+
+h3 {
+  border-bottom: 1px solid #ccc;
 }

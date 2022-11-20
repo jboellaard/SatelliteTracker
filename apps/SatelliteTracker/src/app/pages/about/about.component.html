@@ -1,36 +1,39 @@
 <div class="component-container">
-  <div class="row">
-    <h3 id="aboutTitle">About this application</h3>
-    <p>This application was made for the course 'Clientside web frameworks' at Avans Hogeschool Breda.</p>
-    <h1>Satellite Tracker</h1>
-    <p>
-      Hier beschrijft je wat je project inhoudt. Beschrijf ook de entiteiten/domeinobjecten die je gebruikt, en benoem
-      per entiteit de attributen met hun datatype.
-    </p>
+  <div class="cols-2">
+    <div class="info">
+      <p class="text-muted">
+        This application was made for the course 'Clientside web frameworks' at Avans Hogeschool Breda.
+      </p>
+      <h1>Satellite Tracker</h1>
+      <p>
+        This application will allow users to create and launch satellites into an orbit. They can also track satellites
+        (their own but also satellites created by other users) and see if they are visible at their location at a given
+        time. Users can also follow other users and see when these users create or launch satellites.
+      </p>
+    </div>
+    <mat-card>
+      <img
+        id="profile-pic"
+        src="assets/images/cloudy.webp"
+        class=""
+        alt="Satellite in orbit with earth in the background"
+      />
+      <p class="text-muted">Image credit: <a href="https://www.worldatlas.com/">worldatlas.com</a></p>
+      <h2>Joy Boellaard</h2>
+      Student no. 2182556
+    </mat-card>
   </div>
-  <mat-card>
-    <mat-card-header>
-      <img id="profile-pic" src="assets/images/person.png" class="" alt="..." />
-      <!-- <mat-card-title>Card 1</mat-card-title>
-          <mat-card-subtitle>Subtitle</mat-card-subtitle> -->
-    </mat-card-header>
-    <mat-card-content>
-      <p class="card-title">Joy Boellaard</p>
-      <p class="card-text">Studentnummer: 2182556</p>
-    </mat-card-content>
-  </mat-card>
 
-  <h3>Entiteiten</h3>
+  <h2>Entities</h2>
   <p>
-    Hier geef je een toelichting op je entiteiten. Voeg ook een afbeelding van je model toe zoals dat bij NoSql gevraagd
-    wordt.
+    The entities used in this application are shown here. The type relates to the type as seen in the application, so it
+    differs a bit from how the entities will be stored. E.g. location is a seperate model in the application, but in the
+    database it will be saved as GeoJSON.
   </p>
 
-  <img src="assets/images/erd.png" class="px-5 py-5" alt="..." style="max-width: 100%" />
-
   <div class="entities-wrapper">
-    <div class="entities">
-      <p>satellite</p>
+    <div class="col">
+      <h3>satellite</h3>
       <ul>
         <li>id: string</li>
         <li>name: string</li>
@@ -46,8 +49,8 @@
         <li>updatedAt: date</li>
       </ul>
     </div>
-    <div class="entities">
-      <p>satellitePart</p>
+    <div class="col">
+      <h3>satellitePart</h3>
       <ul>
         <li>id: string</li>
         <li>name: string</li>
@@ -59,8 +62,8 @@
         <li>updatedAt: date</li>
       </ul>
     </div>
-    <div class="entities">
-      <p>orbit</p>
+    <div class="col">
+      <h3>orbit</h3>
       <ul>
         <li>id: string</li>
         <li>type: string</li>
@@ -72,11 +75,8 @@
         <li>updatedAt: date</li>
       </ul>
     </div>
-  </div>
-
-  <div class="entities-wrapper">
-    <div class="entities" cols="3">
-      <p>launch</p>
+    <div class="col">
+      <h3>launch</h3>
       <ul>
         <li>id: string</li>
         <li>launchDate: date</li>
@@ -86,8 +86,8 @@
         <li>updatedAt: date</li>
       </ul>
     </div>
-    <div class="entities">
-      <p>user</p>
+    <div class="col">
+      <h3>user</h3>
       <ul>
         <li>id: string</li>
         <li>userName: string</li>
@@ -98,8 +98,8 @@
         <li>updatedAt: date</li>
       </ul>
     </div>
-    <div class="entities">
-      <p>location</p>
+    <div class="col">
+      <h3>location</h3>
       <ul>
         <li>type: string</li>
         <li>coordinates: number[]</li>
@@ -107,7 +107,13 @@
     </div>
   </div>
 
-  <h3>User stories</h3>
+  <img
+    id="erd-image"
+    src="assets/images/erd.png"
+    alt="Entity relationship diagram of the entities of this application"
+  />
+
+  <h2>User stories</h2>
   <table mat-table [dataSource]="dataSourceUserStories" class="mat-elevation-z8">
     <!-- Position Column -->
     <ng-container matColumnDef="No.">
