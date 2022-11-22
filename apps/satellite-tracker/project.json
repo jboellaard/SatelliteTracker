@@ -1,0 +1,98 @@
+{
+  "name": "satellite-tracker",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "generators": {
+    "@schematics/angular:component": {
+      "style": "scss"
+    }
+  },
+  "sourceRoot": "apps/satellite-tracker/src",
+  "prefix": "app",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:browser",
+      "options": {
+        "outputPath": "dist/apps/satellite-tracker",
+        "index": "apps/satellite-tracker/src/index.html",
+        "main": "apps/satellite-tracker/src/main.ts",
+        "polyfills": "apps/satellite-tracker/src/polyfills.ts",
+        "tsConfig": "apps/satellite-tracker/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": [
+          "apps/satellite-tracker/src/favicon.ico",
+          "apps/satellite-tracker/src/assets",
+          "apps/satellite-tracker/src/_redirects"
+        ],
+        "styles": ["apps/satellite-tracker/src/styles.scss"],
+        "scripts": ["node_modules/chart.js/dist/chart.js"]
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "fileReplacements": [
+            {
+              "replace": "apps/satellite-tracker/src/environments/environment.ts",
+              "with": "apps/satellite-tracker/src/environments/environment.prod.ts"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "browserTarget": "satellite-tracker:build:production"
+        },
+        "development": {
+          "browserTarget": "satellite-tracker:build:development"
+        }
+      },
+      "defaultConfiguration": "development",
+      "options": {
+        "proxyConfig": "apps/satellite-tracker/proxy.conf.json"
+      }
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "satellite-tracker:build"
+      }
+    },
+    "test": {
+      "executor": "@angular-devkit/build-angular:karma",
+      "options": {
+        "main": "apps/satellite-tracker/src/test.ts",
+        "polyfills": "apps/satellite-tracker/src/polyfills.ts",
+        "tsConfig": "apps/satellite-tracker/tsconfig.spec.json",
+        "karmaConfig": "apps/satellite-tracker/karma.conf.js",
+        "inlineStyleLanguage": "scss",
+        "assets": ["apps/satellite-tracker/src/favicon.ico", "apps/satellite-tracker/src/assets"],
+        "styles": ["apps/satellite-tracker/src/styles.scss"],
+        "scripts": []
+      }
+    }
+  }
+}

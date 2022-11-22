@@ -1,6 +1,8 @@
 {
   "version": 2,
   "projects": {
-    "SatelliteTracker": "apps/SatelliteTracker"
+    "data": "libs/data",
+    "data-api": "apps/data-api",
+    "satellite-tracker": "apps/satellite-tracker"
   }
 }
