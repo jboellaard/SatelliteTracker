@@ -20,15 +20,17 @@
   </div>
   <br />
 
-  <p>Mass: {{ satellite.mass }} kg</p>
-  <p>Radius of base: {{ satellite.radiusOfBase }} m</p>
-  <p>Radius of parts: {{ satellite.radiusOfParts }} m</p>
+  <p>
+    This satellite has a mass of {{ satellite.mass }} kg, a base radius of {{ satellite.radiusOfBase }} meters and the
+    parts have a radius of {{ satellite.radiusOfParts }} meters.
+  </p>
+
   <div>
-    Color:
-    <div style="min-width: 20px; min-height: 20px" [ngStyle]="{ 'background-color': satellite.colorOfBase }"></div>
+    <p>Color of the base:</p>
+    <span class="circle" [ngStyle]="{ 'background-color': satellite.colorOfBase }"></span>
   </div>
   <br />
-  <p>Has orbit: {{ satellite.orbit ? 'Yes' : 'No' }}</p>
+  <p>{{ satellite.orbit ? 'This satellite has an orbit' : 'This satellite does not have an orbit yet.' }}</p>
 
   <br />
 </div>
