@@ -1,4 +1,36 @@
-<div class="satellite-detail">
-  <p>detail works!</p>
-  <p>ComponentId = {{ componentId }}</p>
+<div class="component-container" *ngIf="satellite; else loadingMessage">
+  <div class="header">
+    <h1>{{ satellite.name }} created by {{ username }}</h1>
+    <div class="buttons">
+      <button mat-flat-button color="accent" routerLink="edit"><mat-icon>edit</mat-icon> Edit</button>
+      <button mat-flat-button color="warn" (click)="removeSatellite(satellite!.id!)">
+        <mat-icon>delete</mat-icon> Remove
+      </button>
+    </div>
+  </div>
+  <div class="text-muted">
+    <p>
+      Created on:
+      {{ satellite.createdAt | date: 'dd/MM/yyyy' }}
+    </p>
+    <p>
+      Last updated:
+      {{ satellite.lastUpdated | date: 'dd/MM/yyyy' }}
+    </p>
+  </div>
+  <br />
+
+  <p>Mass: {{ satellite.mass }} kg</p>
+  <p>Radius of base: {{ satellite.radiusOfBase }} m</p>
+  <p>Radius of parts: {{ satellite.radiusOfParts }} m</p>
+  <div>
+    Color:
+    <div style="min-width: 20px; min-height: 20px" [ngStyle]="{ 'background-color': satellite.colorOfBase }"></div>
+  </div>
+  <br />
+  <p>Has orbit: {{ satellite.orbit ? 'Yes' : 'No' }}</p>
+
+  <br />
 </div>
+
+<ng-template #loadingMessage> Loading Data Service ... </ng-template>

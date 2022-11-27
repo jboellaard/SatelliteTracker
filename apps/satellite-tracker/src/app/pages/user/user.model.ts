@@ -16,7 +16,7 @@ export class User implements UserInfo, IEntity {
   username!: string;
   profileDescription!: string;
   emailAddress!: string;
-  password!: string;
+  password?: string | undefined;
   location!: LocationCoordinates;
   roles: string[] = ['user'];
   createdAt!: Date;
@@ -25,22 +25,4 @@ export class User implements UserInfo, IEntity {
     // Assign all values to this objects properties
     Object.assign(this, values);
   }
-
-  // constructor(
-  //   id: number = -1,
-  //   username: string = '',
-  //   profiledescription: string = '',
-  //   emailAddress: string = '',
-  //   password: string = '',
-  //   createdAt: Date = new Date(),
-  //   location: LocationCoordinates = { longitude: 0, latitude: 0 }
-  // ) {
-  //   this.id = id;
-  //   this.username = username;
-  //   this.profiledescription = profiledescription;
-  //   this.emailAddress = emailAddress;
-  //   this.password = password;
-  //   this.location = location;
-  //   this.createdAt = createdAt;
-  // }
 }

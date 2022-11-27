@@ -1,19 +1,19 @@
-service: data-api
+# service: data-api
 
-plugins:
-  - serverless-offline
+# plugins:
+#   - serverless-offline
 
-provider:
-  name: aws
-  runtime: nodejs18.x
+# provider:
+#   name: aws
+#   runtime: nodejs14.x
 
-functions:
-  main:
-    handler: dist/main.handler
-    events:
-      - http:
-          method: ANY
-          path: /
-      - http:
-          method: ANY
-          path: '{proxy+}'
+# functions:
+#   main:
+#     handler: dist/main.handler
+#     events:
+#       - http:
+#           method: ANY
+#           path: /
+#       - http:
+#           method: ANY
+#           path: '{proxy+}'

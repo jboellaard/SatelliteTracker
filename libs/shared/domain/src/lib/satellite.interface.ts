@@ -7,6 +7,8 @@ export interface Satellite {
   mass: number;
   radiusOfBase: number;
   radiusOfParts: number;
+  colorOfBase: string;
+  purpose: string;
   orbit?: Orbit;
 
   createdBy: Id;
@@ -17,6 +19,11 @@ export interface Satellite {
 export interface Orbit {
   type: string;
   semiMajorAxis: number;
+  eccentricity: number;
+  inclination: number;
+  period: number;
+  createdAt: Date;
+  lastUpdated: Date;
 }
 
 export interface Launch {

@@ -1,8 +1,146 @@
-<div *ngIf="componentExists">
-  <h1>Editing component {{ componentId }}</h1>
-</div>
-<div *ngIf="!componentExists">
-  <h1>Creating new component</h1>
-</div>
+<div class="edit-container">
+  <div *ngIf="componentExists && satellite">
+    <h1>Editing '{{ satellite.name }}' created by {{ username }}</h1>
+  </div>
+  <div *ngIf="!componentExists">
+    <h1>Creating new satellite for {{ username }}</h1>
+  </div>
 
-<p>ComponentId = {{ componentId }}</p>
+  <!-- Edit form for satelliteimplemented model -->
+
+  <form #satelliteEditForm="ngForm" name="form" (ngSubmit)="onSubmit()" novalidate>
+    <!-- name -->
+    <mat-form-field class="form-group" appearance="fill">
+      <mat-label for="name">Name</mat-label>
+      <input
+        matInput
+        type="text"
+        name="username"
+        class="form-control"
+        [(ngModel)]="satellite!.name"
+        #name="ngModel"
+        minlength="1"
+        required
+        [ngClass]="{
+          'is-invalid': name.invalid && name.touched
+        }"
+      />
+      <mat-error *ngIf="name.invalid && name.touched" class="invalid-feedback">
+        <mat-error *ngIf="name.errors!['required']">Name is required</mat-error>
+        <mat-error *ngIf="name.errors!['minlength']">Username must be at least 1 character long.</mat-error>
+      </mat-error>
+    </mat-form-field>
+
+    <!-- purpose -->
+    <mat-form-field class="form-group" appearance="fill">
+      <mat-label for="purpose">Purpose</mat-label>
+      <input
+        matInput
+        type="text"
+        name="purpose"
+        class="form-control"
+        [(ngModel)]="satellite!.purpose"
+        #purpose="ngModel"
+        required
+        [ngClass]="{
+          'is-invalid': purpose.invalid && purpose.touched
+        }"
+      />
+      <mat-error *ngIf="purpose.invalid && purpose.touched" class="invalid-feedback">
+        <mat-error *ngIf="purpose.errors!['required']">Purpose is required</mat-error>
+      </mat-error>
+    </mat-form-field>
+
+    <div class="cols-3">
+      <!-- mass -->
+      <mat-form-field class="form-group mass" appearance="fill">
+        <mat-label for="mass">Mass</mat-label>
+        <input
+          matInput
+          type="text"
+          name="mass"
+          class="form-control"
+          [(ngModel)]="satellite!.mass"
+          #mass="ngModel"
+          required
+          [ngClass]="{
+            'is-invalid': mass.invalid && mass.touched
+          }"
+        />
+        <mat-error *ngIf="mass.invalid && mass.touched" class="invalid-feedback">
+          <mat-error *ngIf="mass.errors!['required']">Mass is required</mat-error>
+        </mat-error>
+      </mat-form-field>
+
+      <!-- radiusOfBase -->
+      <mat-form-field class="form-group radius" appearance="fill">
+        <mat-label for="radiusB">Radius of base</mat-label>
+        <input
+          matInput
+          type="text"
+          name="radiusB"
+          class="form-control"
+          [(ngModel)]="satellite!.radiusOfBase"
+          #radiusB="ngModel"
+          required
+          [ngClass]="{
+            'is-invalid': radiusB.invalid && radiusB.touched
+          }"
+        />
+        <mat-error *ngIf="radiusB.invalid && radiusB.touched" class="invalid-feedback">
+          <mat-error *ngIf="radiusB.errors!['required']">Radius of base is required</mat-error>
+        </mat-error>
+      </mat-form-field>
+
+      <!-- radiusOfParts -->
+      <mat-form-field class="form-group radius" appearance="fill">
+        <mat-label for="radiusP">Radius of parts</mat-label>
+        <input
+          matInput
+          type="text"
+          name="radiusP"
+          class="form-control"
+          [(ngModel)]="satellite!.radiusOfParts"
+          #radiusP="ngModel"
+          [ngClass]="{
+            'is-invalid': radiusP.invalid && radiusP.touched
+          }"
+        />
+        <mat-error *ngIf="radiusP.invalid && radiusP.touched" class="invalid-feedback"> </mat-error>
+      </mat-form-field>
+    </div>
+
+    <!-- colorOfBase -->
+    <mat-form-field class="form-group color" appearance="fill">
+      <mat-label for="colorB">Color of base</mat-label>
+      <input
+        matInput
+        type="color"
+        name="colorB"
+        class="form-control"
+        [(ngModel)]="satellite!.colorOfBase"
+        #colorB="ngModel"
+        [ngClass]="{
+          'is-invalid': colorB.invalid && colorB.touched
+        }"
+      />
+      <mat-error *ngIf="colorB.invalid && colorB.touched" class="invalid-feedback"> </mat-error>
+    </mat-form-field>
+
+    <!-- Submit en Cancel buttons -->
+    <div class="buttons">
+      <div class="">
+        <button
+          mat-flat-button
+          color="primary"
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="!satelliteEditForm.valid"
+        >
+          Submit
+        </button>
+        <button mat-flat-button class="btn btn-warning" [routerLink]="'/users/' + satellite!.createdBy">Cancel</button>
+      </div>
+    </div>
+  </form>
+</div>

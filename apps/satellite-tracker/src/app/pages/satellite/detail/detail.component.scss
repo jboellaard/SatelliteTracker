@@ -1,0 +1,21 @@
+.header {
+  display: flex;
+  justify-content: space-between;
+}
+
+.header .buttons {
+  justify-self: end;
+}
+
+.buttons button {
+  margin-left: 10px;
+}
+
+table {
+  width: 100%;
+}
+
+// .component-container {
+//   max-width: 800px;
+//   margin: auto;
+// }

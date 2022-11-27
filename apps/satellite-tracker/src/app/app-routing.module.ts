@@ -5,6 +5,10 @@ import { UserListComponent } from './pages/user/list/list.component';
 import { UserDetailComponent } from './pages/user/detail/detail.component';
 import { UserEditComponent } from './pages/user/edit/edit.component';
 
+import { SatelliteListComponent } from './pages/satellite/list/list.component';
+import { SatelliteDetailComponent } from './pages/satellite/detail/detail.component';
+import { SatelliteEditComponent } from './pages/satellite/edit/edit.component';
+
 import { AboutComponent } from './pages/about/about.component';
 
 const routes: Routes = [
@@ -26,6 +30,17 @@ const routes: Routes = [
     pathMatch: 'full',
     component: UserEditComponent,
   },
+  {
+    path: 'users/:userId/satellites/new',
+    pathMatch: 'full',
+    component: SatelliteEditComponent,
+  },
+  {
+    path: 'users/:userId/satellites/:satelliteId/edit',
+    pathMatch: 'full',
+    component: SatelliteEditComponent,
+  },
+  { path: 'users/:userId/satellites/:satelliteId', pathMatch: 'full', component: SatelliteDetailComponent },
   // {
   //   path: 'columns',
   //   component: ColumnsComponent,

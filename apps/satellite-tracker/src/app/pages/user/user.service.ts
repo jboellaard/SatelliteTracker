@@ -1,77 +1,109 @@
 import { Injectable } from '@angular/core';
 // import { GeographicLocation, User } from './user.model';
-import { EntityService } from 'ui/entity';
-import { User, APIResponse, Satellite } from 'shared/domain';
-import { HttpClient } from '@angular/common/http';
-import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+// import { EntityService } from 'ui/entity';
+// import { APIResponse, Satellite } from 'shared/domain';
+// import { HttpClient } from '@angular/common/http';
 // import { environment } from 'apps/satellite-tracker/src/environments/environment';
+import { User } from './user.model';
+import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+
+let users: User[] = [
+  {
+    id: 1,
+    username: 'joy',
+    password: 'Secret12#',
+    profileDescription: '',
+    emailAddress: 'je.boellaard@student.avans.nl',
+    location: { latitude: 51.813297, longitude: 4.690093 },
+    createdAt: new Date(2022, 11, 18),
+    roles: ['user'],
+  },
+  {
+    id: 2,
+    username: 'satellitemaker',
+    password: 'Secret12#',
+    profileDescription: '',
+    emailAddress: 'creator@mail.com',
+    location: { latitude: 44.5, longitude: 11.34 },
+    createdAt: new Date(2022, 11, 18),
+    roles: ['user'],
+  },
+  {
+    id: 3,
+    username: 'firsttracker',
+    password: 'Secret12#',
+    profileDescription: '',
+    emailAddress: 'first@mail.com',
+    location: { latitude: 52.370216, longitude: 4.895168 },
+    createdAt: new Date(2022, 11, 17),
+    roles: ['user'],
+  },
+  {
+    id: 4,
+    username: 'launcher101',
+    password: 'Secret12#',
+    profileDescription: '',
+    emailAddress: 'l@mail.com',
+    location: { latitude: 4.370216, longitude: 4.895168 },
+    createdAt: new Date(),
+    roles: ['user'],
+  },
+  {
+    id: 5,
+    username: 'lovespacefrfr',
+    password: 'Secret12#',
+    profileDescription: '',
+    emailAddress: 'spaced@mail.com',
+    location: { latitude: 52.370216, longitude: 50.895168 },
+    createdAt: new Date(),
+    roles: ['user'],
+  },
+];
 
 @Injectable({
   providedIn: 'root',
 })
-export class UserService extends EntityService<User> {
+export class UserService {
   users: User[] = [];
   private exampleDataSource = new BehaviorSubject<any>(null);
   readonly exampleData$ = this.exampleDataSource.asObservable();
 
-  constructor(http: HttpClient) {
-    // console.log(environment.API_URL);
-    super(http, '/', 'api/users');
-    console.log('UserService created');
-    // console.log(process.env.API_URL);
-  }
-
-  getUserById(id: string): Observable<User | undefined> {
-    console.log('getUserById');
-    // return this.http.get<User>(`${this.url}${this.endpoint}/${id}`);
-    return this.http.get<APIResponse<User>>(`/api/users/${id}`).pipe(
-      map((response: APIResponse<User>) => response.results),
-      tap((user: User) => {
-        return user;
-      })
-    );
-  }
-
-  getAllUsers(): Observable<User[]> {
-    return this.http.get<APIResponse<User[]>>(`/api/users`).pipe(
-      map((response: APIResponse<User[]>) => response.results),
-      tap((users: User[]) => {
-        return users;
-      })
-    );
-  }
-
-  // addUser(user: User) {
-  //   if (!user.id) {
-  //     user.id = this.users[this.users.length - 1].id! + 1;
-  //   }
-  //   this.users.push(user);
+  // constructor(http: HttpClient) {
+  //   super(http, '/', 'api/users');
   // }
 
-  // updateUser(user: User, options?: any) {
-  //   return this.http
-  //     .put<APIResponse<User>>(`/api/users/${user.id}`, user, { ...options, ...httpOptions })
-  //     .pipe(map((response: APIResponse<User>) => response.results));
-  //   // this.users = this.users.map((u) => (u.id === user.id ? user : u));
-  // }
-
-  // removeUser(id: number) {
-  //   this.users = this.users.filter((user) => user.id !== id);
-  // }
-
-  removeUserByUsername(username: string) {
-    this.users = this.users.filter((user) => user.username !== username);
+  create(user: User) {
+    if (!user.id) {
+      user.id = users[users.length - 1].id! + 1;
+    }
+    users.push(user);
   }
 
-  // getUserById(id: number): User | undefined {
-  //   return this.users.find((user) => user.id === id);
-  // }
+  update(user: User) {
+    users = users.map((u) => (u.id === user.id ? user : u));
+  }
+
+  delete(id: number) {
+    users = users.filter((user) => user.id !== id);
+  }
+
+  getAllUsers(): User[] {
+    return users;
+  }
+
+  deleteByUsername(username: string) {
+    users = users.filter((user) => user.username !== username);
+  }
+
+  getById(id: number): User | undefined {
+    return users.find((user) => user.id === id);
+  }
 
   getUserByUsername(username: string): User | undefined {
-    return this.users.find((user) => user.username === username);
+    return users.find((user) => user.username === username);
   }
 
   hasUniqueUsername(username: string): boolean {
-    return this.users.every((user) => user.username.trim().toLowerCase() != username.trim().toLowerCase());
+    return users.every((user) => user.username.trim().toLowerCase() != username.trim().toLowerCase());
   }
 }

@@ -7,7 +7,7 @@ import { AppComponent } from './app.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { SatelliteComponent } from './pages/satellite/satellite.component';
 import { SatelliteDetailComponent } from './pages/satellite/detail/detail.component';
-import { EditComponent } from './pages/satellite/edit/edit.component';
+import { SatelliteEditComponent } from './pages/satellite/edit/edit.component';
 import { SatelliteListComponent } from './pages/satellite/list/list.component';
 import { FooterComponent } from './shared/footer/footer.component';
 import { UserComponent } from './pages/user/user.component';
@@ -27,8 +27,6 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatListModule } from '@angular/material/list';
-import { RandomuserComponent } from './pages/randomuser/randomuser.component';
-import { RandomUserListComponent } from './pages/randomuser/list/list.component';
 import { UserListComponent } from './pages/user/list/list.component';
 
 @NgModule({
@@ -37,7 +35,7 @@ import { UserListComponent } from './pages/user/list/list.component';
     DashboardComponent,
     SatelliteComponent,
     SatelliteDetailComponent,
-    EditComponent,
+    SatelliteEditComponent,
     SatelliteListComponent,
     FooterComponent,
     UserComponent,
@@ -45,8 +43,6 @@ import { UserListComponent } from './pages/user/list/list.component';
     UserEditComponent,
     NavbarComponent,
     AboutComponent,
-    RandomuserComponent,
-    RandomUserListComponent,
     UserListComponent,
   ],
   imports: [

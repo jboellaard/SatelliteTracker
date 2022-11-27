@@ -9,51 +9,36 @@ import { UserService } from '../user.service';
 @Component({
   selector: 'app-user',
   templateUrl: './list.component.html',
-  styleUrls: ['./list.component.scss'],
+  styleUrls: ['./list.component.scss', '../user.component.scss'],
 })
 export class UserListComponent implements OnInit {
   // users: Observable<User[]> | undefined;
   usersArray: User[] = [];
   displayedColumns: string[] = ['id', 'name', 'emailAddress', 'latitude', 'longitude', 'createdAt', 'buttons'];
-  // dataSource = new MatTableDataSource<User>()!;
-  sub!: Subscription;
-
-  // thingsAsMatTableDataSource$ = this.userService
-  //   .getAllUsers()
-  //   .pipe(
-  //     map((things) => {
-  //       const dataSource = this.dataSource;
-  //       dataSource.data = things;
-  //       return dataSource;
-  //     })
-  //   )
-  //   .subscribe((dataSource) => {
-  //     this.dataSource = dataSource;
-  //   });
+  // sub!: Subscription;
 
   constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit(): void {
-    // this.users = this.userService.getAllUsers();
-    this.sub = this.userService.list().subscribe((users) => {
-      if (users) this.usersArray = users;
-    });
+    // this.sub = this.userService.list().subscribe((users) => {
+    //   if (users) this.usersArray = users;
+    // });
+    this.usersArray = this.userService.getAllUsers();
   }
 
-  // addUser(user: User) {
-  //   this.userService.addUser(user);
-  // }
+  addUser(user: User) {
+    this.userService.create(user);
+  }
 
   removeUser(id: number) {
-    this.userService.delete(id).subscribe(() => this.router.navigate(['/users']));
-    //remove data from the table
-    console.log('deleted?');
-    // this.router.navigate(['/users']);
-    // this.userService.removeUser(id);
-    // this.users = this.userService.getAllUsers();
+    // this.userService.delete(id).subscribe(() => this.router.navigate(['/users']));
+
+    this.userService.delete(id);
+    this.usersArray = this.userService.getAllUsers();
+    this.router.navigate(['/users']);
   }
 
-  ngOnDestroy() {
-    this.sub.unsubscribe();
-  }
+  // ngOnDestroy() {
+  // this.sub.unsubscribe();
+  // }
 }
