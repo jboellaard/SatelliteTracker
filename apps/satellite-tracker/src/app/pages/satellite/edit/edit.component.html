@@ -63,12 +63,14 @@
           [(ngModel)]="satellite!.mass"
           #mass="ngModel"
           required
+          min="1"
           [ngClass]="{
             'is-invalid': mass.invalid && mass.touched
           }"
         />
         <mat-error *ngIf="mass.invalid && mass.touched" class="invalid-feedback">
           <mat-error *ngIf="mass.errors!['required']">Mass is required</mat-error>
+          <mat-error *ngIf="mass.errors!['min']">Mass must be at least 1 kg.</mat-error>
         </mat-error>
       </mat-form-field>
 
@@ -83,12 +85,14 @@
           [(ngModel)]="satellite!.radiusOfBase"
           #radiusB="ngModel"
           required
+          min="1"
           [ngClass]="{
             'is-invalid': radiusB.invalid && radiusB.touched
           }"
         />
         <mat-error *ngIf="radiusB.invalid && radiusB.touched" class="invalid-feedback">
           <mat-error *ngIf="radiusB.errors!['required']">Radius of base is required</mat-error>
+          <mat-error *ngIf="radiusB.errors!['min']">Radius of base must be at least 1 m.</mat-error>
         </mat-error>
       </mat-form-field>
 
@@ -102,11 +106,14 @@
           class="form-control"
           [(ngModel)]="satellite!.radiusOfParts"
           #radiusP="ngModel"
+          min="1"
           [ngClass]="{
             'is-invalid': radiusP.invalid && radiusP.touched
           }"
         />
-        <mat-error *ngIf="radiusP.invalid && radiusP.touched" class="invalid-feedback"> </mat-error>
+        <mat-error *ngIf="radiusP.invalid && radiusP.touched" class="invalid-feedback">
+          <mat-error *ngIf="radiusP.errors!['min']">Radius of parts must be at least 1 m.</mat-error>
+        </mat-error>
       </mat-form-field>
     </div>
 

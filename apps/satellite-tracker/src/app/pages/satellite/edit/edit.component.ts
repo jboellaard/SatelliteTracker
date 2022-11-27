@@ -87,10 +87,10 @@ export class SatelliteEditComponent implements OnInit {
     console.log('Submitting the form');
     if (this.componentExists) {
       this.satelliteService.update(this.satellite!);
-      this.router.navigate(['/users/' + this.userId]);
+      this.router.navigate(['/users/' + this.userId + '/satellites/' + this.id]);
     } else {
-      this.satelliteService.create(this.satellite!);
-      this.router.navigate(['/users/' + this.userId]);
+      var satellite = this.satelliteService.create(this.satellite!);
+      this.router.navigate(['/users/' + this.userId + '/satellites/' + satellite.id]);
     }
   }
 }
