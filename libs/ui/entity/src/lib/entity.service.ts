@@ -4,6 +4,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { map, catchError, tap } from 'rxjs/operators';
 import { APIResponse } from 'shared/domain';
 import { validateHeaderValue } from 'http';
+import { EnvironmentInjector } from '@angular/core';
 
 /**
  * See https://angular.io/guide/http#requesting-data-from-a-server

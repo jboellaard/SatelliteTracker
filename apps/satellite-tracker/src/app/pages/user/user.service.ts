@@ -4,6 +4,7 @@ import { EntityService } from 'ui/entity';
 import { User, APIResponse, Satellite } from 'shared/domain';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+import { environment } from 'apps/satellite-tracker/src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,7 @@ export class UserService extends EntityService<User> {
   readonly exampleData$ = this.exampleDataSource.asObservable();
 
   constructor(http: HttpClient) {
-    super(http, '/', 'api/users');
+    super(http, environment.API_URL, 'users');
     console.log('UserService created');
     // console.log(process.env.API_URL);
   }
@@ -22,7 +23,7 @@ export class UserService extends EntityService<User> {
   getUserById(id: string): Observable<User | undefined> {
     console.log('getUserById');
     // return this.http.get<User>(`${this.url}${this.endpoint}/${id}`);
-    return this.http.get<APIResponse<User>>(`/api/users/${id}`).pipe(
+    return this.http.get<APIResponse<User>>(environment.API_URL + `users/${id}`).pipe(
       map((response: APIResponse<User>) => response.results),
       tap((user: User) => {
         return user;
