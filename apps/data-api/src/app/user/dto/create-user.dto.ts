@@ -1,4 +1,4 @@
-import { LocationCoordinates } from 'data';
+import { LocationCoordinates } from 'shared/domain';
 
 export class CreateUserDto {
   username: string;

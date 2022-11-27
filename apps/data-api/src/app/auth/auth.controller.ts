@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, HttpException, HttpStatus } from '@nestjs/common';
-import { UserRegistration, ResourceId } from 'data';
+import { UserRegistration, ResourceId } from 'shared/domain';
 import { AuthService } from './auth.service';
 import { UpdateAuthDto } from './dto/update-auth.dto';
 

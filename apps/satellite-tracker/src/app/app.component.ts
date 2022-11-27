@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { LocationCoordinates } from 'shared/domain';
 
 @Component({
   selector: 'app-root',

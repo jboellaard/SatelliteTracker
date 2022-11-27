@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UpdateAuthDto } from './dto/update-auth.dto';
-import { LocationCoordinates, User } from 'data';
+import { LocationCoordinates, User } from 'shared/domain';
 
 @Injectable()
 export class AuthService {
@@ -71,7 +71,7 @@ export class AuthService {
     roles: string[] = ['user']
   ) {
     const user = {
-      id: this.users[this.users.length - 1].id + 1,
+      id: this.users[this.users.length - 1].id! + 1,
       username,
       emailAddress,
       location,

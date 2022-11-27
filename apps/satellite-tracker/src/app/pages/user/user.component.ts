@@ -1,5 +1,8 @@
+import { CdkTableDataSourceInput } from '@angular/cdk/table';
 import { Component, OnInit } from '@angular/core';
-import { User } from './user.model';
+import { MatTableDataSource } from '@angular/material/table';
+import { map, Observable } from 'rxjs';
+import { User } from 'shared/domain';
 import { UserService } from './user.service';
 
 @Component({
@@ -8,20 +11,20 @@ import { UserService } from './user.service';
   styleUrls: ['./user.component.scss'],
 })
 export class UserComponent implements OnInit {
-  users: User[] = [];
-  displayedColumns: string[] = ['id', 'name', 'latitude', 'longitude', 'createdAt', 'updatedAt', 'buttons'];
+  users: Observable<User[]> | undefined;
   constructor(private userService: UserService) {}
 
   ngOnInit(): void {
-    this.users = this.userService.getAllUsers();
-  }
-  addUser(user: User) {
-    this.userService.addUser(user);
+    // this.users = this.userService.getAllUsers();
   }
 
-  removeUser(id: number) {
-    //remove data from the table
-    this.userService.removeUser(id);
-    this.users = this.userService.getAllUsers();
-  }
+  // addUser(user: User) {
+  //   this.userService.addUser(user);
+  // }
+
+  // removeUser(id: number) {
+  //   //remove data from the table
+  //   this.userService.delete(id);
+  //   this.users = this.userService.getAllUsers();
+  // }
 }

@@ -19,8 +19,9 @@
     "module": "es2020",
     "lib": ["es2020", "dom"],
     "paths": {
-      "auth-ui": ["libs/auth-ui/src/index.ts"],
-      "data": ["libs/data/src/index.ts"]
+      "shared/domain": ["libs/shared/domain/src/index.ts"],
+      "ui/auth": ["libs/ui/auth/src/index.ts"],
+      "ui/entity": ["libs/ui/entity/src/index.ts"]
     },
     "rootDir": "."
   },

@@ -1,6 +1,6 @@
-<div class="component-container">
+<div class="component-container" *ngIf="user; else loadingMessage">
   <div class="header">
-    <h1>Profile of {{ user?.username }}</h1>
+    <h1>Profile of {{ user.username }}</h1>
     <div class="buttons">
       <button mat-flat-button color="accent" routerLink="edit"><mat-icon>edit</mat-icon> Edit</button>
       <button mat-flat-button color="warn" (click)="removeUser(user!.id!)"><mat-icon>delete</mat-icon> Remove</button>
@@ -9,17 +9,13 @@
   <div class="text-muted">
     <p>
       Member since:
-      {{ user!.createdAt!.getDate() + '-' + (user!.createdAt!.getMonth() + 1) + '-' + user!.createdAt!.getFullYear() }}
-    </p>
-    <p>
-      Profile last changed on:
-      {{ user!.updatedAt!.getDate() + '-' + (user!.updatedAt!.getMonth() + 1) + '-' + user!.updatedAt!.getFullYear() }}
+      {{ user.createdAt | date: 'dd/MM/yyyy' }}
     </p>
   </div>
   <br />
 
-  <p>Email address: {{ user!.email }}</p>
-  <p>Location: [ {{ user!.location!.latitude.toFixed(5) }}, {{ user!.location!.longitude.toFixed(5) }} ]</p>
+  <p>Email address: {{ user.emailAddress }}</p>
+  <p>Location: [ {{ user.location.latitude.toFixed(5) }}, {{ user.location.longitude.toFixed(5) }} ]</p>
 
   <br />
 
@@ -35,20 +31,14 @@
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let satellite" [routerLink]="satellite.id">{{ satellite.satellitename }}</td>
+        <td mat-cell *matCellDef="let satellite" [routerLink]="satellite.id">{{ satellite.name }}</td>
       </ng-container>
 
       <!-- CreatedAt Column -->
       <ng-container matColumnDef="createdAt">
         <th mat-header-cell *matHeaderCellDef>Created at</th>
         <td mat-cell *matCellDef="let satellite" [routerLink]="satellite.id">
-          {{
-            satellite.createdAt.getDate() +
-              '-' +
-              (satellite.createdAt.getMonth() + 1) +
-              '-' +
-              satellite.createdAt.getFullYear()
-          }}
+          {{ satellite.createdAt | date: 'dd/MM/yyyy' }}
         </td>
       </ng-container>
 
@@ -56,36 +46,20 @@
       <ng-container matColumnDef="updatedAt">
         <th mat-header-cell *matHeaderCellDef>Last updated</th>
         <td mat-cell *matCellDef="let satellite" [routerLink]="satellite.id">
-          {{
-            satellite.updatedAt.getDate() +
-              '-' +
-              (satellite.updatedAt.getMonth() + 1) +
-              '-' +
-              satellite.updatedAt.getFullYear()
-          }}
+          {{ satellite.lastUpdated | date: 'dd/MM/yyyy' }}
         </td>
       </ng-container>
 
-      <!-- Edit Column -->
-      <ng-container matColumnDef="edit">
+      <!-- Button Column -->
+      <ng-container matColumnDef="buttons">
         <th mat-header-cell *matHeaderCellDef></th>
-        <td
-          mat-cell
-          class="edit icon"
-          layout-align="center center"
-          *matCellDef="let satellite"
-          [routerLink]="satellite.id + '/edit'"
-        >
-          <mat-icon>edit</mat-icon>
-        </td>
-      </ng-container>
-
-      <!-- Delete Column -->
-      <ng-container matColumnDef="delete">
-        <th mat-header-cell *matHeaderCellDef></th>
-        <td mat-cell class="delete icon" layout-align="center center" *matCellDef="let satellite" canDeactivate>
-          <!-- (click)="removeSatellite(satellite.id)" -->
-          <mat-icon>delete</mat-icon>
+        <td mat-cell class="edit icon" layout-align="center center" *matCellDef="let satellite">
+          <button mat-flat-button color="accent" [routerLink]="satellite.id + '/edit'">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-flat-button color="warn" (click)="removeSatellite(satellite.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
         </td>
       </ng-container>
 
@@ -94,3 +68,5 @@
     </table>
   </div>
 </div>
+
+<ng-template #loadingMessage> Loading Data Service ... </ng-template>

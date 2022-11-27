@@ -64,7 +64,7 @@ const USERSTORY_DATA: UserStory[] = [
   styleUrls: ['./about.component.scss'],
 })
 export class AboutComponent implements OnInit {
-  userStoryColumns: string[] = ['No.', 'User story', 'Clarification'];
+  userStoryColumns: string[] = ['No.', 'User story', 'Clarification']; //add which component implements the user story
   dataSourceUserStories = USERSTORY_DATA;
   constructor() {}
 

@@ -1,6 +1,6 @@
 <div class="edit-container">
   <div *ngIf="componentExists && user">
-    <h1>Editing user {{ user.username }}</h1>
+    <h1>Editing user {{ username }}</h1>
   </div>
   <div *ngIf="!componentExists">
     <h1>Creating new User</h1>
@@ -33,7 +33,7 @@
       </mat-form-field>
 
       <!-- password -->
-      <mat-form-field class="form-group password" appearance="fill">
+      <!-- <mat-form-field class="form-group password" appearance="fill">
         <mat-label for="password">Password</mat-label>
         <input
           matInput
@@ -51,7 +51,7 @@
         <mat-error *ngIf="password.invalid && password.touched" class="invalid-feedback">
           <mat-error *ngIf="password.errors!['required']">Password is required</mat-error>
         </mat-error>
-      </mat-form-field>
+      </mat-form-field> -->
     </div>
 
     <!-- email -->
@@ -62,7 +62,7 @@
         type="text"
         name="email"
         class="form-control"
-        [(ngModel)]="user!.email"
+        [(ngModel)]="user!.emailAddress"
         #email="ngModel"
         email
         required
@@ -136,7 +136,7 @@
         matInput
         name="profiledescription"
         class="form-control"
-        [(ngModel)]="user!.profiledescription"
+        [(ngModel)]="user!.profileDescription"
         #profiledescription="ngModel"
       ></textarea>
     </mat-form-field>

@@ -1,5 +1,6 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -28,6 +29,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatListModule } from '@angular/material/list';
 import { RandomuserComponent } from './pages/randomuser/randomuser.component';
 import { RandomUserListComponent } from './pages/randomuser/list/list.component';
+import { UserListComponent } from './pages/user/list/list.component';
 
 @NgModule({
   declarations: [
@@ -45,10 +47,12 @@ import { RandomUserListComponent } from './pages/randomuser/list/list.component'
     AboutComponent,
     RandomuserComponent,
     RandomUserListComponent,
+    UserListComponent,
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
+    HttpClientModule,
     BrowserAnimationsModule,
     FormsModule,
     ReactiveFormsModule,

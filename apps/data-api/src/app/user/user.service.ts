@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { User } from 'data';
+import { Injectable, Logger } from '@nestjs/common';
+import { User } from 'shared/domain';
 import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -59,32 +60,39 @@ export class UserService {
 
   create(newUser: CreateUserDto) {
     const user = {
-      id: this.users[this.users.length - 1].id + 1,
-      username: newUser.username,
-      profileDescription: newUser.profileDescription,
-      emailAddress: newUser.emailAddress,
-      location: newUser.location,
+      id: this.users[this.users.length - 1].id! + 1,
+      ...newUser,
       createdAt: new Date(),
-      roles: newUser.roles,
-      satellites: [],
     };
     this.users.push(user);
-    return user;
+    return { results: user };
   }
 
-  getAll() {
-    return this.users;
+  findAll() {
+    return { results: this.users };
   }
 
-  getUserById(id: number) {
-    return this.users.find((user) => user.id === id);
+  findOne(id: number) {
+    const user = this.users.find((user) => user.id === id);
+    if (!user) return { results: null };
+    return { results: user };
   }
 
-  // update(id: number, updateUserDto: UpdateUserDto) {
-  //   return `This action updates a #${id} user`;
-  // }
+  update(id: number, updateUserDto: UpdateUserDto) {
+    const user = this.users.find((user) => user.id === id);
+    if (user) {
+      const updatedUser = { ...user, ...updateUserDto };
+      this.users = this.users.map((user) => (user.id === id ? updatedUser : user));
+      return { results: updatedUser };
+    }
+    return { results: null };
+  }
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} user`;
-  // }
+  remove(id: number) {
+    Logger.log(`Removing user with id ${id}`);
+    const user = this.users.find((user) => user.id === id);
+    this.users = this.users.filter((user) => user.id !== id);
+    console.log('hoi');
+    return { results: user };
+  }
 }

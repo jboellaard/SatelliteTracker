@@ -1,8 +1,10 @@
 {
   "version": 2,
   "projects": {
-    "data": "libs/data",
     "data-api": "apps/data-api",
-    "satellite-tracker": "apps/satellite-tracker"
+    "satellite-tracker": "apps/satellite-tracker",
+    "shared-domain": "libs/shared/domain",
+    "ui-auth": "libs/ui/auth",
+    "ui-entity": "libs/ui/entity"
   }
 }
