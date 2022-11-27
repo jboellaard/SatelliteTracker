@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   apiUrl: 'randomuser.me/api',
-  API_URL: '/api/',
+  API_URL: '/',
 };
 
 /*

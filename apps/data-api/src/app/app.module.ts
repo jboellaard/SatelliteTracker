@@ -1,4 +1,5 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { RouterModule } from '@nestjs/core';
 
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';

@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  API_URL: 'satellitetracker-api.netlify.app/api/',
+  API_URL: '',
+  // API_URL: 'https://satellitetracker-api.netlify.app/api/',
 };
