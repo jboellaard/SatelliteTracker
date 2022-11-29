@@ -46,14 +46,15 @@ steps:
   displayName: 'build'
 
 - task: CopyFiles@2
+  displayName: 'Copy Files to: $(build.artifactstagingdirectory)\apps\'
   inputs:
-    SourceFolder: '/home/vsts/work/1/a/dist/apps/data-api/'
-    Contents: '**'
+    SourceFolder: '$(Build.SourcesDirectory)/dist/apps/data-api/'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
-  
+    CleanTargetFolder: true
+    OverWrite: true
+
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
-    publishLocation: 'Container'
-    
