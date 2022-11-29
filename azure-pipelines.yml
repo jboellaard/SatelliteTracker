@@ -26,18 +26,18 @@ steps:
     ng build
   displayName: 'build'
   
-- task: PublishBuildArtifacts@1
+- task: PublishPipelineArtifact@0
+  displayName: 'Publish pipeline artifact'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/dist/apps/satellite-tracker'
-    ArtifactName: 'drop'
-    publishLocation: 'Container' 
+    artifactName: 'drop' 
+    targetPath: '$(Build.ArtifactStagingDirectory)'
+    
   
 - script: |
     ng build apps/data-api
   displayName: 'build'
 
-- task: PublishBuildArtifacts@1
+- task: PublishPipelineArtifact@0
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/dist/apps/data-api'
-    ArtifactName: 'drop'
-    publishLocation: 'Container' 
+    targetPath: '$(Build.ArtifactStagingDirectory)'
+    artifactName: 'drop'
