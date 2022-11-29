@@ -31,15 +31,15 @@ steps:
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)\apps\'
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)/dist/apps/satellite-tracker/'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/st'
     CleanTargetFolder: true
     OverWrite: true
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/st'
+    ArtifactName: 'app'
 
 - script: |
     ng build data-api
@@ -49,12 +49,12 @@ steps:
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)\apps\'
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)/dist/apps/data-api/'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)/st-api'
     CleanTargetFolder: true
     OverWrite: true
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/st-api'
+    ArtifactName: 'api'
