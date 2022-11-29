@@ -28,16 +28,18 @@ steps:
   displayName: 'build'
 
 - task: CopyFiles@2
+  displayName: 'Copy Files to: $(build.artifactstagingdirectory)\apps\'
   inputs:
-    SourceFolder: '/home/vsts/work/1/a/dist/apps/satellite-tracker/'
-    Contents: '**'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)'
-  
+    SourceFolder: '$(Build.SourcesDirectory)\dist\apps\satellite-tracker'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)\apps\'
+    CleanTargetFolder: true
+    OverWrite: true
+
 - task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)\apps'
     ArtifactName: 'drop'
-    publishLocation: 'Container'
 
 - script: |
     ng build data-api
