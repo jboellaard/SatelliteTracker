@@ -29,7 +29,7 @@ steps:
 
 - task: CopyFiles@2
   inputs:
-    SourceFolder: '/dist/apps/satellite-tracker/'
+    SourceFolder: '/home/vsts/work/1/a/dist/apps/satellite-tracker/'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
   
@@ -45,7 +45,7 @@ steps:
 
 - task: CopyFiles@2
   inputs:
-    SourceFolder: '/dist/apps/data-api/'
+    SourceFolder: '/home/vsts/work/1/a/dist/apps/data-api/'
     Contents: '**'
     TargetFolder: '$(Build.ArtifactStagingDirectory)'
   
