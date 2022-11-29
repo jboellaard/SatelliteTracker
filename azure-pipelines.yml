@@ -23,7 +23,7 @@ steps:
     npm install
   displayName: 'npm install'
 - script: |
-    ng build
+    ng build satellite-tracker
   displayName: 'build'
   
 - task: PublishPipelineArtifact@0
@@ -34,7 +34,7 @@ steps:
     
   
 - script: |
-    ng build apps/data-api
+    ng build data-api
   displayName: 'build'
 
 - task: PublishPipelineArtifact@0
