@@ -30,15 +30,15 @@ steps:
 - task: CopyFiles@2
   displayName: 'Copy Files to: $(build.artifactstagingdirectory)\apps\'
   inputs:
-    SourceFolder: '$(Build.SourcesDirectory)\dist\apps\satellite-tracker'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)\apps\'
+    SourceFolder: '$(Build.SourcesDirectory)/dist/apps/satellite-tracker/'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
     CleanTargetFolder: true
     OverWrite: true
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)\apps'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'drop'
 
 - script: |
