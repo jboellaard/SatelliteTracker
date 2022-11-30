@@ -11,7 +11,7 @@ import { SatelliteModule } from './satellite/satellite.module';
     AuthModule,
     UserModule,
     SatelliteModule,
-    MongooseModule.forRoot('mongodb://localhost:27017/'),
+    // MongooseModule.forRoot('mongodb://localhost:27017/'),
     RouterModule.register([]),
   ],
   controllers: [],

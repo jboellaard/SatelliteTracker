@@ -61,7 +61,7 @@ let users: User[] = [
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel('User') private userModel: Model<UserDocument>) {}
+  // constructor(@InjectModel('User') private userModel: Model<UserDocument>) {}
 
   create(newUser: CreateUserDto) {
     const user = {
