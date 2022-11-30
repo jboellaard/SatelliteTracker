@@ -29,3 +29,10 @@ steps:
 
 - publish: '$(System.DefaultWorkingDirectory)/dist/apps/satellite-tracker/'
   artifact: app
+
+- script: |
+    ng build data-api
+  displayName: 'build'
+
+- publish: '$(System.DefaultWorkingDirectory)/dist/apps/data-api/'
+  artifact: api
