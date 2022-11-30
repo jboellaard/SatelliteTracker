@@ -35,6 +35,14 @@ steps:
     CleanTargetFolder: true
     OverWrite: true
 
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.BinariesDirectory)'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/st/$(Build.BuildId).zip'
+    replaceExistingArchive: true
+
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
@@ -52,6 +60,14 @@ steps:
     TargetFolder: '$(Build.ArtifactStagingDirectory)/st-api'
     CleanTargetFolder: true
     OverWrite: true
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(Build.BinariesDirectory)'
+    includeRootFolder: true
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/st-api/$(Build.BuildId).zip'
+    replaceExistingArchive: true
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
