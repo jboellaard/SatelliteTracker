@@ -8,7 +8,7 @@ trigger:
 - main
 
 pool:
-  vmImage: windows-latest
+  vmImage: ubuntu-latest
 
 steps:
 - task: NodeTool@0
@@ -27,34 +27,29 @@ steps:
     ng build satellite-tracker
   displayName: 'build'
 
-- task: CopyFiles@2
-  displayName: 'Copy Files to: $(build.artifactstagingdirectory)\apps\'
+- task: ArchiveFiles@2
+  displayName: 'Archive files'
   inputs:
-    SourceFolder: '$(Build.SourcesDirectory)/dist/apps/satellite-tracker/'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/st'
-    CleanTargetFolder: true
-    OverWrite: true
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/st'
-    ArtifactName: 'app'
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/dist/apps/satellite-tracker/'
+    includeRootFolder: false
+    archiveType: zip
+    archiveFile: $(Build.ArtifactStagingDirectory)/app.zip
+    replaceExistingArchive: true
 
 - script: |
     ng build data-api
   displayName: 'build'
 
-- task: CopyFiles@2
-  displayName: 'Copy Files to: $(build.artifactstagingdirectory)\apps\'
+- task: ArchiveFiles@2
+  displayName: 'Archive files'
   inputs:
-    SourceFolder: '$(Build.SourcesDirectory)/dist/apps/data-api/'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/st-api'
-    CleanTargetFolder: true
-    OverWrite: true
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/dist/apps/data-api/'
+    includeRootFolder: false
+    archiveType: zip
+    archiveFile: $(Build.ArtifactStagingDirectory)/api.zip
+    replaceExistingArchive: true
 
 - task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/st-api'
-    ArtifactName: 'api'
+    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: drop
