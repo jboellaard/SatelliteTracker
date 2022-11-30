@@ -28,49 +28,44 @@ steps:
   displayName: 'build'
 
 - task: CopyFiles@2
-  displayName: 'Copy Files to: $(build.artifactstagingdirectory)\apps\'
+  displayName: 'Copy Files to: $(Build.BinariesDirectory)\apps\'
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)/dist/apps/satellite-tracker/'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/st'
+    TargetFolder: '$(Build.BinariesDirectory)/st'
     CleanTargetFolder: true
     OverWrite: true
 
 - task: ArchiveFiles@2
+  displayName: 'Archive files: $(Build.BinariesDirectory)'
   inputs:
-    rootFolderOrFile: '$(Build.BinariesDirectory)'
+    rootFolderOrFile: '$(Build.BinariesDirectory)/st'
     includeRootFolder: true
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/st/$(Build.BuildId).zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
     replaceExistingArchive: true
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/st'
-    ArtifactName: 'app'
 
 - script: |
     ng build data-api
   displayName: 'build'
 
 - task: CopyFiles@2
-  displayName: 'Copy Files to: $(build.artifactstagingdirectory)\apps\'
+  displayName: 'Copy Files to: $(Build.BinariesDirectory)\apps\'
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)/dist/apps/data-api/'
-    TargetFolder: '$(Build.ArtifactStagingDirectory)/st-api'
+    TargetFolder: '$(Build.BinariesDirectory)/st-api'
     CleanTargetFolder: true
     OverWrite: true
 
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: '$(Build.BinariesDirectory)'
+    rootFolderOrFile: '$(Build.BinariesDirectory)/st-api'
     includeRootFolder: true
     archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/st-api/$(Build.BuildId).zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/api.zip'
     replaceExistingArchive: true
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/st-api'
-    ArtifactName: 'api'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
