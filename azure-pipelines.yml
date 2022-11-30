@@ -33,8 +33,24 @@ steps:
     rootFolderOrFile: '$(System.DefaultWorkingDirectory)/dist/apps/satellite-tracker/'
     includeRootFolder: false
     archiveType: zip
-    archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+    archiveFile: $(Build.ArtifactStagingDirectory)/app.zip
     replaceExistingArchive: true
 
-- publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+- publish: $(Build.ArtifactStagingDirectory)/app.zip
+  artifact: drop
+
+- script: |
+    ng build data-api
+  displayName: 'build'
+
+- task: ArchiveFiles@2
+  displayName: 'Archive files'
+  inputs:
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/dist/apps/data-api/'
+    includeRootFolder: false
+    archiveType: zip
+    archiveFile: $(Build.ArtifactStagingDirectory)/api.zip
+    replaceExistingArchive: true
+
+- publish: $(Build.ArtifactStagingDirectory)/api.zip
   artifact: drop
