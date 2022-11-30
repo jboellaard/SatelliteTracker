@@ -43,25 +43,6 @@ steps:
     archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
     replaceExistingArchive: true
 
-- script: |
-    ng build data-api
-  displayName: 'build'
-
-- task: CopyFiles@2
-  displayName: 'Copy Files to: $(Build.BinariesDirectory)\apps\'
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)/dist/apps/data-api/'
-    TargetFolder: '$(Build.BinariesDirectory)'
-    CleanTargetFolder: true
-    OverWrite: true
-
-- task: ArchiveFiles@2
-  inputs:
-    rootFolderOrFile: '$(Build.BinariesDirectory)'
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/api.zip'
-    replaceExistingArchive: true
-
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
