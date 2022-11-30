@@ -16,12 +16,12 @@ steps:
     versionSpec: '18.12.1'
   displayName: 'Install Node.js'
 
+- script: 
+    'npm cache clean'
+
 - script: |
     npm install -g @angular/cli@14.2.0 @nrwl/angular@15.1.1
   displayName: 'npm install Angular CLI and Nx'
-
-- script: 
-    'nx clear cache'
 
 - script: |
     npm install
