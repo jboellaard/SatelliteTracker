@@ -1,110 +1,44 @@
 import { Injectable } from '@nestjs/common';
-import { UpdateAuthDto } from './dto/update-auth.dto';
-import { LocationCoordinates, User } from 'shared/domain';
+
+import { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+
+// import { Auth, AuthDocument } from './auth.schema';
+// import { User, UserDocument } from '../user/user.schema';
 
 @Injectable()
 export class AuthService {
-  users: User[] = [
-    {
-      id: 1,
-      username: 'joy',
-      profileDescription: '',
-      emailAddress: 'je.boellaard@student.avans.nl',
-      location: { latitude: 51.813297, longitude: 4.690093 },
-      createdAt: new Date(2022, 11, 18),
-      roles: ['user'],
-      satellites: [],
-    },
-    {
-      id: 2,
-      username: 'satellitemaker',
-      profileDescription: '',
-      emailAddress: 'creator@mail.com',
-      location: { latitude: 44.5, longitude: 11.34 },
-      createdAt: new Date(2022, 11, 18),
-      roles: ['user'],
-      satellites: [],
-    },
-    {
-      id: 3,
-      username: 'firsttracker',
-      profileDescription: '',
-      emailAddress: 'first@mail.com',
-      location: { latitude: 52.370216, longitude: 4.895168 },
-      createdAt: new Date(2022, 11, 17),
-      roles: ['user'],
-      satellites: [],
-    },
-    {
-      id: 4,
-      username: 'launcher101',
-      profileDescription: '',
-      emailAddress: 'l@mail.com',
-      location: { latitude: 4.370216, longitude: 4.895168 },
-      createdAt: new Date(),
-      roles: ['user'],
-      satellites: [],
-    },
-    {
-      id: 5,
-      username: 'lovespacefrfr',
-      profileDescription: '',
-      emailAddress: 'spaced@mail.com',
-      location: { latitude: 52.370216, longitude: 50.895168 },
-      createdAt: new Date(),
-      roles: ['user'],
-      satellites: [],
-    },
-  ];
-
+  // constructor(
+  //   @InjectModel(Auth.name) private identityModel: Model<AuthDocument>,
+  //   @InjectModel(User.name) private userModel: Model<UserDocument>
+  // ) {}
   // async createUser(name: string, emailAddress: string): Promise<string> {
   //   const user = new this.userModel({ name, emailAddress });
   //   await user.save();
   //   return user.id;
   // }
-
-  createUser(
-    username: string,
-    emailAddress: string,
-    location: LocationCoordinates,
-    profileDescription = '',
-    roles: string[] = ['user']
-  ) {
-    const user = {
-      id: this.users[this.users.length - 1].id! + 1,
-      username,
-      emailAddress,
-      location,
-      createdAt: new Date(),
-      profileDescription,
-      roles,
-      satellites: [],
-    };
-    this.users.push(user);
-    return user;
-  }
-
+  // async verifyToken(token: string): Promise<string | JwtPayload> {
+  //   return new Promise((resolve, reject) => {
+  //     verify(token, process.env.JWT_SECRET, (err, payload) => {
+  //       if (err) reject(err);
+  //       else resolve(payload);
+  //     });
+  //   });
+  // }
   // async registerUser(username: string, password: string, emailAddress: string) {
   //   const generatedHash = await hash(password, parseInt(process.env.SALT_ROUNDS, 10));
-
   //   const identity = new this.identityModel({ username, hash: generatedHash, emailAddress });
-
   //   await identity.save();
   // }
-
-  findAll() {
-    return `This action returns all auth`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
-  }
+  // async generateToken(username: string, password: string): Promise<string> {
+  //   const identity = await this.identityModel.findOne({ username });
+  //   if (!identity || !(await compare(password, identity.hash))) throw new Error('user not authorized');
+  //   const user = await this.userModel.findOne({ name: username });
+  //   return new Promise((resolve, reject) => {
+  //     sign({ username, id: user.id }, process.env.JWT_SECRET, (err: Error, token: string) => {
+  //       if (err) reject(err);
+  //       else resolve(token);
+  //     });
+  //   });
+  // }
 }
