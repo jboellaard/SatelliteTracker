@@ -53,4 +53,3 @@ steps:
     replaceExistingArchive: true
 
 - publish: $(Build.ArtifactStagingDirectory)/api.zip
-  artifact: drop
