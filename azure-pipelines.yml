@@ -37,7 +37,6 @@ steps:
     replaceExistingArchive: true
 
 - publish: $(Build.ArtifactStagingDirectory)/app.zip
-  artifact: drop
 
 - script: |
     ng build data-api
