@@ -31,14 +31,14 @@ steps:
   displayName: 'Copy Files to: $(Build.BinariesDirectory)\apps\'
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)/dist/apps/satellite-tracker/'
-    TargetFolder: '$(Build.BinariesDirectory)/st'
+    TargetFolder: '$(Build.BinariesDirectory)'
     CleanTargetFolder: true
     OverWrite: true
 
 - task: ArchiveFiles@2
   displayName: 'Archive files: $(Build.BinariesDirectory)'
   inputs:
-    rootFolderOrFile: '$(Build.BinariesDirectory)/st'
+    rootFolderOrFile: '$(Build.BinariesDirectory)'
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
     replaceExistingArchive: true
@@ -51,13 +51,13 @@ steps:
   displayName: 'Copy Files to: $(Build.BinariesDirectory)\apps\'
   inputs:
     SourceFolder: '$(Build.SourcesDirectory)/dist/apps/data-api/'
-    TargetFolder: '$(Build.BinariesDirectory)/st-api'
+    TargetFolder: '$(Build.BinariesDirectory)'
     CleanTargetFolder: true
     OverWrite: true
 
 - task: ArchiveFiles@2
   inputs:
-    rootFolderOrFile: '$(Build.BinariesDirectory)/st-api'
+    rootFolderOrFile: '$(Build.BinariesDirectory)'
     archiveType: 'zip'
     archiveFile: '$(Build.ArtifactStagingDirectory)/api.zip'
     replaceExistingArchive: true
