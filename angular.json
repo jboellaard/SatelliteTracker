@@ -5,6 +5,7 @@
     "satellite-tracker": "apps/satellite-tracker",
     "shared-domain": "libs/shared/domain",
     "ui-auth": "libs/ui/auth",
-    "ui-entity": "libs/ui/entity"
+    "ui-entity": "libs/ui/entity",
+    "dist": "dist/apps/data-api"
   }
 }
