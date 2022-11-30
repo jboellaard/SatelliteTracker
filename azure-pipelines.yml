@@ -27,24 +27,14 @@ steps:
     ng build satellite-tracker
   displayName: 'build'
 
-- task: CopyFiles@2
-  displayName: 'Copy Files to: $(Build.BinariesDirectory)\apps\'
-  inputs:
-    SourceFolder: '$(Build.SourcesDirectory)/dist/apps/satellite-tracker/'
-    TargetFolder: '$(Build.BinariesDirectory)'
-    CleanTargetFolder: true
-    OverWrite: true
-
 - task: ArchiveFiles@2
-  displayName: 'Archive files: $(Build.BinariesDirectory)'
+  displayName: 'Archive files'
   inputs:
-    rootFolderOrFile: '$(Build.BinariesDirectory)'
-    archiveType: 'zip'
-    archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)/dist/apps/satellite-tracker/'
+    includeRootFolder: false
+    archiveType: zip
+    archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
     replaceExistingArchive: true
 
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    ArtifactName: 'drop'
+- publish: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
+  artifact: drop
