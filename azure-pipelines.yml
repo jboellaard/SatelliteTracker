@@ -36,8 +36,6 @@ steps:
     archiveFile: $(Build.ArtifactStagingDirectory)/app.zip
     replaceExistingArchive: true
 
-- publish: $(Build.ArtifactStagingDirectory)/app.zip
-
 - script: |
     ng build data-api
   displayName: 'build'
@@ -51,4 +49,7 @@ steps:
     archiveFile: $(Build.ArtifactStagingDirectory)/api.zip
     replaceExistingArchive: true
 
-- publish: $(Build.ArtifactStagingDirectory)/api.zip
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)'
+    artifactName: drop
