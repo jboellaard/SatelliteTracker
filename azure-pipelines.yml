@@ -25,7 +25,7 @@ steps:
   displayName: 'npm install --cache /tmp/empty-cache'
 
 - script: |
-    ng build satellite-tracker
+    ng run satellite-tracker:build:production
   displayName: 'build'
 
 - task: ArchiveFiles@2
@@ -38,8 +38,8 @@ steps:
     replaceExistingArchive: true
 
 - script: |
-    ng build data-api
-  displayName: 'build'
+    ng run data-api:build:production
+  displayName: 'build api'
 
 - task: ArchiveFiles@2
   displayName: 'Archive files'
