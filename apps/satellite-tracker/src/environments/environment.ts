@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   apiUrl: 'randomuser.me/api',
-  API_URL: 'https://satellitetracker.up.railway.app/api/',
+  API_URL: 'api/',
 };
 
 /*
