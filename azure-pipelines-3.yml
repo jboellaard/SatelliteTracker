@@ -14,7 +14,7 @@ variables:
   imageRepository: 'satellitetracker'
   containerRegistry: 'satellitetracker.azurecr.io'
   dockerfilePath: '**/Dockerfile'
-  tag: '$(Build.BuildId)'
+  tag: 'latest'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -37,17 +37,3 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
-  - job: Run
-    workspace:
-      clean: all
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - task: Docker@2
-      displayName: Login to ACR
-      inputs:
-        command: login
-        containerRegistry: $(dockerRegistryServiceConnection)
-        arguments: -u satellitetracker -p wFPcWlIPx673JJyga+yOYu7wPCZnYHqS
-    - script: |
-        docker run satellitetracker.azurecr.io/satellitetracker
