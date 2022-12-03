@@ -47,6 +47,6 @@ stages:
       displayName: Login to ACR
       inputs:
         command: login
-        containerRegistry: $(dockerRegistryServiceConnection)
+        containerRegistry: $(containerRegistry)
     - script: |
         docker run satellitetracker.azurecr.io/satellitetracker
