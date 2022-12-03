@@ -14,7 +14,7 @@ variables:
   imageRepository: 'satellitetracker'
   containerRegistry: 'satellitetracker.azurecr.io'
   dockerfilePath: '**/Dockerfile'
-  tag: '$(Build.BuildId)'
+  tag: 'latest'
 
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
