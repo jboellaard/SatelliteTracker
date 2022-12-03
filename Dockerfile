@@ -1,6 +1,6 @@
 FROM node:18.12-alpine As development
 
-WORKDIR /
+WORKDIR /SatelliteTracker/
 
 COPY package*.json ./
 
@@ -19,7 +19,7 @@ FROM node:18.12-alpine as production
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-WORKDIR /
+WORKDIR /SatelliteTracker/
 
 COPY package*.json ./
 
