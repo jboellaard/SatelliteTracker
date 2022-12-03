@@ -15,15 +15,14 @@ export class UserListComponent implements OnInit {
   // users: Observable<User[]> | undefined;
   usersArray: User[] = [];
   displayedColumns: string[] = ['id', 'name', 'emailAddress', 'latitude', 'longitude', 'createdAt', 'buttons'];
-  // sub!: Subscription;
+  sub!: Subscription;
 
   constructor(private userService: UserService, private router: Router) {}
 
   ngOnInit(): void {
-    // this.sub = this.userService.list().subscribe((users) => {
-    //   if (users) this.usersArray = users;
-    // });
-    this.usersArray = this.userService.getAllUsers();
+    this.sub = this.userService.list().subscribe((users) => {
+      if (users) this.usersArray = users;
+    });
   }
 
   addUser(user: User) {
@@ -31,14 +30,10 @@ export class UserListComponent implements OnInit {
   }
 
   removeUser(id: number) {
-    // this.userService.delete(id).subscribe(() => this.router.navigate(['/users']));
-
-    this.userService.delete(id);
-    this.usersArray = this.userService.getAllUsers();
-    this.router.navigate(['/users']);
+    this.userService.delete(id).subscribe(() => this.router.navigate(['/users']));
   }
 
-  // ngOnDestroy() {
-  // this.sub.unsubscribe();
-  // }
+  ngOnDestroy() {
+    this.sub.unsubscribe();
+  }
 }

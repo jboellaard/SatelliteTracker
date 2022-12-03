@@ -3,9 +3,11 @@ import { Injectable } from '@angular/core';
 // import { EntityService } from 'ui/entity';
 // import { APIResponse, Satellite } from 'shared/domain';
 // import { HttpClient } from '@angular/common/http';
-// import { environment } from 'apps/satellite-tracker/src/environments/environment';
+import { environment } from 'apps/satellite-tracker/src/environments/environment';
 import { User } from './user.model';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { EntityService } from 'ui/entity';
 
 let users: User[] = [
   {
@@ -63,29 +65,29 @@ let users: User[] = [
 @Injectable({
   providedIn: 'root',
 })
-export class UserService {
+export class UserService extends EntityService<User> {
   users: User[] = [];
   private exampleDataSource = new BehaviorSubject<any>(null);
   readonly exampleData$ = this.exampleDataSource.asObservable();
 
-  // constructor(http: HttpClient) {
-  //   super(http, '/', 'api/users');
+  constructor(http: HttpClient) {
+    super(http, environment.API_URL!, 'users');
+  }
+
+  // create(user: User) {
+  //   if (!user.id) {
+  //     user.id = users[users.length - 1].id! + 1;
+  //   }
+  //   users.push(user);
   // }
 
-  create(user: User) {
-    if (!user.id) {
-      user.id = users[users.length - 1].id! + 1;
-    }
-    users.push(user);
-  }
+  // update(user: User) {
+  //   users = users.map((u) => (u.id === user.id ? user : u));
+  // }
 
-  update(user: User) {
-    users = users.map((u) => (u.id === user.id ? user : u));
-  }
-
-  delete(id: number) {
-    users = users.filter((user) => user.id !== id);
-  }
+  // delete(id: number) {
+  //   users = users.filter((user) => user.id !== id);
+  // }
 
   getAllUsers(): User[] {
     return users;
