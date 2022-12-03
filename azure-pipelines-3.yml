@@ -49,4 +49,4 @@ stages:
         command: login
         containerRegistry: $(dockerRegistryServiceConnection)
     - script: |
-        docker run satellitetracker.azurecr.io/satellitetracker:latest 
+        docker run satellitetracker.azurecr.io/satellitetracker 
