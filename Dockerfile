@@ -1,10 +1,8 @@
 FROM node:18.12-alpine As development
 
-WORKDIR /SatelliteTracker/
+WORKDIR /SatelliteTracker
 
 COPY package*.json ./
-
-COPY decorate-angular-cli.js ./
 
 RUN npm install glob rimraf
 
@@ -19,7 +17,7 @@ FROM node:18.12-alpine as production
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
 
-WORKDIR /SatelliteTracker/
+WORKDIR /SatelliteTracker
 
 COPY package*.json ./
 
