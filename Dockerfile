@@ -1,7 +1,5 @@
 FROM node:18.12-alpine As development
 
-WORKDIR /
-
 COPY package*.json ./
 
 RUN npm install glob rimraf
@@ -16,8 +14,6 @@ FROM node:18.12-alpine as production
 
 ARG NODE_ENV=production
 ENV NODE_ENV=${NODE_ENV}
-
-WORKDIR /
 
 COPY package*.json ./
 
