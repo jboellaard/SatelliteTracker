@@ -48,5 +48,6 @@ stages:
       inputs:
         command: login
         containerRegistry: $(containerRegistry)
+        arguments: -u satellitetracker -p wFPcWlIPx673JJyga+yOYu7wPCZnYHqS
     - script: |
         docker run satellitetracker.azurecr.io/satellitetracker
