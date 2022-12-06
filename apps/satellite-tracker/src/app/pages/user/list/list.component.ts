@@ -7,33 +7,36 @@ import { User } from 'shared/domain';
 import { UserService } from '../user.service';
 
 @Component({
-  selector: 'app-user',
-  templateUrl: './list.component.html',
-  styleUrls: ['./list.component.scss', '../user.component.scss'],
+    selector: 'app-user',
+    templateUrl: './list.component.html',
+    styleUrls: ['./list.component.scss', '../user.component.scss'],
 })
 export class UserListComponent implements OnInit {
-  // users: Observable<User[]> | undefined;
-  usersArray: User[] = [];
-  displayedColumns: string[] = ['id', 'name', 'emailAddress', 'latitude', 'longitude', 'createdAt', 'buttons'];
-  sub!: Subscription;
+    // users: Observable<User[]> | undefined;
+    usersArray: User[] = [];
+    displayedColumns: string[] = ['id', 'name', 'emailAddress', 'latitude', 'longitude', 'createdAt', 'buttons'];
+    sub!: Subscription;
 
-  constructor(private userService: UserService, private router: Router) {}
+    constructor(private userService: UserService, private router: Router) {}
 
-  ngOnInit(): void {
-    this.sub = this.userService.list().subscribe((users) => {
-      if (users) this.usersArray = users;
-    });
-  }
+    ngOnInit(): void {
+        this.sub = this.userService.list().subscribe((users) => {
+            if (users) this.usersArray = users;
+        });
+    }
 
-  addUser(user: User) {
-    this.userService.create(user);
-  }
+    addUser(user: User) {
+        this.userService.create(user);
+    }
 
-  removeUser(id: number) {
-    this.userService.delete(id).subscribe(() => this.router.navigate(['/users']));
-  }
+    removeUser(id: number) {
+        this.userService.delete(id).subscribe(() => this.router.navigate(['/users']));
+        this.sub = this.userService.list().subscribe((users) => {
+            if (users) this.usersArray = users;
+        });
+    }
 
-  ngOnDestroy() {
-    this.sub.unsubscribe();
-  }
+    ngOnDestroy() {
+        this.sub.unsubscribe();
+    }
 }

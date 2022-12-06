@@ -1,12 +1,6 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateUserDto } from './create-user.dto';
+import { LocationCoordinates } from 'shared/domain';
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {
-  override username?: string;
-  override profileDescription?: string;
-  override emailAddress?: string;
-  override location?: {
-    latitude: number;
-    longitude: number;
-  };
+export class UpdateUserDto {
+    location?: LocationCoordinates;
+    profileDescription?: string;
 }

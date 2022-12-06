@@ -1,24 +1,29 @@
 import { Id } from './id.type';
-import { Satellite } from './satellite.interface';
+import { ISatellite } from './satellite.interface';
 
-export interface UserIdentity {
-  id: Id;
-  username: string;
+export interface IIdentity {
+    id: Id;
+    username: string;
+    emailAddress?: string;
+    password?: string;
 }
 
-export interface UserInfo extends UserIdentity {
-  createdAt: Date;
-  emailAddress: string;
-  location: LocationCoordinates;
-  profileDescription: string;
-  roles: string[];
+export interface IUserInfo {
+    id?: Id;
+    username: string;
+    location?: ILocation;
+    profileDescription?: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
-export interface User extends UserInfo {
-  satellites?: Satellite[];
+export interface IUser extends IUserInfo {
+    satellites?: ISatellite[];
 }
 
-export interface LocationCoordinates {
-  longitude: number;
-  latitude: number;
+export interface ILocation {
+    coordinates?: {
+        longitude: number;
+        latitude: number;
+    };
 }
