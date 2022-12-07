@@ -11,7 +11,7 @@ export class PointCoordinates {
         required: true,
         default: 'Point',
     })
-    type!: string;
+    type?: string;
 
     @Prop({
         _id: false,
@@ -48,8 +48,8 @@ export class User {
     })
     satellites?: Satellite[];
 
-    createdAt!: Date;
-    updatedAt!: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

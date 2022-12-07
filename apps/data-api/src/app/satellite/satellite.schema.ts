@@ -2,29 +2,39 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Schema as MongooseSchema } from 'mongoose';
 import { PointCoordinates } from '../user/user.schema';
 
+export type SatellitePartDocument = SatellitePart & Document;
+export type CustomSatellitePartDocument = CustomSatellitePart & Document;
+export type OrbitDocument = Orbit & Document;
+export type LaunchDocument = Launch & Document;
 export type SatelliteDocument = Satellite & Document;
 
 @Schema()
 export class SatellitePart {
+    @Prop({ required: true, unique: true, minlength: 1 })
+    partName!: string;
+
     @Prop()
-    name?: string;
+    description?: string;
 
     @Prop()
     function?: string;
 
     @Prop()
     material?: string;
+
+    @Prop({ type: [MongooseSchema.Types.ObjectId], ref: 'SatelliteParts' })
+    dependsOn?: SatellitePart[];
 }
 
 export const SatellitePartSchema = SchemaFactory.createForClass(SatellitePart);
 
 @Schema({ _id: false })
-export class CustomSatellitePart {
-    @Prop({ required: true, type: SatellitePartSchema })
-    satellitePart?: SatellitePart;
+export class CustomSatellitePart extends SatellitePart {
+    @Prop({ unique: false })
+    override partName!: string;
 
     @Prop()
-    height?: number;
+    size?: number;
 
     @Prop()
     color?: string;
@@ -52,8 +62,8 @@ export class Orbit {
     @Prop({ required: true, default: 0, min: 0, max: 360 })
     argumentOfPerigee?: number;
 
-    createdAt!: Date;
-    updatedAt!: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export const OrbitSchema = SchemaFactory.createForClass(Orbit);
@@ -72,8 +82,8 @@ export class Launch {
     @Prop()
     succeeded?: boolean;
 
-    createdAt!: Date;
-    updatedAt!: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export const LaunchSchema = SchemaFactory.createForClass(Launch);
@@ -87,7 +97,10 @@ export class Satellite {
         required: true,
         minlength: 1,
     })
-    name!: string;
+    satelliteName!: string;
+
+    @Prop()
+    description?: string;
 
     @Prop({ required: true })
     mass!: number;
@@ -101,7 +114,7 @@ export class Satellite {
     @Prop({ required: true, default: 'TBD' })
     purpose!: string;
 
-    @Prop({ required: true, default: [], type: [CustomSatellitePartSchema] })
+    @Prop({ default: [], type: [CustomSatellitePartSchema] })
     satelliteParts?: CustomSatellitePart[];
 
     @Prop({ required: false, type: OrbitSchema })
@@ -110,12 +123,12 @@ export class Satellite {
     @Prop({ required: false, type: LaunchSchema })
     launch?: Launch;
 
-    createdAt!: Date;
-    updatedAt!: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export const SatelliteSchema = SchemaFactory.createForClass(Satellite);
-SatelliteSchema.index({ createdBy: 1, name: 1 }, { unique: true });
+SatelliteSchema.index({ createdById: 1, satelliteName: 1 }, { unique: true });
 SatelliteSchema.pre('validate', function (next) {
     if (this.launch && !this.orbit) {
         next(new Error('Cannot create launch if there is no orbit'));
@@ -129,4 +142,29 @@ SatelliteSchema.pre('validate', function (next) {
     } else {
         next();
     }
+});
+
+SatelliteSchema.pre('validate', function (next) {
+    if (this.satelliteParts && this.satelliteParts.length > 0) {
+        for (const part of this.satelliteParts) {
+            if (part.dependsOn) {
+                if (
+                    part.dependsOn.some((d) =>
+                        this.satelliteParts
+                            ?.map(function (p) {
+                                return p;
+                            })
+                            .includes(d)
+                    )
+                ) {
+                    next(
+                        new Error(
+                            `SatellitePart ${part.partName} depends on ${part.dependsOn}, please add it to the satelliteParts`
+                        )
+                    );
+                }
+            }
+        }
+    }
+    next();
 });

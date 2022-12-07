@@ -9,12 +9,12 @@ export interface IIdentity {
 }
 
 export interface IUserInfo {
-    id?: Id;
+    _id?: Id;
     username: string;
     location?: ILocation;
     profileDescription?: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface IUser extends IUserInfo {

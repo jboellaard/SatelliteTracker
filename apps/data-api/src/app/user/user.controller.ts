@@ -1,11 +1,7 @@
 import { Controller, Get, Post, Body, Param, Logger, Put, Delete, Patch } from '@nestjs/common';
 import { UserService } from './user.service';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { IUser } from 'shared/domain';
-import { APIResponse } from 'shared/domain';
 import { SatelliteService } from '../satellite/satellite.service';
-import { Roles } from '../auth/roles.decorator';
-import { AuthService } from '../auth/auth.service';
 
 @Controller('users')
 export class UserController {
@@ -24,9 +20,9 @@ export class UserController {
         return this.userService.findOne(id);
     }
 
-    @Get(':id/satellites')
-    getSatellites(@Param('id') id: string) {
-        this.logger.log('getSatellites ' + id);
-        return this.satelliteService.getSatellitesOfUserWithId(id);
-    }
+    // @Get(':id/satellites')
+    // getSatellites(@Param('id') id: string) {
+    //     this.logger.log('getSatellites ' + id);
+    //     return this.satelliteService.getSatellitesOfUserWithId(id);
+    // }
 }

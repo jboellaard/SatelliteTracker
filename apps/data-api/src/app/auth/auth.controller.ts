@@ -11,12 +11,13 @@ import {
     Param,
     Patch,
 } from '@nestjs/common';
-import { UserRegistration, ResourceId, Token, UserCredentials } from 'shared/domain';
+import { UserRegistration, ResourceId, Token, UserCredentials, IIdentity } from 'shared/domain';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './jwt-auth.guard';
-import { Roles } from './roles.decorator';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { Roles } from './guards/roles.decorator';
+import { RolesGuard } from './guards/roles.guard';
 
 @Controller()
 export class AuthController {
@@ -25,13 +26,11 @@ export class AuthController {
     @Post('register')
     async register(@Body() credentials: UserRegistration): Promise<ResourceId> {
         try {
-            await this.authService.registerUser(credentials.username, credentials.password, credentials.emailAddress);
-
             return {
-                id: await this.authService.createUser(credentials.username),
+                id: await this.authService.registerUser(credentials),
             };
         } catch (e) {
-            throw new HttpException('Username invalid', HttpStatus.BAD_REQUEST);
+            throw new HttpException('Username or email invalid', HttpStatus.BAD_REQUEST);
         }
     }
 
@@ -48,28 +47,27 @@ export class AuthController {
 
     @UseGuards(JwtAuthGuard)
     @Get('self')
-    getProfile(@Request() req: any) {
-        console.log(req.user);
+    getSelf(@Request() req: any) {
         return this.authService.getIdentity(req.user.username);
     }
 
     @UseGuards(JwtAuthGuard)
     @Patch('self')
-    async patchSelf(@Request() req: any, @Body() updatedCredentials: UserRegistration) {
-        return this.authService.updateCredentials(req.user.username, updatedCredentials);
+    async patchSelf(@Request() req: any, @Body() updatedCredentials: IIdentity) {
+        return this.authService.updateIdentity(req.user.username, updatedCredentials);
     }
 
-    // @UseGuards(JwtAuthGuard)
-    // @Get('self/info')
-    // getProfileInfo(@Request() req: any) {
-    //     return this.userService.findOne(req.user.userId);
-    // }
+    @UseGuards(JwtAuthGuard)
+    @Get('self/info')
+    getProfileInfo(@Request() req: any) {
+        return this.userService.findOne(req.user.userId);
+    }
 
-    // @UseGuards(JwtAuthGuard)
-    // @Patch('self/info')
-    // async patchInfo(@Request() req: any, @Body() updatedUser: UpdateUserDto) {
-    //     return this.userService.update(req.user.userId, updatedUser);
-    // }
+    @UseGuards(JwtAuthGuard)
+    @Patch('self/info')
+    async patchInfo(@Request() req: any, @Body() updatedUser: UpdateUserDto) {
+        return this.userService.update(req.user.userId, updatedUser);
+    }
 
     @UseGuards(JwtAuthGuard)
     @Delete('self')
@@ -77,15 +75,30 @@ export class AuthController {
         return this.authService.delete(req.user.userId);
     }
 
-    @Patch('users/:id')
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin')
-    update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-        return this.userService.update(id, updateUserDto);
+    @Patch('users/:id')
+    patchById(@Param('id') id: string, @Body() updatedUser: UpdateUserDto) {
+        return this.userService.update(id, updatedUser);
     }
 
-    @Delete('users/:id')
+    @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin')
-    remove(@Param('id') id: string) {
+    @Patch('users/:id/identity')
+    patchIdentityById(@Param('id') id: string, @Body() updatedIdentity: IIdentity) {
+        return this.authService.updateIdentity(id, updatedIdentity);
+    }
+
+    // @Delete('users/:id')
+    // @Roles('admin')
+    // deleteById(@Param('id') id: string) {
+    //     return this.authService.delete(id);
+    // }
+
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles('admin')
+    @Delete('users/:username')
+    deleteById(@Param('username') id: string) {
         return this.authService.delete(id);
     }
 }

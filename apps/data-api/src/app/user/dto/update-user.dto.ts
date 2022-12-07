@@ -1,6 +1,6 @@
-import { LocationCoordinates } from 'shared/domain';
+import { ILocation } from 'shared/domain';
 
 export class UpdateUserDto {
-    location?: LocationCoordinates;
+    location?: ILocation;
     profileDescription?: string;
 }

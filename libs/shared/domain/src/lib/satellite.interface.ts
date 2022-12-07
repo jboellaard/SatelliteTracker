@@ -12,10 +12,14 @@ export type Purpose =
     | 'TBD';
 
 export interface ISatellitePart {
-    name?: string; // communication system (antenna, transponder, etc.), propulsion system (thruster, engine, etc.), solar panel, camera, telescope (lens), particle detector, thermal system?, shield?, battery?
+    partName: string;
+    description?: string;
     function?: string;
     material?: string;
-    height?: number;
+}
+
+export interface ICustomSatellitePart extends ISatellitePart {
+    size?: number;
     color?: string;
     quantity?: number;
 }
@@ -35,23 +39,24 @@ export interface ILaunch {
     launchDate: Date;
     launchSite?: ILocation;
     succeeded?: boolean;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
 export interface ISatellite {
     id?: Id;
-    name: string;
+    satelliteName: string;
+    description?: string;
     mass: number;
     sizeOfBase: number;
     colorOfBase: string;
     purpose: string;
-    satelliteParts?: ISatellitePart[];
+    satelliteParts?: ICustomSatellitePart[];
     orbit?: IOrbit;
     launch?: ILaunch;
 
     createdById: Id;
     createdBy?: IUser;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
 }

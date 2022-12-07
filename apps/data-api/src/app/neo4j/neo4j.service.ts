@@ -1,9 +1,9 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnApplicationShutdown } from '@nestjs/common';
 import { Driver, Result, Session, session } from 'neo4j-driver';
 import { NEO4J_DRIVER } from './neo4j.constants';
 
 @Injectable()
-export class Neo4jService {
+export class Neo4jService implements OnApplicationShutdown {
     constructor(@Inject(NEO4J_DRIVER) private readonly driver: Driver) {}
 
     getReadSession(database?: string): Session {
@@ -12,6 +12,7 @@ export class Neo4jService {
             defaultAccessMode: session.READ,
         });
     }
+
     getWriteSession(database?: string): Session {
         return this.driver.session({
             database: database || process.env.NEO4J_DATABASE,
