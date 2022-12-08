@@ -104,6 +104,14 @@ export class DbseedService implements OnModuleInit {
                         satellites: [],
                     }),
                 };
+
+                await this.userModel.insertMany([user1.user, user2.user, user3.user, user4.user, user5.user]);
+                user1.identity.user = user1.user;
+                user2.identity.user = user2.user;
+                user3.identity.user = user3.user;
+                user4.identity.user = user4.user;
+                user5.identity.user = user5.user;
+
                 this.identityModel.insertMany([
                     user1.identity,
                     user2.identity,
@@ -111,7 +119,6 @@ export class DbseedService implements OnModuleInit {
                     user4.identity,
                     user5.identity,
                 ]);
-                await this.userModel.insertMany([user1.user, user2.user, user3.user, user4.user, user5.user]);
 
                 this.neo4jService.write(
                     `MERGE (n:User {username: $username1, longitude: $longitude1, latitude: $latitude1}) 
@@ -119,14 +126,14 @@ export class DbseedService implements OnModuleInit {
                 MERGE (o:User {username: $username3, longitude: $longitude3, latitude: $latitude3}) 
                 MERGE (p:User {username: $username4, longitude: $longitude4, latitude: $latitude4})
                 MERGE (q:User {username: $username5, longitude: $longitude5, latitude: $latitude5})
-                MERGE (m)-[:FOLLOWS]->(n)
-                MERGE (o)-[:FOLLOWS]->(n)
-                MERGE (p)-[:FOLLOWS]->(n)
-                MERGE (p)-[:FOLLOWS]->(q)
-                MERGE (q)-[:FOLLOWS]->(p)
-                MERGE (n)-[:FOLLOWS]->(m)
-                MERGE (n)-[:FOLLOWS]->(p)
-                MERGE (o)-[:FOLLOWS]->(m)`,
+                MERGE (m)-[:FOLLOWS { since: datetime() }]->(n)
+                MERGE (o)-[:FOLLOWS { since: datetime() }]->(n)
+                MERGE (p)-[:FOLLOWS { since: datetime() }]->(n)
+                MERGE (p)-[:FOLLOWS { since: datetime() }]->(q)
+                MERGE (q)-[:FOLLOWS { since: datetime() }]->(p)
+                MERGE (n)-[:FOLLOWS { since: datetime() }]->(m)
+                MERGE (n)-[:FOLLOWS { since: datetime() }]->(p)
+                MERGE (o)-[:FOLLOWS { since: datetime() }]->(m)`,
                     {
                         username1: user1.user.username,
                         longitude1: user1.user.location?.coordinates?.longitude ?? 0,
@@ -310,61 +317,61 @@ export class DbseedService implements OnModuleInit {
                     colorOfBase: '#000000',
                     satelliteParts: [
                         {
-                            ...satellitePart1,
+                            satellitePart: satellitePart1,
                             size: 20,
                             color: '#000000',
                             quantity: 1,
                         },
                         {
-                            ...satellitePart1,
+                            satellitePart: satellitePart1,
                             size: 20,
                             color: '#ffffff',
                             quantity: 1,
                         },
                         {
-                            ...satellitePart4,
+                            satellitePart: satellitePart4,
                             size: 20,
                             color: '#000000',
                             quantity: 1,
                         },
                         {
-                            ...satellitePart6,
+                            satellitePart: satellitePart6,
                             size: 20,
                             color: '#000000',
                             quantity: 1,
                         },
                         {
-                            ...satellitePart8,
+                            satellitePart: satellitePart8,
                             size: 20,
                             color: '#000000',
                             quantity: 1,
                         },
                         {
-                            ...satellitePart9,
+                            satellitePart: satellitePart9,
                             size: 20,
                             color: '#000000',
                             quantity: 1,
                         },
                         {
-                            ...satellitePart11,
+                            satellitePart: satellitePart11,
                             size: 20,
                             color: '#000000',
                             quantity: 1,
                         },
                         {
-                            ...satellitePart13,
+                            satellitePart: satellitePart13,
                             size: 20,
                             color: '#000000',
                             quantity: 1,
                         },
                         {
-                            ...satellitePart17,
+                            satellitePart: satellitePart17,
                             size: 20,
                             color: '#000000',
                             quantity: 1,
                         },
                         {
-                            ...satellitePart18,
+                            satellitePart: satellitePart18,
                             size: 20,
                             color: '#000000',
                             quantity: 1,
@@ -376,11 +383,12 @@ export class DbseedService implements OnModuleInit {
                         inclination: 51.6,
                         longitudeOfAscendingNode: 0,
                         argumentOfPerigee: 0,
+                        dateTimeOfLaunch: new Date(2023, 11, 20),
                     },
-                    launch: {
-                        launchDate: new Date(2023, 11, 20),
-                        launchSite: { coordinates: { latitude: 28.608, longitude: -80.604 } },
-                    },
+                    // launch: {
+                    //     launchDate: new Date(2023, 11, 20),
+                    //     launchSite: { coordinates: { latitude: 28.608, longitude: -80.604 } },
+                    // },
                     createdById: user1.user._id,
                 });
                 const satellite2 = new this.satelliteModel({
@@ -448,17 +456,16 @@ export class DbseedService implements OnModuleInit {
                     createdById: user1.user._id,
                 });
 
-                this.satelliteModel.insertMany([
-                    satellite1,
-                    satellite2,
-                    satellite3,
-                    satellite4,
-                    satellite5,
-                    satellite6,
-                    satellite7,
-                    satellite8,
-                    satellite9,
-                ]);
+                // Saving seperately for the post save hook, normally only one would be created at most
+                satellite1.save();
+                satellite2.save();
+                satellite3.save();
+                satellite4.save();
+                satellite5.save();
+                satellite6.save();
+                satellite7.save();
+                satellite8.save();
+                satellite9.save();
 
                 this.neo4jService.write(
                     `
@@ -468,23 +475,23 @@ export class DbseedService implements OnModuleInit {
                 MATCH (u4:User {username: $username4})
                 MATCH (u5:User {username: $username5})
 
-                MERGE (s:Satellite {name: $name1, createdBy: $username1, launchSiteLongitude: $longitude1, launchSiteLatitude: $latitude1 })                
+                MERGE (s:Satellite {satelliteName: $name1, createdBy: $username1 })                
                 MERGE (s)<-[:CREATED {createdAt: datetime()}]-(u1)                
-                MERGE (s2:Satellite {name: $name2, createdBy: $username2 })                
+                MERGE (s2:Satellite {satelliteName: $name2, createdBy: $username2 })                
                 MERGE (s2)<-[:CREATED {createdAt: datetime()}]-(u2)                
-                MERGE (s3:Satellite {name: $name3, createdBy: $username1 })
+                MERGE (s3:Satellite {satelliteName: $name3, createdBy: $username1 })
                 MERGE (s3)<-[:CREATED {createdAt: datetime()}]-(u1)
-                MERGE (s4:Satellite {name: $name4, createdBy: $username4 })
+                MERGE (s4:Satellite {satelliteName: $name4, createdBy: $username4 })
                 MERGE (s4)<-[:CREATED {createdAt: datetime()}]-(u4)
-                MERGE (s5:Satellite {name: $name5, createdBy: $username4 })
+                MERGE (s5:Satellite {satelliteName: $name5, createdBy: $username4 })
                 MERGE (s5)<-[:CREATED {createdAt: datetime()}]-(u4)
-                MERGE (s6:Satellite {name: $name6, createdBy: $username1 })
+                MERGE (s6:Satellite {satelliteName: $name6, createdBy: $username1 })
                 MERGE (s6)<-[:CREATED {createdAt: datetime()}]-(u1)
-                MERGE (s7:Satellite {name: $name7, createdBy: $username1 })
+                MERGE (s7:Satellite {satelliteName: $name7, createdBy: $username1 })
                 MERGE (s7)<-[:CREATED {createdAt: datetime()}]-(u1)
-                MERGE (s8:Satellite {name: $name8, createdBy: $username1 })
+                MERGE (s8:Satellite {satelliteName: $name8, createdBy: $username1 })
                 MERGE (s8)<-[:CREATED {createdAt: datetime()}]-(u1)
-                MERGE (s9:Satellite {name: $name9, createdBy: $username1 })
+                MERGE (s9:Satellite {satelliteName: $name9, createdBy: $username1 })
                 MERGE (s9)<-[:CREATED {createdAt: datetime()}]-(u1)
                 MERGE (u1)-[:TRACKS]->(s)
                 MERGE (u2)-[:TRACKS]->(s2)
@@ -509,8 +516,6 @@ export class DbseedService implements OnModuleInit {
                 `,
                     {
                         name1: satellite1.satelliteName,
-                        longitude1: satellite1.launch?.launchSite?.coordinates?.longitude ?? 0,
-                        latitude1: satellite1.launch?.launchSite?.coordinates?.latitude ?? 0,
                         name2: satellite2.satelliteName,
                         name3: satellite3.satelliteName,
                         name4: satellite4.satelliteName,

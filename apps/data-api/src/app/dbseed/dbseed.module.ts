@@ -1,8 +1,6 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Identity, IdentitySchema } from '../auth/schemas/identity.schema';
-import { Neo4jModule } from '../neo4j/neo4j.module';
-import { Neo4jService } from '../neo4j/neo4j.service';
 import { Satellite, SatelliteSchema, SatellitePart, SatellitePartSchema } from '../satellite/satellite.schema';
 import { User, UserSchema } from '../user/user.schema';
 import { DbseedService } from './dbseed.service';

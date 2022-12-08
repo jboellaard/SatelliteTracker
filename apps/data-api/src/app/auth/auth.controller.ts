@@ -10,6 +10,7 @@ import {
     Delete,
     Param,
     Patch,
+    Logger,
 } from '@nestjs/common';
 import { UserRegistration, ResourceId, Token, UserCredentials, IIdentity } from 'shared/domain';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
@@ -21,10 +22,12 @@ import { RolesGuard } from './guards/roles.guard';
 
 @Controller()
 export class AuthController {
+    private readonly logger = new Logger(AuthController.name);
     constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
 
     @Post('register')
     async register(@Body() credentials: UserRegistration): Promise<ResourceId> {
+        this.logger.log('POST register called');
         try {
             return {
                 id: await this.authService.registerUser(credentials),
@@ -36,6 +39,7 @@ export class AuthController {
 
     @Post('login')
     async login(@Body() credentials: UserCredentials): Promise<Token> {
+        this.logger.log('POST login called');
         try {
             return {
                 token: await this.authService.generateToken(credentials.username, credentials.password),
@@ -48,57 +52,59 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     @Get('self')
     getSelf(@Request() req: any) {
+        this.logger.log('GET self called');
         return this.authService.getIdentity(req.user.username);
     }
 
     @UseGuards(JwtAuthGuard)
     @Patch('self')
     async patchSelf(@Request() req: any, @Body() updatedCredentials: IIdentity) {
+        this.logger.log('PATCH self called');
         return this.authService.updateIdentity(req.user.username, updatedCredentials);
     }
 
     @UseGuards(JwtAuthGuard)
     @Get('self/info')
     getProfileInfo(@Request() req: any) {
+        this.logger.log('GET self/info called');
         return this.userService.findOne(req.user.userId);
     }
 
     @UseGuards(JwtAuthGuard)
     @Patch('self/info')
     async patchInfo(@Request() req: any, @Body() updatedUser: UpdateUserDto) {
+        this.logger.log('PATCH self/info called');
         return this.userService.update(req.user.userId, updatedUser);
     }
 
     @UseGuards(JwtAuthGuard)
     @Delete('self')
     delete(@Request() req: any) {
-        return this.authService.delete(req.user.userId);
+        this.logger.log('DELETE self called');
+        return this.authService.delete(req.user.username);
     }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin')
-    @Patch('users/:id')
-    patchById(@Param('id') id: string, @Body() updatedUser: UpdateUserDto) {
-        return this.userService.update(id, updatedUser);
+    @Patch('users/:username')
+    patchByUsername(@Param('username') username: string, @Body() updatedUser: UpdateUserDto) {
+        this.logger.log('PATCH users/:username called');
+        return this.userService.update(username, updatedUser);
     }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin')
-    @Patch('users/:id/identity')
-    patchIdentityById(@Param('id') id: string, @Body() updatedIdentity: IIdentity) {
-        return this.authService.updateIdentity(id, updatedIdentity);
+    @Patch('users/:username/identity')
+    patchIdentityByUsername(@Param('username') username: string, @Body() updatedIdentity: IIdentity) {
+        this.logger.log('PATCH users/:username/identity called');
+        return this.authService.updateIdentity(username, updatedIdentity);
     }
-
-    // @Delete('users/:id')
-    // @Roles('admin')
-    // deleteById(@Param('id') id: string) {
-    //     return this.authService.delete(id);
-    // }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles('admin')
     @Delete('users/:username')
     deleteById(@Param('username') id: string) {
+        this.logger.log('DELETE users/:username called');
         return this.authService.delete(id);
     }
 }

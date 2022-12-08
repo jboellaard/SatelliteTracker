@@ -18,7 +18,8 @@ export interface ISatellitePart {
     material?: string;
 }
 
-export interface ICustomSatellitePart extends ISatellitePart {
+export interface ICustomSatellitePart {
+    satellitePart: ISatellitePart;
     size?: number;
     color?: string;
     quantity?: number;
@@ -31,6 +32,7 @@ export interface IOrbit {
     longitudeOfAscendingNode?: number;
     argumentOfPerigee?: number;
     period?: number;
+    dateTimeOfLaunch?: Date;
     createdAt?: Date;
     updatedAt?: Date;
 }
@@ -50,12 +52,12 @@ export interface ISatellite {
     mass: number;
     sizeOfBase: number;
     colorOfBase: string;
-    purpose: string;
+    purpose?: string;
     satelliteParts?: ICustomSatellitePart[];
     orbit?: IOrbit;
-    launch?: ILaunch;
+    // launch?: ILaunch;
 
-    createdById: Id;
+    createdById?: Id;
     createdBy?: IUser;
     createdAt?: Date;
     updatedAt?: Date;

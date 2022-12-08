@@ -10,13 +10,13 @@ export class UserController {
 
     @Get()
     findAll(): Promise<IUser[]> {
-        this.logger.log('getAll');
+        this.logger.log('GET users called');
         return this.userService.findAll();
     }
 
     @Get(':id')
     findOne(@Param('id') id: string) {
-        this.logger.log('findOne');
+        this.logger.log('GET users/:id called');
         return this.userService.findOne(id);
     }
 

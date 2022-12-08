@@ -1,6 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ExtractJwt } from 'passport-jwt';
 import { Role } from 'shared/domain';
 import { ROLES_KEY } from './roles.decorator';
 

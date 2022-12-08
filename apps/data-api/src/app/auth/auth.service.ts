@@ -33,7 +33,7 @@ export class AuthService {
         stsession.startTransaction();
         identitySession.startTransaction();
         const transaction = neo4jSession.beginTransaction();
-        this.logger.log(`Started transaction`);
+        this.logger.log(`Started transaction for creating user with username ${credentials.username}`);
 
         try {
             const userAttributes = { username: credentials.username, ...credentials.profileInfo };
@@ -43,6 +43,7 @@ export class AuthService {
                 username: credentials.username,
                 hash: generatedHash,
                 emailAddress: credentials.emailAddress,
+                userId: user._id,
             });
 
             await Promise.all([
@@ -67,16 +68,16 @@ export class AuthService {
             await Promise.all([stsession.commitTransaction(), identitySession.commitTransaction()]);
             this.logger.log(`Created user`);
 
-            return identity._id.toString();
+            return user._id.toString();
         } catch (error) {
             if (error instanceof Error) {
                 this.logger.error(`Error while creating user with username ${credentials.username}: ${error.message}`);
             }
             await Promise.all([stsession.abortTransaction(), identitySession.abortTransaction()]);
-            this.logger.error(`Rolled back transaction`);
-            throw new Error('Error while creating user');
+            this.logger.error(`Rolled back transaction for creating user with username ${credentials.username}`);
+            throw new Error('Could not create user');
         } finally {
-            this.logger.log(`Ending session`);
+            this.logger.log(`Closing create sessions`);
             await Promise.all([stsession.endSession(), identitySession.endSession(), neo4jSession.close()]);
         }
     }
@@ -85,8 +86,8 @@ export class AuthService {
         const identity = await this.identityModel.findOne({ username: username }).exec();
 
         if (!identity || !(await compare(password, identity.hash))) throw new Error('Invalid credentials');
-
-        return this.jwtService.sign({ sub: identity._id, username, roles: identity?.roles });
+        this.logger.log(`User validated, generating token for user ${username}`);
+        return this.jwtService.sign({ sub: identity.user, username, roles: identity?.roles });
     }
 
     async getIdentity(username: string) {
@@ -94,11 +95,11 @@ export class AuthService {
     }
 
     async updateIdentity(username: string, updatedCredentials: IIdentity) {
-        return this.identityModel.updateOne({ username: username }, updatedCredentials, { new: true }).exec();
+        return this.identityModel.findOneAndUpdate({ username: username }, updatedCredentials, { new: true }).exec();
     }
 
     async delete(username: string) {
-        this.logger.log(`Removing user with id ${username} (including identity)`);
+        this.logger.log(`Removing user with username ${username} (including identity)`);
         const stsession = await this.stconnection.startSession();
         const identitySession = await this.identityConnection.startSession();
         const neo4jSession = this.neo4jService.getWriteSession();
@@ -106,13 +107,13 @@ export class AuthService {
         stsession.startTransaction();
         identitySession.startTransaction();
         const transaction = neo4jSession.beginTransaction();
-        this.logger.log(`Started transaction`);
+        this.logger.log(`Started transaction for deleting user with username ${username}`);
 
         try {
             const user = await this.userModel.deleteOne({ username: username }).session(stsession);
             await this.identityModel.deleteOne({ username: username }).session(identitySession);
             try {
-                transaction.run('MATCH (u:User {username: $username}) DETACH DELETE u', { username: username });
+                transaction.run(AuthNeoQueries.removeUser, { username: username });
             } catch (error) {
                 transaction.rollback();
                 throw error;
@@ -122,12 +123,12 @@ export class AuthService {
             this.logger.log(`Deleted user and identity`);
             return user;
         } catch (error) {
-            this.logger.error(`Error while deleting user with id ${username}: ${error}`);
+            this.logger.error(`Error while deleting user with username ${username}: ${error}`);
             await Promise.all([stsession.abortTransaction(), identitySession.abortTransaction()]);
-            this.logger.error(`Rolled back transaction`);
-            throw new Error(`Error while deleting user with id ${username}: ${error}`);
+            this.logger.error(`Rolled back transaction for deleting user with username ${username}`);
+            throw new Error(`Error while deleting user with username ${username}: ${error}`);
         } finally {
-            this.logger.log(`Ended transaction`);
+            this.logger.log(`Closing delete sessions`);
             await Promise.all([stsession.endSession(), identitySession.endSession(), neo4jSession.close()]);
         }
     }
