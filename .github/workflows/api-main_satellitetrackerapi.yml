@@ -23,8 +23,8 @@ jobs:
 
       - name: npm install, build, and test
         run: |
-          npm install
-          npm run test satellite-tracker-api --if-present
+          npm install          
+          npm run build satellite-tracker-api --if-present
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v2
