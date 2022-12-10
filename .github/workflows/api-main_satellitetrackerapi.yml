@@ -59,4 +59,3 @@ jobs:
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_077F48E143344BD38BE5E8DDF42323A4 }}
           package: .
-          startup-command: node dist/apps/data-api/main
