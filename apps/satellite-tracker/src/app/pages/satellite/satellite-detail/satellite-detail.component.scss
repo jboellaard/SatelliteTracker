@@ -1,0 +1,29 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.header .buttons {
+    justify-self: end;
+}
+
+.buttons button {
+    margin-left: 10px;
+}
+
+table {
+    width: 100%;
+}
+
+// .component-container {
+//   max-width: 800px;
+//   margin: auto;
+// }
+
+.circle {
+    height: 30px;
+    width: 30px;
+    border-radius: 50%;
+    display: inline-block;
+    border: 1px solid white;
+}
