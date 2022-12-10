@@ -23,7 +23,6 @@ jobs:
 
       - name: npm install, build, and test
         run: |
-          using: 'node16'
           npm install          
           npm run build satellite-tracker-api --if-present
           
