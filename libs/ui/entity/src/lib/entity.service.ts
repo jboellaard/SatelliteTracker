@@ -2,161 +2,69 @@ import { IEntity } from './entity.interface';
 import { Observable, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { map, catchError, tap } from 'rxjs/operators';
-import { APIResponse } from 'shared/domain';
-import { validateHeaderValue } from 'http';
-import { EnvironmentInjector } from '@angular/core';
+import { APIResponse, Id } from 'shared/domain';
 
-/**
- * See https://angular.io/guide/http#requesting-data-from-a-server
- */
 const httpOptions = {
-  observe: 'body',
-  responseType: 'json',
+    observe: 'body',
+    responseType: 'json',
 };
 
-/**
- * Generic service class for communicating objects to/from services.
- * Serves generic CRUD operations.
- */
+// Generic service for all entities
 export class EntityService<T extends IEntity> {
-  /**
-   * Service constructor.
-   */
-  constructor(protected readonly http: HttpClient, public readonly url: string, public readonly endpoint: string) {}
+    constructor(protected readonly http: HttpClient, public readonly url: string, public readonly endpoint: string) {}
 
-  /**
-   * Get all items.
-   *
-   * @options options
-   */
-  public list(options?: any): Observable<T[] | null> {
-    const endpoint = `${this.url}${this.endpoint}`;
-    console.log(`list ${endpoint}`);
-    return this.http.get<APIResponse<T[]>>(endpoint, { ...options, ...httpOptions }).pipe(
-      map((response: any) => response.results),
-      catchError(this.handleError)
-    );
-  }
+    public getAll(options?: any): Observable<T[]> {
+        const endpoint = `${this.url}${this.endpoint}`;
+        console.log(`list ${endpoint}`);
+        return this.http.get<T[]>(endpoint, { ...options, ...httpOptions }).pipe(
+            tap((response: any) => console.log(response)),
+            // map((response: any) => response),
+            catchError(this.handleError)
+        );
+    }
 
-  /**
-   * Create the item at the service.
-   *
-   * @param item Item to be created.
-   */
-  // public create(item: T, options?: any): Observable<T> {
-  //   const endpoint = `${this.url}${this.endpoint}`;
-  //   console.log(`create ${endpoint}`);
-  //   return this.http.post<T>(endpoint, item, { ...options, ...httpOptions }).pipe(
-  //     // tap(console.log),
-  //     // map((response: any) => response.result),
-  //     catchError(this.handleError)
-  //   );
-  // }
+    public getById(id: Id | null, options?: any): Observable<T> {
+        const endpoint = `${this.url}${this.endpoint}/${id}`;
+        console.log(`get one ${endpoint}`);
+        return this.http.get<T[]>(endpoint, { ...options, ...httpOptions }).pipe(
+            // map((response: any) => response.results),
+            catchError(this.handleError)
+        );
+    }
 
-  public create(item: T, options?: any): Observable<T> {
-    return this.http.post<APIResponse<T>>(`${this.url}${this.endpoint}`, item, { ...options, ...httpOptions }).pipe(
-      map((response: any) => response.results),
-      tap((value) => {
-        return value;
-      })
-    );
-  }
+    public create(item: T, options?: any): Observable<T> {
+        return this.http.post<T>(`${this.url}${this.endpoint}`, item, { ...options, ...httpOptions }).pipe(
+            // map((response: any) => response.results),
+            catchError(this.handleError)
+        );
+    }
 
-  /**
-   * Get a single item from the service.
-   *
-   * @param id ID of the item to get.
-   */
-  public read(id: string | null, options?: any): Observable<T> {
-    const endpoint = `${this.url}${this.endpoint}/${id}`;
-    console.log(`read ${endpoint}`);
-    return this.http.get<APIResponse<T[]>>(endpoint, { ...options, ...httpOptions }).pipe(
-      map((response: any) => response.results),
-      tap((value) => {
-        return value;
-      }),
-      catchError(this.handleError)
-    );
-  }
+    public update(item: T, options?: any) {
+        return this.http.patch<T>(`${this.url}${this.endpoint}/${item.id}`, item, { ...options, ...httpOptions }).pipe(
+            // map((response: any) => response.results),
+            catchError(this.handleError)
+        );
+    }
 
-  // readOne(id: string | null): Observable<T> {
-  //   console.log('readOne');
-  //   console.log(`${this.url}${this.endpoint}/${id}`);
-  //   return this.http.get<T>(`${this.url}${this.endpoint}/${id}`);
-  // }
+    public delete(id: Id, options?: any): Observable<T> {
+        console.log('delete');
+        console.log(`${this.url}${this.endpoint}/${id}`);
+        return this.http.delete(`${this.url}${this.endpoint}/${id}`, { ...options, ...httpOptions }).pipe(
+            // map((response: any) => response.result),
+            catchError(this.handleError)
+        );
+    }
 
-  /**
-   * Update (put) new info.
-   *
-   * @param item The new item.
-   */
-  // public update(item: T, options?: any): Observable<T> {
-  //   const endpoint = `${this.url}${this.endpoint}/${item.id}`;
-  //   console.log(`update ${endpoint}`);
-  //   return this.http.put(endpoint, item, { ...options, ...httpOptions }).pipe(
-  //     map((response: any) => response.result),
-  //     catchError(this.handleError)
-  //   );
-  // }
+    public handleError(error: HttpErrorResponse): Observable<any> {
+        console.log(error);
 
-  public update(item: T, options?: any) {
-    return this.http
-      .patch<APIResponse<T>>(`${this.url}${this.endpoint}/${item.id}`, item, { ...options, ...httpOptions })
-      .pipe(
-        map((response: any) => response.results),
-        tap((value) => {
-          return value;
-        })
-      );
-  }
-
-  /**
-   * Delete an item at the service.
-   *
-   * @param id ID of item to be deleted.
-   */
-  //  public delete(id: string, options?: any): Observable<T> {
-  //   const endpoint = `${this.url}${this.endpoint}/${id}`
-  //   console.log(`delete ${endpoint}`)
-  //   return this.http.delete(endpoint, { ...options, ...httpOptions }).pipe(
-  //     // map((response: any) => response.result),
-  //     catchError(this.handleError)
-  //   )
-  // }
-
-  public delete(id: number, options?: any): Observable<T> {
-    // const endpoint = `${this.url}${this.endpoint}/${id}`;
-    // console.log(`delete ${endpoint}`);
-    console.log('delete');
-    console.log(`${this.url}${this.endpoint}/${id}`);
-    return this.http.delete(`${this.url}${this.endpoint}/${id}`, { ...options, ...httpOptions }).pipe(
-      map((response: any) => response.result),
-      catchError(this.handleError)
-    );
-  }
-
-  // public delete(id: string, options?: any): Observable<T> {
-  //   return this.http
-  //     .delete<APIResponse<T>>(`${this.url}${this.endpoint}/${id}`, { ...options, ...httpOptions })
-  //     .pipe(
-  //       map((response: any) => response.results),
-  //       tap((value) => {
-  //         return value;
-  //       })
-  //     );
-  // }
-
-  /**
-   * Handle errors.
-   */
-  public handleError(error: HttpErrorResponse): Observable<any> {
-    console.log(error);
-
-    const errorResponse = {
-      type: 'error',
-      message: error.error.message || error.message,
-    };
-    // return an error observable with a user-facing error message
-    return throwError(errorResponse);
-  }
+        const errorResponse = {
+            type: 'error',
+            message: error.error.message || error.message,
+        };
+        return new Observable((observer) => {
+            observer.error(errorResponse);
+        });
+        // return throwError(errorResponse);
+    }
 }

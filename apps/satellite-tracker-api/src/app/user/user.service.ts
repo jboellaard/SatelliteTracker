@@ -16,7 +16,7 @@ export class UserService {
 
     async findOne(id: Id) {
         const user = await this.userModel
-            .findById(id)
+            .findOne({ username: id })
             .populate('satellites')
             .populate('satellites.satelliteParts.satellitePart');
         if (!user) {

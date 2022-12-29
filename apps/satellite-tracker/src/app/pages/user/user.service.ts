@@ -22,38 +22,21 @@ export class UserService extends EntityService<IUser> {
         super(http, environment.API_URL, 'users');
     }
 
-    // create(user: User) {
-    //   if (!user.id) {
-    //     user.id = users[users.length - 1].id! + 1;
-    //   }
-    //   users.push(user);
+    getByUsername(username: string): Observable<IUser> {
+        const endpoint = `${environment.API_URL}${'users'}/${username}`;
+        console.log(`get one ${endpoint}`);
+        return this.http.get<IUser>(endpoint).pipe(tap((response: any) => console.log(response)));
+    }
+
+    // deleteByUsername(username: string) {
+    //     this.users = this.users.filter((user) => user.username !== username);
     // }
 
-    // update(user: User) {
-    //   users = users.map((u) => (u.id === user.id ? user : u));
+    // getUserByUsername(username: string): IUser | undefined {
+    //     return this.users.find((user) => user.username === username);
     // }
 
-    // delete(id: number) {
-    //   users = users.filter((user) => user.id !== id);
+    // hasUniqueUsername(username: string): boolean {
+    //     return this.users.every((user) => user.username.trim().toLowerCase() != username.trim().toLowerCase());
     // }
-
-    getAllUsers(): IUser[] {
-        return this.users;
-    }
-
-    deleteByUsername(username: string) {
-        this.users = this.users.filter((user) => user.username !== username);
-    }
-
-    getById(id: Id): IUser | undefined {
-        return this.users.find((user) => user.id === id);
-    }
-
-    getUserByUsername(username: string): IUser | undefined {
-        return this.users.find((user) => user.username === username);
-    }
-
-    hasUniqueUsername(username: string): boolean {
-        return this.users.every((user) => user.username.trim().toLowerCase() != username.trim().toLowerCase());
-    }
 }

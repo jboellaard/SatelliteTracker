@@ -1,6 +1,6 @@
 <div class="edit-container">
     <div *ngIf="componentExists && satellite">
-        <h1>Editing '{{ satellite.name }}' created by {{ username }}</h1>
+        <h1>Editing '{{ satellite.satelliteName }}' created by {{ username }}</h1>
     </div>
     <div *ngIf="!componentExists">
         <h1>Creating new satellite for {{ username }}</h1>
@@ -17,7 +17,7 @@
                 type="text"
                 name="username"
                 class="form-control"
-                [(ngModel)]="satellite!.name"
+                [(ngModel)]="satellite!.satelliteName"
                 #name="ngModel"
                 minlength="1"
                 required
@@ -82,7 +82,7 @@
                     type="text"
                     name="radiusB"
                     class="form-control"
-                    [(ngModel)]="satellite!.radiusOfBase"
+                    [(ngModel)]="satellite!.sizeOfBase"
                     #radiusB="ngModel"
                     required
                     min="1"
@@ -93,26 +93,6 @@
                 <mat-error *ngIf="radiusB.invalid && radiusB.touched" class="invalid-feedback">
                     <mat-error *ngIf="radiusB.errors!['required']">Radius of base is required</mat-error>
                     <mat-error *ngIf="radiusB.errors!['min']">Radius of base must be at least 1 m.</mat-error>
-                </mat-error>
-            </mat-form-field>
-
-            <!-- radiusOfParts -->
-            <mat-form-field class="form-group radius" appearance="fill">
-                <mat-label for="radiusP">Radius of parts</mat-label>
-                <input
-                    matInput
-                    type="text"
-                    name="radiusP"
-                    class="form-control"
-                    [(ngModel)]="satellite!.radiusOfParts"
-                    #radiusP="ngModel"
-                    min="1"
-                    [ngClass]="{
-                        'is-invalid': radiusP.invalid && radiusP.touched
-                    }"
-                />
-                <mat-error *ngIf="radiusP.invalid && radiusP.touched" class="invalid-feedback">
-                    <mat-error *ngIf="radiusP.errors!['min']">Radius of parts must be at least 1 m.</mat-error>
                 </mat-error>
             </mat-form-field>
         </div>

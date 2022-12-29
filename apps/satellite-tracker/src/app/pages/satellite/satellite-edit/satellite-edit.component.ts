@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { Id, ISatellite } from 'shared/domain';
 // import { SatelliteImplemented } from '../../satellite/satellite.model';
 import { UserService } from '../../user/user.service';
@@ -10,30 +11,15 @@ import { SatelliteService } from '../satellite.service';
     templateUrl: './satellite-edit.component.html',
     styleUrls: ['./satellite-edit.component.scss'],
 })
-export class SatelliteEditComponent implements OnInit {
+export class SatelliteEditComponent implements OnInit, OnDestroy {
     componentId: string | null | undefined;
     componentExists = false;
     id!: Id | null | undefined;
     satellite: ISatellite | undefined;
     userId!: Id | null | undefined;
     username: string | undefined;
-
-    // constructor(private route: ActivatedRoute, private router: Router) {}
-
-    // ngOnInit(): void {
-    //   this.route.paramMap.subscribe((params) => {
-    //     this.componentId = params.get('id');
-    //     if (this.componentId) {
-    //       // Bestaande user
-    //       console.log('Bestaande component');
-    //       this.componentExists = true;
-    //     } else {
-    //       // Nieuwe user
-    //       console.log('Nieuwe component');
-    //       this.componentExists = false;
-    //     }
-    //   });
-    // }
+    userSub: Subscription | undefined;
+    satelliteSub: Subscription | undefined;
 
     constructor(
         private route: ActivatedRoute,
@@ -44,53 +30,56 @@ export class SatelliteEditComponent implements OnInit {
 
     ngOnInit(): void {
         this.route.paramMap.subscribe((params) => {
-            this.id = parseInt(params.get('satelliteId')!);
-            this.userId = parseInt(params.get('userId')!);
-            this.username = this.userService.getById(this.userId!)?.username;
+            this.id = params.get('satelliteId')!;
+            this.username = params.get('username')!;
+            // this.userSub = this.userService.getByUsername(this.username).subscribe((user) => {
+            //     if (user) {
+            //         this.username = user.username;
+            //     }
+            // });
             if (this.id) {
-                console.log('existing satellite');
                 this.componentExists = true;
-                var satellite = this.satelliteService.getById(this.id);
-                if (satellite) {
-                    this.satellite = { ...satellite };
-                } else {
-                    this.componentExists = false;
-                    this.satellite = new SatelliteImplemented({
-                        name: '',
-                        purpose: '',
-                        mass: 0,
-                        radiusOfBase: 0,
-                        radiusOfParts: 0,
-                        colorOfBase: '#000000',
-                        orbit: undefined,
-                        createdBy: params.get('userId')!,
-                    });
-                }
-            } else {
-                console.log('new satellite');
-                this.componentExists = false;
-                this.satellite = new SatelliteImplemented({
-                    name: '',
-                    purpose: '',
-                    mass: 0,
-                    radiusOfBase: 0,
-                    radiusOfParts: 0,
-                    colorOfBase: '#000000',
-                    orbit: undefined,
-                    createdBy: params.get('userId')!,
+                this.satelliteSub = this.satelliteService.getById(this.id).subscribe((satellite) => {
+                    if (satellite) {
+                        this.satellite = { ...satellite };
+                    } else {
+                        this.newSatellite();
+                    }
                 });
+            } else {
+                this.newSatellite();
             }
         });
+    }
+
+    newSatellite() {
+        this.componentExists = false;
+        this.satellite = {
+            satelliteName: '',
+            purpose: '',
+            mass: 0,
+            sizeOfBase: 0,
+            colorOfBase: '#000000',
+            orbit: undefined,
+            createdById: this.userId!, // userId from token!
+        };
     }
 
     onSubmit() {
         console.log('Submitting the form');
         if (this.componentExists) {
             this.satelliteService.update(this.satellite!);
-            this.router.navigate(['/users/' + this.userId + '/satellites/' + this.id]);
+            this.router.navigate(['/users/' + this.username + '/satellites/' + this.id]);
         } else {
-            var satellite = this.satelliteService.create(this.satellite!);
-            this.router.navigate(['/users/' + this.userId + '/satellites/' + satellite.id]);
+            this.satelliteService.create(this.satellite!).subscribe((satellite) => {
+                this.satellite = { ...satellite };
+                this.router.navigate(['/users/' + this.username + '/satellites/' + this.satellite.id]);
+            });
         }
+    }
+
+    ngOnDestroy() {
+        if (this.userSub) this.userSub.unsubscribe();
+        if (this.satelliteSub) this.satelliteSub.unsubscribe();
     }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BehaviorSubject, Observable, Subscription, switchMap, tap } from 'rxjs';
-import { ISatellite, IUser } from 'shared/domain';
+import { Id, ISatellite, IUser } from 'shared/domain';
 import { SatelliteService } from '../../satellite/satellite.service';
 import { UserService } from '../user.service';
 
@@ -13,7 +13,7 @@ import { UserService } from '../user.service';
 export class UserDetailComponent implements OnInit {
     user$!: Observable<IUser | undefined>;
     username: string | null | undefined;
-    id: string | null | undefined;
+    id: Id | null | undefined;
     user?: IUser;
     satelliteColumns: string[] = ['id', 'name', 'mass', 'radius', 'orbit', 'createdAt', 'updatedAt', 'buttons'];
     satellites: ISatellite[] = [];
@@ -31,54 +31,44 @@ export class UserDetailComponent implements OnInit {
     ) {}
 
     ngOnInit(): void {
+        console.log('UserDetailComponent.ngOnInit()');
         this.route.paramMap.subscribe((params) => {
-            this.id = params.get('id');
-            if (this.id) {
-                this.user = this.userService.getById(this.id);
-                if (!this.user) {
-                    this.router.navigate(['/users/new']);
+            this.username = params.get('username');
+            if (this.username) {
+                this.userSub = this.userService.getById(this.username).subscribe((user) => {
+                    if (user) this.user = user;
+                    else this.router.navigate(['/users/new']);
+                });
+                if (this.user) {
+                    this.username = this.user.username;
+                    // this.satelliteSub = this.satelliteService
+                    //     .getSatellitesOfUserWithId(this.username)
+                    //     .subscribe((satellites) => {
+                    //         if (satellites) this.satellites = satellites;
+                    //     });
                 }
-                this.satellites = this.satelliteService.getSatellitesOfUserWithId(parseInt(this.id));
             } else {
                 this.router.navigate(['/users/new']);
             }
         });
     }
 
-    removeUser(id: number) {
+    removeUser(id: Id) {
         this.userService.delete(id);
         this.router.navigate(['/users']);
     }
 
-    removeSatellite(id: number) {
+    removeSatellite(id: Id) {
         this.satelliteService.delete(id);
-        this.satellites = this.satelliteService.getSatellitesOfUserWithId(this.user!.id!);
+        if (this.id) {
+            this.satelliteSub = this.satelliteService.getSatellitesOfUserWithId(this.id).subscribe((satellites) => {
+                if (satellites) this.satellites = satellites;
+            });
+        }
     }
 
-    // ngOnInit(): void {
-    //   this.userSub = this.userService.read(this.route.snapshot.paramMap.get('id')!).subscribe((user) => {
-    //     if (user) this.user = user;
-    //   });
-    //   this.satelliteSub = this.satelliteService
-    //     .getSatellitesOfUserWithId(this.route.snapshot.paramMap.get('id')!)
-    //     .subscribe((satellites) => {
-    //       if (satellites) this.satellites = satellites;
-    //     });
-    // }
-
-    // ngOnDestroy(): void {
-    //   this.userSub.unsubscribe();
-    //   this.satelliteSub.unsubscribe();
-    // }
-
-    // removeUser(id: number) {
-    //   this.userService.delete(id).subscribe(() => this.router.navigate(['/users']));
-    // }
-
-    // removeSatellite(id: number) {
-    //   this.satelliteService.delete(id).subscribe();
-    //   this.satelliteSub = this.satelliteService.getSatellitesOfUserWithId(`${this.user!.id}`).subscribe((satellites) => {
-    //     if (satellites) this.satellites = satellites;
-    //   });
-    // }
+    ngOnDestroy(): void {
+        this.userSub.unsubscribe();
+        this.satelliteSub.unsubscribe();
+    }
 }

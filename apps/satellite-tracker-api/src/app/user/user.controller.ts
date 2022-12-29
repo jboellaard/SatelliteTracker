@@ -7,17 +7,17 @@ export class UserController {
     private readonly logger = new Logger(UserController.name);
     constructor(private readonly userService: UserService, private readonly satelliteService: SatelliteService) {}
 
-    @Get(':id')
-    async findOne(@Res() res: any, @Param('id') id: string) {
-        this.logger.log('GET users/:id called');
+    @Get(':username')
+    async findOne(@Res() res: any, @Param('username') id: string) {
+        this.logger.log('GET users/:username called');
         const user = await this.userService.findOne(id);
-        return res.status(HttpStatus.OK).json({ results: user });
+        return res.status(HttpStatus.OK).json(user);
     }
 
-    @Get(':id/satellites')
-    async getSatellites(@Res() res: any, @Param('id') id: string) {
-        this.logger.log('GET users/:id/satellites called');
+    @Get(':username/satellites')
+    async getSatellites(@Res() res: any, @Param('username') id: string) {
+        this.logger.log('GET users/:username/satellites called');
         const satellites = await this.satelliteService.getSatellitesOfUserWithId(id);
-        return res.status(HttpStatus.OK).json({ results: satellites });
+        return res.status(HttpStatus.OK).json(satellites);
     }
 }

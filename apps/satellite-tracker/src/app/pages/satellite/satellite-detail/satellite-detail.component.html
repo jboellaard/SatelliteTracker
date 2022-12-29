@@ -1,9 +1,9 @@
 <div class="component-container" *ngIf="satellite; else loadingMessage">
     <div class="header">
-        <h1>{{ satellite.name }} created by {{ username }}</h1>
+        <h1>{{ satellite.satelliteName }} created by {{ username }}</h1>
         <div class="buttons">
             <button mat-flat-button color="accent" routerLink="edit"><mat-icon>edit</mat-icon> Edit</button>
-            <button mat-flat-button color="warn" (click)="removeSatellite(satellite!.id!)">
+            <button mat-flat-button color="warn" (click)="removeSatellite(satellite!.id)">
                 <mat-icon>delete</mat-icon> Remove
             </button>
         </div>
@@ -15,15 +15,12 @@
         </p>
         <p>
             Last updated:
-            {{ satellite.lastUpdated | date : 'dd/MM/yyyy' }}
+            {{ satellite.updatedAt | date : 'dd/MM/yyyy' }}
         </p>
     </div>
     <br />
 
-    <p>
-        This satellite has a mass of {{ satellite.mass }} kg, a base radius of {{ satellite.radiusOfBase }} meters and
-        the parts have a radius of {{ satellite.radiusOfParts }} meters.
-    </p>
+    <p>This satellite has a mass of {{ satellite.mass }} kg, a base radius of {{ satellite.sizeOfBase }} meters.</p>
 
     <div>
         <p>Color of the base:</p>

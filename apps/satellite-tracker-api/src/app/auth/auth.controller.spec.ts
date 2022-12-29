@@ -48,7 +48,7 @@ describe('AuthController', () => {
     });
 
     describe('register', () => {
-        let credentials, invalidCredentials, register;
+        let credentials, invalidCredentials, register, mockResponse;
         let example_id: string;
 
         beforeEach(() => {
@@ -63,6 +63,11 @@ describe('AuthController', () => {
                 emailAddress: 'test@test',
             };
             example_id = 'id12345';
+
+            mockResponse = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn(),
+            };
 
             register = jest.spyOn(authService, 'registerUser').mockImplementation(async (credentials) => {
                 if (credentials.username === 'invalid') {
@@ -79,12 +84,13 @@ describe('AuthController', () => {
         });
 
         it('should call registerUser', async () => {
-            await authController.register('', credentials);
+            await authController.register(mockResponse, credentials);
             expect(register).toHaveBeenCalledWith(credentials);
+            expect(mockResponse.status).toHaveBeenCalledWith(HttpStatus.CREATED);
         });
 
         it('should return the new user', async () => {
-            const result = await authController.register('', credentials);
+            const result = await authController.register(mockResponse, credentials);
             console.log(result);
             expect(result).toHaveProperty('_id', example_id);
         });
@@ -93,7 +99,7 @@ describe('AuthController', () => {
             register.mockImplementation(async () => {
                 return new HttpException('Could not create user', HttpStatus.BAD_REQUEST);
             });
-            const result = await authController.register('', credentials);
+            const result = await authController.register(mockResponse, credentials);
             expect(register).toReturnWith(new HttpException('Could not create user', HttpStatus.BAD_REQUEST));
             // expect(result).toEqual(new HttpException('Could not create user', HttpStatus.BAD_REQUEST));
         });
@@ -126,17 +132,17 @@ describe('AuthController', () => {
         });
 
         it('should call generateToken', async () => {
-            await controller.login('', validCredentials);
+            await authController.login('', validCredentials);
             expect(generateToken).toBeCalledWith(validCredentials.username, validCredentials.password);
         });
 
         it('should return a token', async () => {
-            const result = await controller.login('', validCredentials);
+            const result = await authController.login('', validCredentials);
             expect(result).toEqual({ token: 'token12345' });
         });
 
         it('should return an exception if generateToken returns exception', async () => {
-            const result = await controller.login('', invalidCredentials);
+            const result = await authController.login('', invalidCredentials);
             expect(generateToken).toReturnWith(new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST));
         });
     });
@@ -161,17 +167,17 @@ describe('AuthController', () => {
         });
 
         it('should call getIdentity', async () => {
-            await controller.getSelf('', identity._id);
+            await authController.getSelf('', identity._id);
             expect(getIdentity).toBeCalledWith(identity._id);
         });
 
         it('should return the identity', async () => {
-            const result = await controller.getSelf('', identity._id);
+            const result = await authController.getSelf('', identity._id);
             expect(result).toEqual(identity);
         });
 
         it('should return an exception if getIdentity returns exception', async () => {
-            const result = await controller.getSelf('', 'invalid');
+            const result = await authController.getSelf('', 'invalid');
             expect(getIdentity).toReturnWith(new HttpException('Could not find user', HttpStatus.BAD_REQUEST));
         });
 

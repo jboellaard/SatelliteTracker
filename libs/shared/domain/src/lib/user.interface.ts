@@ -9,7 +9,7 @@ export interface IIdentity {
 }
 
 export interface IUserInfo {
-    _id?: Id;
+    id?: Id;
     username: string;
     location?: ILocation;
     profileDescription?: string;

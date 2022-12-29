@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { map, Observable, Subscription } from 'rxjs';
-import { IUser } from 'shared/domain';
+import { Id, IUser } from 'shared/domain';
 import { UserService } from '../user.service';
 
 @Component({
@@ -14,13 +14,14 @@ import { UserService } from '../user.service';
 export class UserListComponent implements OnInit, OnDestroy {
     // users: Observable<User[]> | undefined;
     usersArray: IUser[] = [];
-    displayedColumns: string[] = ['id', 'name', 'emailAddress', 'latitude', 'longitude', 'createdAt', 'buttons'];
+    displayedColumns: string[] = ['id', 'name', 'latitude', 'longitude', 'createdAt', 'buttons'];
     sub!: Subscription;
 
     constructor(private userService: UserService, private router: Router) {}
 
     ngOnInit(): void {
-        this.sub = this.userService.list().subscribe((users) => {
+        this.sub = this.userService.getAll().subscribe((users) => {
+            console.log(users);
             if (users) this.usersArray = users;
         });
     }
@@ -29,9 +30,9 @@ export class UserListComponent implements OnInit, OnDestroy {
         this.userService.create(user);
     }
 
-    removeUser(id: number) {
-        this.userService.delete(id).subscribe(() => this.router.navigate(['/users']));
-        this.sub = this.userService.list().subscribe((users) => {
+    removeUser(username: string) {
+        this.userService.delete(username).subscribe(() => this.router.navigate(['/users']));
+        this.sub = this.userService.getAll().subscribe((users) => {
             if (users) this.usersArray = users;
         });
     }

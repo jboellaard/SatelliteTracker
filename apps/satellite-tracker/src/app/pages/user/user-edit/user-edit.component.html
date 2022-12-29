@@ -33,7 +33,7 @@
             </mat-form-field>
 
             <!-- password -->
-            <mat-form-field class="form-group password" appearance="fill">
+            <!-- <mat-form-field class="form-group password" appearance="fill">
                 <mat-label for="password">Password</mat-label>
                 <input
                     matInput
@@ -51,11 +51,11 @@
                 <mat-error *ngIf="password.invalid && password.touched" class="invalid-feedback">
                     <mat-error *ngIf="password.errors!['required']">Password is required</mat-error>
                 </mat-error>
-            </mat-form-field>
+            </mat-form-field> -->
         </div>
 
         <!-- email -->
-        <mat-form-field class="form-group" appearance="fill">
+        <!-- <mat-form-field class="form-group" appearance="fill">
             <mat-label for="email">Email</mat-label>
             <input
                 matInput
@@ -74,7 +74,7 @@
                 <mat-error *ngIf="email.errors!['required']">Email address is required</mat-error>
                 <mat-error *ngIf="email.errors!['email']">Please enter a valid email address.</mat-error>
             </mat-error>
-        </mat-form-field>
+        </mat-form-field> -->
 
         <!-- location -->
         <div>
@@ -87,7 +87,7 @@
                         type="number"
                         name="latitude"
                         class="form-control"
-                        [(ngModel)]="user!.location.latitude"
+                        [(ngModel)]="user!.location!.coordinates!.latitude"
                         #latitude="ngModel"
                         min="-90"
                         max="90"
@@ -111,7 +111,7 @@
                         type="number"
                         name="longitude"
                         class="form-control"
-                        [(ngModel)]="user!.location.longitude"
+                        [(ngModel)]="user!.location!.coordinates!.longitude"
                         #longitude="ngModel"
                         min="-180"
                         max="180"
@@ -160,8 +160,4 @@
             </div>
         </div>
     </form>
-
-    <!-- <pre
-      >{{ user | json }}
-  </pre> -->
 </div>

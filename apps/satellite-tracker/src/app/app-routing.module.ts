@@ -19,26 +19,26 @@ const routes: Routes = [
         component: UserEditComponent,
     },
     {
-        path: 'users/:id',
+        path: 'users/:username',
         pathMatch: 'full',
         component: UserDetailComponent,
     },
     {
-        path: 'users/:id/edit',
+        path: 'users/:username/edit',
         pathMatch: 'full',
         component: UserEditComponent,
     },
     {
-        path: 'users/:userId/satellites/new',
+        path: 'users/:username/satellites/new',
         pathMatch: 'full',
         component: SatelliteEditComponent,
     },
     {
-        path: 'users/:userId/satellites/:satelliteId/edit',
+        path: 'users/:username/satellites/:satelliteId/edit',
         pathMatch: 'full',
         component: SatelliteEditComponent,
     },
-    { path: 'users/:userId/satellites/:satelliteId', pathMatch: 'full', component: SatelliteDetailComponent },
+    { path: 'users/:username/satellites/:satelliteId', pathMatch: 'full', component: SatelliteDetailComponent },
     // {
     //   path: 'columns',
     //   component: ColumnsComponent,

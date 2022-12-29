@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { catchError, of, Subscription, switchMap, tap } from 'rxjs';
-import { IUser, IUserInfo } from 'shared/domain';
+import { APIResponse, IUser, IUserInfo } from 'shared/domain';
 import { UserService } from '../user.service';
 
 @Component({
@@ -26,93 +26,12 @@ export class UserEditComponent implements OnInit {
 
     constructor(private route: ActivatedRoute, private router: Router, private userService: UserService) {}
 
-    // ngOnInit(): void {
-    //   this.route.paramMap.subscribe((params) => {
-    //     this.id = params.get('id');
-    //     if (this.id) {
-    //       console.log('existing user');
-    //       this.componentExists = true;
-    //       var userByUsername = this.userService.getById(parseInt(this.id));
-    //       if (userByUsername) {
-    //         this.user = { ...userByUsername };
-    //       } else {
-    //         this.componentExists = false;
-    //         this.user = new User({
-    //           username: '',
-    //           password: '',
-    //           location: { latitude: 0, longitude: 0 },
-    //           profileDescription: '',
-    //           emailAddress: '',
-    //         });
-    //       }
-    //     } else {
-    //       console.log('new user');
-    //       this.componentExists = false;
-    //       this.user = new User({
-    //         username: '',
-    //         password: '',
-    //         location: { latitude: 0, longitude: 0 },
-    //         profileDescription: '',
-    //         emailAddress: '',
-    //       });
-    //     }
-    //   });
-    // }
-
-    // onSubmit() {
-    //   console.log('Submitting the form');
-    //   if (this.componentExists) {
-    //     this.userService.update(this.user!);
-    //     this.router.navigate(['..']);
-    //   } else {
-    //     if (this.userService.hasUniqueUsername(this.user!.username)) {
-    //       this.user!.createdAt = new Date();
-    //       this.userService.create(this.user!);
-    //       this.router.navigate(['..']);
-    //     } else {
-    //       alert('Username already exists');
-    //     }
-    //   }
-    // }
-
-    // ngOnInit(): void {
-    //   this.route.paramMap.subscribe((params) => {
-    //     this.id = params.get('id');
-    //     if (this.id) {
-    //       console.log('existing user');
-    //       this.componentExists = true;
-    //       var userByUsername = this.userService.getUserById(this.id);
-    //       if (userByUsername) {
-    //         this.user = { ...userByUsername };
-    //       } else {
-    //         this.componentExists = false;
-    //         this.user = {
-    //           id: 0,
-    //           username: '',
-    //           password: '',
-    //           createdAt: new Date(),
-    //           profileDescription: '',
-    //           updatedAt: new Date(),
-    //           emailAddress: '',
-    //         };
-    //         // this.user = new User(undefined, '', '', '', '', new Date(), undefined);
-    //       }
-    //     } else {
-    //       console.log('new user');
-    //       this.componentExists = false;
-    //       // this.user = new User(undefined, '', '', '', '', new Date(), undefined);
-    //     }
-    //   });
-    // }
-
     ngOnInit(): void {
-        // Haal de user op voor edit
         this.subscriptionParams = this.route.paramMap
             .pipe(
                 tap(console.log),
                 switchMap((params: ParamMap) => {
-                    // als we een nieuw item maken is er geen 'id'
-                    if (!params.get('id')) {
+                    if (!params.get('username')) {
                         return of({
                             username: '',
                             password: '',
@@ -122,23 +41,19 @@ export class UserEditComponent implements OnInit {
                         } as IUser);
                     } else {
                         this.componentExists = true;
-                        return this.userService.read(params.get('id')!);
+                        return this.userService.getByUsername(params.get('username')!);
                     }
-                }),
-                tap(console.log)
+                })
             )
-            .subscribe((user: IUserInfo) => {
+            .subscribe((user: IUser) => {
+                console.log(user);
                 this.user = user;
-                this.username = user.username;
+                this.username = this.user.username;
             });
     }
 
-    // Save user via the service
     onSubmit(): void {
-        console.log('onSubmit', this.user);
-
         if (this.user.id) {
-            console.log('update user');
             this.userService
                 .update(this.user, this.httpOptions)
                 .pipe(
@@ -155,8 +70,6 @@ export class UserEditComponent implements OnInit {
                     }
                 });
         } else {
-            // A user without id has not been saved to the database before.
-            console.log('create user');
             this.userService
                 .create(this.user, this.httpOptions)
                 .pipe(
