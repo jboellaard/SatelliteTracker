@@ -8,10 +8,14 @@ import { SatelliteDetailComponent } from './pages/satellite/satellite-detail/sat
 import { SatelliteEditComponent } from './pages/satellite/satellite-edit/satellite-edit.component';
 
 import { AboutComponent } from './pages/about/about.component';
+import { LoginComponent } from './auth/login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
 
 const routes: Routes = [
     { path: '', pathMatch: 'full', redirectTo: 'users' },
     { path: 'about', pathMatch: 'full', component: AboutComponent },
+    { path: 'login', pathMatch: 'full', component: LoginComponent },
+    { path: 'register', pathMatch: 'full', component: RegisterComponent },
     { path: 'users', pathMatch: 'full', component: UserListComponent },
     {
         path: 'users/new',

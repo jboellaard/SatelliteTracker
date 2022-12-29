@@ -8,7 +8,7 @@ import { User, UserDocument } from '../user/schemas/user.schema';
 
 import { hash, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { IIdentity, UserRegistration } from 'shared/domain';
+import { UserIdentity } from 'shared/domain';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { AuthNeoQueries } from './neo4j/auth.cypher';
 
@@ -25,7 +25,7 @@ export class AuthService {
         private jwtService: JwtService
     ) {}
 
-    async registerUser(credentials: UserRegistration): Promise<any> {
+    async registerUser(credentials: UserIdentity): Promise<any> {
         const stsession = await this.stconnection.startSession();
         const identitySession = await this.identityConnection.startSession();
         const neo4jSession = this.neo4jService.getWriteSession();
@@ -92,7 +92,7 @@ export class AuthService {
         return await this.identityModel.findOne({ username: username }).select('-hash').exec();
     }
 
-    async updateIdentity(username: string, updatedCredentials: IIdentity) {
+    async updateIdentity(username: string, updatedCredentials: UserIdentity) {
         const identitySession = await this.identityConnection.startSession();
         identitySession.startTransaction();
         this.logger.log(`Started transaction for updating user with username ${username}`);

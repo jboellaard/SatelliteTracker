@@ -59,15 +59,6 @@ body {
     font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
-html,
-body {
-    height: 100%;
-}
-body {
-    margin: 0;
-    font-family: Roboto, 'Helvetica Neue', sans-serif;
-}
-
 table {
     margin-bottom: 20px;
 }
@@ -82,4 +73,32 @@ button:hover {
 
 .text-muted {
     color: #a2adb6;
+}
+
+.spacer {
+    flex: 1 1 auto;
+}
+
+form {
+    min-width: 150px;
+    max-width: 500px;
+    width: 100%;
+    margin: auto;
+}
+
+mat-form-field {
+    width: 100%;
+}
+
+.cols-2 {
+    display: flex;
+    justify-content: space-between;
+}
+
+.cols-2 mat-form-field {
+    width: 49%;
+}
+
+.buttons button {
+    margin-inline: 5px;
 }

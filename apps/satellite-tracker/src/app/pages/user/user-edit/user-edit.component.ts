@@ -35,7 +35,7 @@ export class UserEditComponent implements OnInit {
                         return of({
                             username: '',
                             password: '',
-                            location: { latitude: 0, longitude: 0 },
+                            location: { coordinates: { latitude: 0, longitude: 0 } },
                             profileDescription: '',
                             emailAddress: '',
                         } as IUser);

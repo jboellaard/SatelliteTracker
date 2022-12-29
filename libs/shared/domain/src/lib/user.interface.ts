@@ -1,12 +1,12 @@
 import { Id } from './id.type';
 import { ISatellite } from './satellite.interface';
 
-export interface IIdentity {
-    id?: Id;
-    username?: string;
-    emailAddress?: string;
-    password?: string;
-}
+// export interface IIdentity {
+//     id?: Id;
+//     username?: string;
+//     emailAddress?: string;
+//     password?: string;
+// }
 
 export interface IUserInfo {
     id?: Id;

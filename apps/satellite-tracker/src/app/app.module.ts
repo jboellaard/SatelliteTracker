@@ -28,6 +28,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatListModule } from '@angular/material/list';
+import { LoginComponent } from './auth/login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
+
+import { AuthService } from './auth/auth.service';
+import { httpInterceptorProviders } from './auth/auth.interceptor';
 
 @NgModule({
     declarations: [
@@ -44,6 +49,8 @@ import { MatListModule } from '@angular/material/list';
         NavbarComponent,
         AboutComponent,
         UserListComponent,
+        LoginComponent,
+        RegisterComponent,
     ],
     imports: [
         BrowserModule,
@@ -62,7 +69,7 @@ import { MatListModule } from '@angular/material/list';
         MatGridListModule,
         MatListModule,
     ],
-    providers: [],
+    providers: [AuthService, httpInterceptorProviders],
     bootstrap: [AppComponent],
 })
 export class AppModule {}
