@@ -9,7 +9,7 @@ export interface UserCredentials {
 export interface UserIdentity extends UserCredentials {
     id?: Id;
     emailAddress?: string;
-    roles: string[];
+    roles?: string[];
     profileInfo?: IUserInfo;
 }
 

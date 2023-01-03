@@ -1,6 +1,8 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { UserIdentity } from 'shared/domain';
+import { AuthService } from '../auth.service';
 
 @Component({
     selector: 'app-register',
@@ -9,9 +11,9 @@ import { UserIdentity } from 'shared/domain';
 })
 export class RegisterComponent implements OnInit {
     registerForm!: FormGroup;
-    @Output() formSubmitted = new EventEmitter<UserIdentity>();
+    // @Output() formSubmitted = new EventEmitter<UserIdentity>();
 
-    constructor(private formBuilder: FormBuilder) {}
+    constructor(private formBuilder: FormBuilder, private authService: AuthService, private router: Router) {}
 
     ngOnInit(): void {
         this.registerForm = this.formBuilder.group({
@@ -23,7 +25,14 @@ export class RegisterComponent implements OnInit {
 
     onSubmit(): void {
         if (this.registerForm.valid) {
-            this.formSubmitted.emit(this.registerForm.value);
+            // this.formSubmitted.emit(this.registerForm.value);
+            console.log(this.registerForm.value);
+            this.authService.register(this.registerForm.value).subscribe((res) => {
+                console.log(res);
+                if (res) {
+                    this.router.navigate(['/login']);
+                }
+            });
         } else {
             console.log('invalid form');
         }

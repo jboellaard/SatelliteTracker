@@ -1,1 +1,79 @@
-<p>login works!</p>
+<div class="edit-container">
+    <h1>Login</h1>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" name="form" novalidate>
+        <div class="cols-2">
+            <!-- name -->
+            <mat-form-field class="form-group" appearance="fill">
+                <mat-label for="username">User name</mat-label>
+                <input
+                    matInput
+                    type="text"
+                    name="username"
+                    class="form-control"
+                    formControlName="username"
+                    minlength="3"
+                    required
+                    [ngClass]="{
+                        'is-invalid': loginForm.get('username')?.invalid && loginForm.get('username')?.touched
+                    }"
+                />
+                <mat-error
+                    *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+                    class="invalid-feedback"
+                >
+                    <ng-container *ngIf="loginForm.get('username')?.hasError('required')"
+                        >Username is required</ng-container
+                    >
+                    <ng-container *ngIf="loginForm.get('username')?.hasError('minlength')"
+                        >Username must be at least 3 chars long.</ng-container
+                    >
+                </mat-error>
+            </mat-form-field>
+
+            <!-- password -->
+            <mat-form-field class="form-group password" appearance="fill">
+                <mat-label for="password">Password</mat-label>
+                <input
+                    matInput
+                    type="password"
+                    name="password"
+                    class="form-control"
+                    formControlName="password"
+                    password
+                    required
+                    [ngClass]="{
+                        'is-invalid': loginForm.get('password')?.invalid && loginForm.get('password')?.touched
+                    }"
+                />
+                <mat-error
+                    *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+                    class="invalid-feedback"
+                >
+                    <ng-container *ngIf="loginForm.get('password')?.hasError('required')"
+                        >Password is required</ng-container
+                    >
+                    <ng-container *ngIf="loginForm.get('password')?.hasError('minlength')"
+                        >Password must be at least 3 chars long</ng-container
+                    >
+                </mat-error>
+            </mat-form-field>
+        </div>
+
+        <!-- Submit en Cancel buttons -->
+        <div class="buttons">
+            <div class="">
+                <button
+                    mat-flat-button
+                    color="primary"
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="!loginForm.valid"
+                >
+                    Submit
+                </button>
+                <button mat-flat-button class="btn btn-warning" routerLink="..">Cancel</button>
+            </div>
+        </div>
+    </form>
+</div>

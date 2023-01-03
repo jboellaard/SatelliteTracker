@@ -28,6 +28,7 @@ export class AuthController {
     @Post('register')
     async register(@Res() res: any, @Body() credentials: UserIdentity): Promise<ResourceId> {
         this.logger.log('POST register called');
+        this.logger.error(credentials);
         const user = await this.authService.registerUser(credentials);
         return res.status(HttpStatus.CREATED).json(user);
     }
