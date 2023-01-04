@@ -32,11 +32,6 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         this.route.paramMap.subscribe((params) => {
             this.id = params.get('satelliteId')!;
             this.username = params.get('username')!;
-            // this.userSub = this.userService.getByUsername(this.username).subscribe((user) => {
-            //     if (user) {
-            //         this.username = user.username;
-            //     }
-            // });
             if (this.id) {
                 this.componentExists = true;
                 this.satelliteSub = this.satelliteService.getById(this.id).subscribe((satellite) => {
@@ -61,7 +56,6 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
             sizeOfBase: 0,
             colorOfBase: '#000000',
             orbit: undefined,
-            createdById: this.userId!, // userId from token!
         };
     }
 
@@ -75,6 +69,14 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                 this.satellite = { ...satellite };
                 this.router.navigate(['/users/' + this.username + '/satellites/' + this.satellite.id]);
             });
+        }
+    }
+
+    backClicked() {
+        if (this.componentExists) {
+            this.router.navigate(['/users/' + this.username + '/satellites/' + this.id]);
+        } else {
+            this.router.navigate(['/users/' + this.username]);
         }
     }
 

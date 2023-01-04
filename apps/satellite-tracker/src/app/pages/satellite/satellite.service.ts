@@ -14,10 +14,10 @@ export class SatelliteService extends EntityService<ISatellite> {
         console.log('SatelliteService created');
     }
 
-    getSatellitesOfUserWithId(id: string): Observable<ISatellite[] | undefined> {
-        console.log('getUserById');
+    getSatellitesOfUserWithUsername(username: string): Observable<ISatellite[] | undefined> {
+        console.log('getUserByUsername');
         return this.http
-            .get<APIResponse<ISatellite[]>>(environment.API_URL + `users/${id}/satellites`)
-            .pipe(map((response: APIResponse<ISatellite[]>) => response.results));
+            .get<ISatellite[]>(environment.API_URL + `users/${username}/satellites`)
+            .pipe(tap((response: any) => console.log(response)));
     }
 }

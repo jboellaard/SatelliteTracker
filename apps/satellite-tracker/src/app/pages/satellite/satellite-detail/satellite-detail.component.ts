@@ -14,7 +14,6 @@ export class SatelliteDetailComponent implements OnInit {
     username: string | null | undefined;
     id: Id | null | undefined;
     satellite: ISatellite | undefined;
-    userId: Id | undefined;
     userSub: Subscription | undefined;
     satelliteSub: Subscription | undefined;
 
@@ -28,25 +27,20 @@ export class SatelliteDetailComponent implements OnInit {
     ngOnInit(): void {
         this.route.paramMap.subscribe((params) => {
             this.id = params.get('satelliteId');
-            this.userId = params.get('userId')!;
-            this.userSub = this.userService.getById(this.userId!).subscribe((user) => {
-                if (user) {
-                    this.username = user.username;
-                }
-            });
+            this.username = params.get('username')!;
             if (this.id) {
                 this.satelliteSub = this.satelliteService.getById(this.id).subscribe((satellite) => {
                     if (satellite) this.satellite = satellite;
-                    else this.router.navigate([`/users/${this.userId}/satellites/new`]);
+                    else this.router.navigate([`/users/${this.username}/satellites/new`]);
                 });
             } else {
-                this.router.navigate([`/users/${this.userId}/satellites/new`]);
+                this.router.navigate([`/users/${this.username}/satellites/new`]);
             }
         });
     }
 
     removeSatellite(id: Id) {
         this.satelliteService.delete(id);
-        this.router.navigate([`/users/${this.userId}`]);
+        this.router.navigate([`/users/${this.username}`]);
     }
 }

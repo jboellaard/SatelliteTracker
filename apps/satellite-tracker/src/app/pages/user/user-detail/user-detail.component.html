@@ -81,17 +81,17 @@
                 <ng-container matColumnDef="buttons">
                     <th mat-header-cell *matHeaderCellDef></th>
                     <td mat-cell class="edit icon" layout-align="center center" *matCellDef="let satellite">
-                        <button mat-flat-button color="accent" [routerLink]="'satellites/' + satellite.id + '/edit'">
+                        <button mat-flat-button color="accent" [routerLink]="'satellites/' + satellite._id + '/edit'">
                             <mat-icon>edit</mat-icon>
                         </button>
-                        <button mat-flat-button color="warn" (click)="removeSatellite(satellite.id)">
+                        <button mat-flat-button color="warn" (click)="removeSatellite(satellite._id)">
                             <mat-icon>delete</mat-icon>
                         </button>
                     </td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="satelliteColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: satelliteColumns" [routerLink]="'satellites/' + row.id"></tr>
+                <tr mat-row *matRowDef="let row; columns: satelliteColumns" [routerLink]="'satellites/' + row._id"></tr>
             </table>
         </div>
     </div>

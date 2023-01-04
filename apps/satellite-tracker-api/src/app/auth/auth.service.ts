@@ -8,7 +8,7 @@ import { User, UserDocument } from '../user/schemas/user.schema';
 
 import { hash, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { UserIdentity } from 'shared/domain';
+import { Id, UserIdentity } from 'shared/domain';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { AuthNeoQueries } from './neo4j/auth.cypher';
 
@@ -85,7 +85,35 @@ export class AuthService {
         if (!identity || !(await compare(password, identity.hash)))
             return new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
         this.logger.log(`User validated, generating token for user ${username}`);
-        return this.jwtService.sign({ sub: identity.user, username, roles: identity?.roles });
+        const payload = await this.getTokens(identity.user, username, identity.roles);
+        return payload;
+    }
+
+    async refreshToken(username: string): Promise<any> {
+        const identity = await this.identityModel.findOne({ username: username }).exec();
+
+        if (!identity) return new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
+        this.logger.log(`Generating new tokens for ${username}`);
+        const payload = await this.getTokens(identity.user, username, identity.roles);
+        return payload;
+    }
+
+    async getTokens(user: User, username: string, roles: string[]): Promise<any> {
+        const accessToken = this.jwtService.sign(
+            { sub: user, username: username, roles: roles },
+            { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '15m' }
+        );
+        const refreshToken = this.jwtService.sign(
+            { sub: user },
+            { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '7d' }
+        );
+        return {
+            accessToken,
+            refreshToken,
+            expiresAt: process.env.JWT_ACCESS_EXPIRATION,
+            username: username,
+            roles: roles,
+        };
     }
 
     async getIdentity(username: string): Promise<Identity | null> {

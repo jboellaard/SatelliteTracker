@@ -16,7 +16,8 @@ import { UserIdentity, ResourceId, Token, UserCredentials } from 'shared/domain'
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { AccessJwtAuthGuard } from './guards/access-jwt-auth.guard';
+import { RefreshJwtAuthGuard } from './guards/refresh-jwt-auth.guard';
 import { Roles } from './guards/roles.decorator';
 import { RolesGuard } from './guards/roles.guard';
 
@@ -37,10 +38,18 @@ export class AuthController {
     async login(@Res() res: any, @Body() credentials: UserCredentials): Promise<Token> {
         this.logger.log('POST login called');
         const token = await this.authService.generateToken(credentials.username, credentials.password);
-        return res.status(HttpStatus.OK).json({ token: token });
+        return res.status(HttpStatus.OK).json(token);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(RefreshJwtAuthGuard)
+    @Post('token')
+    async token(@Res() res: any, @Request() req: any): Promise<Token> {
+        this.logger.log('POST token called');
+        const token = await this.authService.refreshToken(req.user.username);
+        return res.status(HttpStatus.OK).json(token);
+    }
+
+    @UseGuards(AccessJwtAuthGuard)
     @Get('self')
     async getSelf(@Res() res: any, @Request() req: any): Promise<UserIdentity | null> {
         this.logger.log('GET self called');
@@ -48,7 +57,7 @@ export class AuthController {
         return res.status(HttpStatus.OK).json(identity);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AccessJwtAuthGuard)
     @Patch('self')
     async patchSelf(@Res() res: any, @Request() req: any, @Body() updatedCredentials: UserIdentity) {
         this.logger.log('PATCH self called');
@@ -56,7 +65,7 @@ export class AuthController {
         return res.status(HttpStatus.OK).json(identity);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AccessJwtAuthGuard)
     @Get('self/info')
     async getProfileInfo(@Res() res: any, @Request() req: any) {
         this.logger.log('GET self/info called');
@@ -64,7 +73,7 @@ export class AuthController {
         return res.status(HttpStatus.OK).json(user);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AccessJwtAuthGuard)
     @Patch('self/info')
     async patchInfo(@Res() res: any, @Request() req: any, @Body() updatedUser: UpdateUserDto) {
         this.logger.log('PATCH self/info called');
@@ -72,7 +81,7 @@ export class AuthController {
         return res.status(HttpStatus.OK).json(user);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AccessJwtAuthGuard)
     @Delete('self')
     async deleteSelf(@Res() res: any, @Request() req: any) {
         this.logger.log('DELETE self called');
@@ -80,7 +89,7 @@ export class AuthController {
         return res.status(HttpStatus.OK).json(user);
     }
 
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseGuards(AccessJwtAuthGuard, RolesGuard)
     @Roles('admin')
     @Get('users')
     async getAll(@Res() res: any) {
@@ -89,7 +98,7 @@ export class AuthController {
         return res.status(HttpStatus.OK).json(users);
     }
 
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseGuards(AccessJwtAuthGuard, RolesGuard)
     @Roles('admin')
     @Patch('users/:username')
     async patchByUsername(@Res() res: any, @Param('username') username: string, @Body() updatedUser: UpdateUserDto) {
@@ -98,7 +107,7 @@ export class AuthController {
         return res.status(HttpStatus.OK).json(user);
     }
 
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseGuards(AccessJwtAuthGuard, RolesGuard)
     @Roles('admin')
     @Patch('users/:username/identity')
     async patchIdentityByUsername(
@@ -111,7 +120,7 @@ export class AuthController {
         return res.status(HttpStatus.OK).json(identity);
     }
 
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseGuards(AccessJwtAuthGuard, RolesGuard)
     @Roles('admin')
     @Delete('users/:username')
     async deleteByUsername(@Res() res: any, @Param('username') username: string) {

@@ -36,17 +36,18 @@ export class UserDetailComponent implements OnInit {
             this.username = params.get('username');
             if (this.username) {
                 this.userSub = this.userService.getById(this.username).subscribe((user) => {
-                    if (user) this.user = user;
-                    else this.router.navigate(['/users/new']);
+                    console.log(user);
+                    if (user) {
+                        this.user = user;
+                        this.username = this.user.username;
+                        this.satelliteSub = this.satelliteService
+                            .getSatellitesOfUserWithUsername(this.username)
+                            .subscribe((satellites) => {
+                                console.log(satellites);
+                                if (satellites) this.satellites = satellites;
+                            });
+                    } else this.router.navigate(['/users/new']);
                 });
-                if (this.user) {
-                    this.username = this.user.username;
-                    // this.satelliteSub = this.satelliteService
-                    //     .getSatellitesOfUserWithId(this.username)
-                    //     .subscribe((satellites) => {
-                    //         if (satellites) this.satellites = satellites;
-                    //     });
-                }
             } else {
                 this.router.navigate(['/users/new']);
             }
@@ -60,10 +61,12 @@ export class UserDetailComponent implements OnInit {
 
     removeSatellite(id: Id) {
         this.satelliteService.delete(id);
-        if (this.id) {
-            this.satelliteSub = this.satelliteService.getSatellitesOfUserWithId(this.id).subscribe((satellites) => {
-                if (satellites) this.satellites = satellites;
-            });
+        if (this.user?.username) {
+            this.satelliteSub = this.satelliteService
+                .getSatellitesOfUserWithUsername(this.user.username)
+                .subscribe((satellites) => {
+                    if (satellites) this.satellites = satellites;
+                });
         }
     }
 

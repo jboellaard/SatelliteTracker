@@ -15,7 +15,7 @@ import {
 } from '@nestjs/common';
 import { SatelliteService } from './satellite.service';
 import { SatelliteDto, UpdateSatelliteDto } from './dto/satellite.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { AccessJwtAuthGuard } from '../auth/guards/access-jwt-auth.guard';
 import { OrbitDto, UpdateOrbitDto } from './dto/orbit.dto';
 
 @Controller('satellites')
@@ -23,7 +23,7 @@ export class SatelliteController {
     private readonly logger = new Logger(SatelliteController.name);
     constructor(private readonly satelliteService: SatelliteService) {}
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AccessJwtAuthGuard)
     @Post()
     async create(@Res() res: any, @Request() req: any, @Body() newSatellite: SatelliteDto) {
         this.logger.log('POST satellites called');
@@ -60,7 +60,7 @@ export class SatelliteController {
         return res.status(HttpStatus.OK).json(satellite);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AccessJwtAuthGuard)
     @Patch(':id')
     async update(
         @Res() res: any,
@@ -73,7 +73,7 @@ export class SatelliteController {
         return res.status(HttpStatus.OK).json(updatedSatellite);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AccessJwtAuthGuard)
     @Delete(':id')
     async remove(@Res() res: any, @Request() req: any, @Param('id') id: string) {
         Logger.debug('DELETE satellites/:id called');
@@ -81,7 +81,7 @@ export class SatelliteController {
         return res.status(HttpStatus.OK).json(deletedSatellite);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AccessJwtAuthGuard)
     @Post(':id/orbit')
     async createOrbit(@Res() res: any, @Request() req: any, @Param('id') id: string, @Body() orbit: OrbitDto) {
         this.logger.log('POST satellites/:id/orbit called');
@@ -89,7 +89,7 @@ export class SatelliteController {
         return res.status(HttpStatus.CREATED).json(updatedSatellite);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AccessJwtAuthGuard)
     @Patch(':id/orbit')
     async updateOrbit(@Res() res: any, @Request() req: any, @Param('id') id: string, @Body() orbit: UpdateOrbitDto) {
         this.logger.log('PATCH satellites/:id/orbit called');
@@ -97,7 +97,7 @@ export class SatelliteController {
         return res.status(HttpStatus.OK).json(updatedSatellite);
     }
 
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(AccessJwtAuthGuard)
     @Delete(':id/orbit')
     async removeOrbit(@Res() res: any, @Request() req: any, @Param('id') id: string) {
         this.logger.log('DELETE satellites/:id/orbit called');

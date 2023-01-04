@@ -14,5 +14,9 @@ export interface UserIdentity extends UserCredentials {
 }
 
 export interface Token {
-    token: string;
+    accessToken: string;
+    refreshToken: string;
+    expiresIn: number;
+    username: string;
+    roles: string[];
 }
