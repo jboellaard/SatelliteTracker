@@ -28,6 +28,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatListModule } from '@angular/material/list';
+import { MatSidenavModule } from '@angular/material/sidenav';
+
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 
@@ -68,6 +70,7 @@ import { httpInterceptorProviders } from './auth/auth.interceptor';
         MatCardModule,
         MatGridListModule,
         MatListModule,
+        MatSidenavModule,
     ],
     providers: [AuthService, httpInterceptorProviders],
     bootstrap: [AppComponent],

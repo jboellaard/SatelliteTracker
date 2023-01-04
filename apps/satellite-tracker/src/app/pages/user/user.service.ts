@@ -1,11 +1,6 @@
 import { Injectable } from '@angular/core';
-// import { GeographicLocation, User } from './user.model';
-// import { EntityService } from 'ui/entity';
-// import { APIResponse, Satellite } from 'shared/domain';
-// import { HttpClient } from '@angular/common/http';
 import { environment } from 'apps/satellite-tracker/src/environments/environment';
-// import { User } from './user.model';
-import { Id, IUser } from 'shared/domain';
+import { IUser } from 'shared/domain';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { EntityService } from 'ui/entity';

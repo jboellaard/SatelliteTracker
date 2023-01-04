@@ -1,9 +1,7 @@
-import { CdkTableDataSourceInput } from '@angular/cdk/table';
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
-import { map, Observable, Subscription } from 'rxjs';
-import { Id, IUser } from 'shared/domain';
+import { Subscription } from 'rxjs';
+import { IUser } from 'shared/domain';
 import { UserService } from '../user.service';
 
 @Component({
@@ -14,7 +12,7 @@ import { UserService } from '../user.service';
 export class UserListComponent implements OnInit, OnDestroy {
     // users: Observable<User[]> | undefined;
     usersArray: IUser[] = [];
-    displayedColumns: string[] = ['id', 'name', 'latitude', 'longitude', 'createdAt', 'buttons'];
+    displayedColumns: string[] = ['name', 'latitude', 'longitude', 'createdAt', 'buttons'];
     sub!: Subscription;
 
     constructor(private userService: UserService, private router: Router) {}

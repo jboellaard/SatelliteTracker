@@ -1,29 +1,14 @@
-table {
-    width: 100%;
-}
-
-.mat-row .mat-cell {
+.mat-mdc-row .mat-mdc-cell {
     border-bottom: 1px solid transparent;
     border-top: 1px solid transparent;
     cursor: pointer;
 }
 
-.mat-row:hover .mat-cell {
+.mat-mdc-row:hover .mat-mdc-cell {
     border-color: currentColor;
+    background-color: transparent;
 }
 
-.mat-cell.icon {
-    text-align: end;
-}
-
-.container {
-    padding: 20px;
-}
-
-.smalltext {
-    font-size: 9px;
-}
-
-table button {
-    margin-inline: 5px;
+table button mat-icon {
+    margin: 0px;
 }
