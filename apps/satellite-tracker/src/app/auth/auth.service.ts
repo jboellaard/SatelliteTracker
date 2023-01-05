@@ -12,7 +12,7 @@ import * as moment from 'moment';
 export class AuthService {
     private readonly headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     username: string | null | undefined;
-    admin: boolean | null | undefined;
+    admin = false;
 
     constructor(private http: HttpClient, private router: Router) {
         console.log('AuthService constructor ' + environment.API_URL);
@@ -22,9 +22,10 @@ export class AuthService {
         return this.http.post<any>(`${environment.API_URL}login`, { ...credentials }, { headers: this.headers }).pipe(
             tap((res) => {
                 console.log(res);
-                if (res.token) {
+                if (res.accessToken) {
                     localStorage.setItem('access_token', res.accessToken);
                     localStorage.setItem('refresh_token', res.refreshToken);
+                    localStorage.setItem('admin', res.roles.includes('admin') ? 'true' : 'false');
                     this.username = res.username;
                     this.admin = res.roles.includes('admin');
                     const expiresAt = moment().add(res.expiresIn, 'minute');
@@ -57,12 +58,12 @@ export class AuthService {
         localStorage.removeItem('token');
         localStorage.removeItem('expires_at');
         this.username = undefined;
-        this.admin = undefined;
+        this.admin = false;
         this.router.navigate(['/login']);
     }
 
-    getToken(): string | null {
-        return localStorage.getItem('token');
+    getAccessToken(): string | null {
+        return localStorage.getItem('access_token');
     }
 
     isLoggedIn(): boolean {
@@ -82,20 +83,18 @@ export class AuthService {
     refreshToken(): Observable<any> {
         const refreshToken = localStorage.getItem('refresh_token');
         return this.http
-            .post<any>(
-                `${environment.API_URL}token`,
-                { refreshToken },
-                { headers: { Authorization: `Bearer ${refreshToken}` } }
-            )
+            .get<any>(`${environment.API_URL}token`, {
+                headers: { authorization: `Bearer ${refreshToken}` },
+            })
             .pipe(
                 tap((res) => {
-                    console.log(res);
-                    if (res.token) {
+                    if (res.accessToken) {
                         localStorage.setItem('access_token', res.accessToken);
                         localStorage.setItem('refresh_token', res.refreshToken);
                         const expiresAt = moment().add(res.expiresIn, 'minute');
                         localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
                     }
+                    return of(res);
                 }),
                 catchError((err) => {
                     console.log('refresh error', err);

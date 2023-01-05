@@ -115,3 +115,9 @@ tr .icon {
 table button {
     margin-inline: 5px;
 }
+
+app-root {
+    min-height: 100%;
+    display: block;
+    position: relative;
+}

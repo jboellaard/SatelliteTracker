@@ -1,3 +1,4 @@
+import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { BehaviorSubject, Observable, Subscription, switchMap, tap } from 'rxjs';
@@ -15,8 +16,9 @@ export class UserDetailComponent implements OnInit {
     username: string | null | undefined;
     id: Id | null | undefined;
     user?: IUser;
-    satelliteColumns: string[] = ['id', 'name', 'mass', 'radius', 'orbit', 'createdAt', 'updatedAt', 'buttons'];
+    satelliteColumns: string[] = ['name', 'mass', 'radius', 'orbit', 'createdAt', 'updatedAt', 'buttons'];
     satellites: ISatellite[] = [];
+    admin = false;
 
     userSub!: Subscription;
     satelliteSub!: Subscription;
@@ -27,8 +29,12 @@ export class UserDetailComponent implements OnInit {
         private route: ActivatedRoute,
         private router: Router,
         public userService: UserService,
-        public satelliteService: SatelliteService
-    ) {}
+        public satelliteService: SatelliteService,
+        private breakpointObserver: BreakpointObserver
+    ) {
+        console.log(this.userService.admin);
+        this.admin = this.userService.admin;
+    }
 
     ngOnInit(): void {
         console.log('UserDetailComponent.ngOnInit()');
@@ -50,6 +56,20 @@ export class UserDetailComponent implements OnInit {
                 });
             } else {
                 this.router.navigate(['/users/new']);
+            }
+        });
+
+        this.breakpointObserver.observe(['(max-width: 600px)']).subscribe((result) => {
+            if (result.matches) {
+                this.satelliteColumns = ['name', 'orbit'];
+            } else {
+                this.breakpointObserver.observe(['(max-width: 900px)']).subscribe((result) => {
+                    if (result.matches) {
+                        this.satelliteColumns = ['name', 'mass', 'radius', 'orbit'];
+                    } else {
+                        this.satelliteColumns = ['name', 'mass', 'radius', 'orbit', 'createdAt', 'updatedAt'];
+                    }
+                });
             }
         });
     }

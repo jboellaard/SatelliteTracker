@@ -42,7 +42,7 @@ export class AuthController {
     }
 
     @UseGuards(RefreshJwtAuthGuard)
-    @Post('token')
+    @Get('token')
     async token(@Res() res: any, @Request() req: any): Promise<Token> {
         this.logger.log('POST token called');
         const token = await this.authService.refreshToken(req.user.username);

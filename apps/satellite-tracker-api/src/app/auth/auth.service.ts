@@ -84,7 +84,7 @@ export class AuthService {
 
         if (!identity || !(await compare(password, identity.hash)))
             return new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-        this.logger.log(`User validated, generating token for user ${username}`);
+        this.logger.log(`User validated, generating tokens for user ${username}`);
         const payload = await this.getTokens(identity.user, username, identity.roles);
         return payload;
     }
@@ -104,7 +104,7 @@ export class AuthService {
             { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '15m' }
         );
         const refreshToken = this.jwtService.sign(
-            { sub: user },
+            { sub: user, username: username },
             { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '7d' }
         );
         return {

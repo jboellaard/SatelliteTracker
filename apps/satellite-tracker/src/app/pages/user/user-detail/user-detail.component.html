@@ -1,7 +1,7 @@
 <div class="component-container" *ngIf="user; else loadingMessage">
     <div class="header">
         <h1>Profile of {{ user.username }}</h1>
-        <div class="buttons">
+        <div class="buttons" *ngIf="admin">
             <button mat-flat-button color="accent" routerLink="edit"><mat-icon>edit</mat-icon> Edit</button>
             <button mat-flat-button color="warn" (click)="removeUser(user!.username!)">
                 <mat-icon>delete</mat-icon> Remove

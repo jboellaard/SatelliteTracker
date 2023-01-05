@@ -3,7 +3,7 @@
 
     <div class="table-wrapper">
         <table mat-table [dataSource]="usersArray" class="mat-elevation-z8 demo-table">
-            <caption>
+            <caption style="visibility: hidden">
                 All current users
             </caption>
 
@@ -11,12 +11,6 @@
             <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef>Username</th>
                 <td mat-cell *matCellDef="let user">{{ user.username }}</td>
-            </ng-container>
-
-            <!-- Email Column -->
-            <ng-container matColumnDef="emailAddress">
-                <th mat-header-cell *matHeaderCellDef>Email address</th>
-                <td mat-cell *matCellDef="let user">{{ user.emailAddress }}</td>
             </ng-container>
 
             <!-- Location latitude Column -->

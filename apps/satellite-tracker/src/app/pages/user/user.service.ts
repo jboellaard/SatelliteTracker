@@ -10,6 +10,7 @@ import { EntityService } from 'ui/entity';
 })
 export class UserService extends EntityService<IUser> {
     users: IUser[] = [];
+    admin = localStorage.getItem('admin') === 'true';
     private exampleDataSource = new BehaviorSubject<any>(null);
     readonly exampleData$ = this.exampleDataSource.asObservable();
 
@@ -22,16 +23,4 @@ export class UserService extends EntityService<IUser> {
         console.log(`get one ${endpoint}`);
         return this.http.get<IUser>(endpoint).pipe(tap((response: any) => console.log(response)));
     }
-
-    // deleteByUsername(username: string) {
-    //     this.users = this.users.filter((user) => user.username !== username);
-    // }
-
-    // getUserByUsername(username: string): IUser | undefined {
-    //     return this.users.find((user) => user.username === username);
-    // }
-
-    // hasUniqueUsername(username: string): boolean {
-    //     return this.users.every((user) => user.username.trim().toLowerCase() != username.trim().toLowerCase());
-    // }
 }
