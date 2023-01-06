@@ -76,7 +76,7 @@ export class SatelliteController {
     @UseGuards(AccessJwtAuthGuard)
     @Delete(':id')
     async remove(@Res() res: any, @Request() req: any, @Param('id') id: string) {
-        Logger.debug('DELETE satellites/:id called');
+        this.logger.log('DELETE satellites/:id called');
         const deletedSatellite = await this.satelliteService.remove(req.user.userId, id);
         return res.status(HttpStatus.OK).json(deletedSatellite);
     }

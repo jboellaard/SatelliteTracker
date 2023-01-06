@@ -8,7 +8,7 @@ import { User, UserDocument } from '../user/schemas/user.schema';
 
 import { hash, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { Id, UserIdentity } from 'shared/domain';
+import { Id, UserIdentity, UserRegistration } from 'shared/domain';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { AuthNeoQueries } from './neo4j/auth.cypher';
 
@@ -25,7 +25,7 @@ export class AuthService {
         private jwtService: JwtService
     ) {}
 
-    async registerUser(credentials: UserIdentity): Promise<any> {
+    async registerUser(credentials: UserRegistration): Promise<any> {
         const stsession = await this.stconnection.startSession();
         const identitySession = await this.identityConnection.startSession();
         const neo4jSession = this.neo4jService.getWriteSession();
@@ -85,34 +85,40 @@ export class AuthService {
         if (!identity || !(await compare(password, identity.hash)))
             return new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
         this.logger.log(`User validated, generating tokens for user ${username}`);
-        const payload = await this.getTokens(identity.user, username, identity.roles);
+        delete identity.hash;
+        const payload = await this.getTokens(identity);
         return payload;
     }
 
     async refreshToken(username: string): Promise<any> {
-        const identity = await this.identityModel.findOne({ username: username }).exec();
+        const identity = await this.getIdentity(username);
 
         if (!identity) return new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
         this.logger.log(`Generating new tokens for ${username}`);
-        const payload = await this.getTokens(identity.user, username, identity.roles);
+        const payload = await this.getTokens(identity);
         return payload;
     }
 
-    async getTokens(user: User, username: string, roles: string[]): Promise<any> {
+    async getTokens(identity: Identity): Promise<any> {
+        const user: UserIdentity = {
+            id: identity.user.toString(),
+            username: identity.username,
+            roles: identity.roles,
+            emailAddress: identity.emailAddress,
+        };
         const accessToken = this.jwtService.sign(
-            { sub: user, username: username, roles: roles },
+            { sub: user.id, username: user.username, roles: user.roles },
             { secret: process.env.JWT_ACCESS_SECRET, expiresIn: '15m' }
         );
         const refreshToken = this.jwtService.sign(
-            { sub: user, username: username },
+            { sub: user.id, username: user.username },
             { secret: process.env.JWT_REFRESH_SECRET, expiresIn: '7d' }
         );
         return {
             accessToken,
             refreshToken,
-            expiresAt: process.env.JWT_ACCESS_EXPIRATION,
-            username: username,
-            roles: roles,
+            refreshTokenExpiresIn: '7d',
+            user,
         };
     }
 
@@ -120,7 +126,7 @@ export class AuthService {
         return await this.identityModel.findOne({ username: username }).select('-hash').exec();
     }
 
-    async updateIdentity(username: string, updatedCredentials: UserIdentity) {
+    async updateIdentity(username: string, updatedCredentials: UserRegistration) {
         const identitySession = await this.identityConnection.startSession();
         identitySession.startTransaction();
         this.logger.log(`Started transaction for updating user with username ${username}`);

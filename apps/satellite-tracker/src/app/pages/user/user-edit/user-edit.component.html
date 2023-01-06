@@ -1,6 +1,6 @@
 <div class="edit-container">
     <div *ngIf="componentExists && user">
-        <h1>Editing user {{ username }}</h1>
+        <h1>Editing user {{ user.username }}</h1>
     </div>
     <div *ngIf="!componentExists">
         <h1>Creating new User</h1>
@@ -77,7 +77,7 @@
         </mat-form-field> -->
 
         <!-- location -->
-        <div>
+        <!-- <div>
             <label>Location</label>
             <div class="cols-2">
                 <mat-form-field class="form-group" appearance="fill">
@@ -87,7 +87,7 @@
                         type="number"
                         name="latitude"
                         class="form-control"
-                        [(ngModel)]="user!.location!.coordinates!.latitude"
+                        [(ngModel)]="user!.location.coordinates!.latitude"
                         #latitude="ngModel"
                         min="-90"
                         max="90"
@@ -111,7 +111,7 @@
                         type="number"
                         name="longitude"
                         class="form-control"
-                        [(ngModel)]="user!.location!.coordinates!.longitude"
+                        [(ngModel)]="user!.location.coordinates.longitude"
                         #longitude="ngModel"
                         min="0"
                         max="180"
@@ -129,7 +129,7 @@
                     </mat-error>
                 </mat-form-field>
             </div>
-        </div>
+        </div> -->
 
         <!-- email -->
         <mat-form-field class="form-group" appearance="fill">

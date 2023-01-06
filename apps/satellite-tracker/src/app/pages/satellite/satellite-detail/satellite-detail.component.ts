@@ -30,8 +30,10 @@ export class SatelliteDetailComponent implements OnInit {
             this.username = params.get('username')!;
             if (this.id) {
                 this.satelliteSub = this.satelliteService.getById(this.id).subscribe((satellite) => {
-                    if (satellite) this.satellite = satellite;
-                    else this.router.navigate([`/users/${this.username}/satellites/new`]);
+                    if (satellite) {
+                        this.satellite = satellite;
+                        this.satellite.id = satellite._id;
+                    } else this.router.navigate([`/users/${this.username}/satellites/new`]);
                 });
             } else {
                 this.router.navigate([`/users/${this.username}/satellites/new`]);
@@ -40,7 +42,7 @@ export class SatelliteDetailComponent implements OnInit {
     }
 
     removeSatellite(id: Id) {
-        this.satelliteService.delete(id);
+        this.satelliteService.delete(id).subscribe(() => {});
         this.router.navigate([`/users/${this.username}`]);
     }
 }

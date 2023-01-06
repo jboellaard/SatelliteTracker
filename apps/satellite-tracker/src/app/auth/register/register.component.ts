@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserIdentity } from 'shared/domain';
+import { UserRegistration } from 'shared/domain';
 import { AuthService } from '../auth.service';
 
 @Component({

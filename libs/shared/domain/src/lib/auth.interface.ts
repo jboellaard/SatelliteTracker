@@ -6,12 +6,26 @@ export interface UserCredentials {
     password: string;
 }
 
-export interface UserIdentity extends UserCredentials {
+export interface UserRegistration extends UserCredentials {
     id?: Id;
     emailAddress?: string;
     roles?: string[];
     profileInfo?: IUserInfo;
 }
+
+export interface UserIdentity {
+    id?: Id;
+    username?: string;
+    emailAddress?: string;
+    roles?: string[];
+}
+
+// export interface IIdentity {
+//     id?: Id;
+//     username?: string;
+//     emailAddress?: string;
+//     roles?: string[];
+// }
 
 export interface Token {
     accessToken: string;

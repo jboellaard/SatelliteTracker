@@ -67,7 +67,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         } else {
             this.satelliteService.create(this.satellite!).subscribe((satellite) => {
                 this.satellite = { ...satellite };
-                this.router.navigate(['/users/' + this.username + '/satellites/' + this.satellite.id]);
+                this.router.navigate(['/users/' + this.username + '/satellites/' + this.satellite._id]);
             });
         }
     }

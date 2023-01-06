@@ -3,10 +3,15 @@
         <button mat-button routerLink="/" routerLinkActive="active" ariaCurrentWhenActive="page">Home</button>
         <!-- <span class="title">Satellite Tracker</span> -->
     </div>
-    <div>
-        <button mat-button routerLink="/login" routerLinkActive="active" ariaCurrentWhenActive="page">Login</button>
-        <button mat-button routerLink="/register" routerLinkActive="active" ariaCurrentWhenActive="page">
-            Register
-        </button>
+    <div *ngIf="user != null; else anonymous">
+        <button mat-button (click)="logout()" ariaCurrentWhenActive="page">Logout</button>
     </div>
+    <ng-template #anonymous
+        ><div>
+            <button mat-button routerLink="/login" routerLinkActive="active" ariaCurrentWhenActive="page">Login</button>
+            <button mat-button routerLink="/register" routerLinkActive="active" ariaCurrentWhenActive="page">
+                Register
+            </button>
+        </div></ng-template
+    >
 </mat-toolbar>

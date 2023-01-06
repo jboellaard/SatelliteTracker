@@ -86,7 +86,7 @@ export class SatelliteService {
 
     async getSatellitesOfUserWithUsername(username: string) {
         const user = await this.userModel.findOne({ username });
-        return await this.satelliteModel.find({ createdBy: user._id }).populate('satelliteParts.satellitePart');
+        return await this.satelliteModel.find({ createdById: user._id }).populate('satelliteParts.satellitePart');
     }
 
     async update(userId: Id, id: Id, updateSatelliteDto: UpdateSatelliteDto) {

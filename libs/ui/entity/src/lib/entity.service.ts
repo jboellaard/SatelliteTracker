@@ -49,7 +49,8 @@ export class EntityService<T extends IEntity> {
     public delete(id: Id, options?: any): Observable<T> {
         console.log('delete');
         console.log(`${this.url}${this.endpoint}/${id}`);
-        return this.http.delete(`${this.url}${this.endpoint}/${id}`, { ...options, ...httpOptions }).pipe(
+        return this.http.delete<T>(`${this.url}${this.endpoint}/${id}`, { ...options, ...httpOptions }).pipe(
+            tap((response: any) => console.log(response)),
             // map((response: any) => response.result),
             catchError(this.handleError)
         );

@@ -12,7 +12,7 @@ import {
     Logger,
     Res,
 } from '@nestjs/common';
-import { UserIdentity, ResourceId, Token, UserCredentials } from 'shared/domain';
+import { UserRegistration, ResourceId, Token, UserCredentials } from 'shared/domain';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
@@ -27,7 +27,7 @@ export class AuthController {
     constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
 
     @Post('register')
-    async register(@Res() res: any, @Body() credentials: UserIdentity): Promise<ResourceId> {
+    async register(@Res() res: any, @Body() credentials: UserRegistration): Promise<ResourceId> {
         this.logger.log('POST register called');
         this.logger.error(credentials);
         const user = await this.authService.registerUser(credentials);
@@ -51,7 +51,7 @@ export class AuthController {
 
     @UseGuards(AccessJwtAuthGuard)
     @Get('self')
-    async getSelf(@Res() res: any, @Request() req: any): Promise<UserIdentity | null> {
+    async getSelf(@Res() res: any, @Request() req: any): Promise<UserRegistration | null> {
         this.logger.log('GET self called');
         const identity = await this.authService.getIdentity(req.user.username);
         return res.status(HttpStatus.OK).json(identity);
@@ -59,7 +59,7 @@ export class AuthController {
 
     @UseGuards(AccessJwtAuthGuard)
     @Patch('self')
-    async patchSelf(@Res() res: any, @Request() req: any, @Body() updatedCredentials: UserIdentity) {
+    async patchSelf(@Res() res: any, @Request() req: any, @Body() updatedCredentials: UserRegistration) {
         this.logger.log('PATCH self called');
         const identity = await this.authService.updateIdentity(req.user.username, updatedCredentials);
         return res.status(HttpStatus.OK).json(identity);
@@ -113,7 +113,7 @@ export class AuthController {
     async patchIdentityByUsername(
         @Res() res: any,
         @Param('username') username: string,
-        @Body() updatedIdentity: UserIdentity
+        @Body() updatedIdentity: UserRegistration
     ) {
         this.logger.log(`PATCH users/${username}/identity called`);
         const identity = await this.authService.updateIdentity(username, updatedIdentity);

@@ -22,12 +22,7 @@ export class AuthInterceptor implements HttpInterceptor {
         }
         return next.handle(authReq).pipe(
             catchError((error) => {
-                if (
-                    error instanceof HttpErrorResponse &&
-                    !authReq.url.includes('login') &&
-                    !authReq.url.includes('token') &&
-                    error.status === 401
-                ) {
+                if (error instanceof HttpErrorResponse && error.status === 401) {
                     return this.handle401Error(authReq, next);
                 }
                 return next.handle(authReq);
@@ -41,7 +36,7 @@ export class AuthInterceptor implements HttpInterceptor {
                 if (res.accessToken) {
                     return next.handle(request.clone({ setHeaders: { Authorization: `Bearer ${res.accessToken}` } }));
                 } else {
-                    this.authService.logout();
+                    console.log('Something went wrong');
                     return next.handle(request);
                 }
             })
