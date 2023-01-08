@@ -41,6 +41,7 @@ export class EntityService<T extends IEntity> {
 
     public update(item: T, options?: any) {
         return this.http.patch<T>(`${this.url}${this.endpoint}/${item.id}`, item, { ...options, ...httpOptions }).pipe(
+            tap((response: any) => console.log(response)),
             // map((response: any) => response.results),
             catchError(this.handleError)
         );
@@ -50,7 +51,6 @@ export class EntityService<T extends IEntity> {
         console.log('delete');
         console.log(`${this.url}${this.endpoint}/${id}`);
         return this.http.delete<T>(`${this.url}${this.endpoint}/${id}`, { ...options, ...httpOptions }).pipe(
-            tap((response: any) => console.log(response)),
             // map((response: any) => response.result),
             catchError(this.handleError)
         );

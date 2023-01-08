@@ -3,7 +3,7 @@
         <button mat-button routerLink="/" routerLinkActive="active" ariaCurrentWhenActive="page">Home</button>
         <!-- <span class="title">Satellite Tracker</span> -->
     </div>
-    <div *ngIf="user != null; else anonymous">
+    <div *ngIf="user; else anonymous">
         <button mat-button (click)="logout()" ariaCurrentWhenActive="page">Logout</button>
     </div>
     <ng-template #anonymous

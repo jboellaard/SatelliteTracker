@@ -78,7 +78,14 @@ export class Orbit {
 
 export const OrbitSchema = SchemaFactory.createForClass(Orbit);
 OrbitSchema.virtual('period').get(function () {
-    return 2 * Math.PI * Math.sqrt(Math.pow(this.semiMajorAxis, 3) / 398600.4418);
+    return (
+        (2 *
+            Math.PI *
+            Math.sqrt(
+                Math.pow(this.semiMajorAxis * 1000, 3) / (5.9722 * Math.pow(10, 24) * 6.6743 * Math.pow(10, -11))
+            )) /
+        (24 * 60 * 60)
+    );
 });
 
 /**

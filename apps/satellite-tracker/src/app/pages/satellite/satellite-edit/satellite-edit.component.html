@@ -107,12 +107,150 @@
                 class="form-control"
                 [(ngModel)]="satellite!.colorOfBase"
                 #colorB="ngModel"
+                (ngModelChange)="changeColorSatellite()"
                 [ngClass]="{
                     'is-invalid': colorB.invalid && colorB.touched
                 }"
             />
             <mat-error *ngIf="colorB.invalid && colorB.touched" class="invalid-feedback"> </mat-error>
         </mat-form-field>
+
+        <div *ngIf="satellite.orbit">
+            <!-- semi major axis -->
+            <mat-form-field class="form-group orbit" appearance="fill">
+                <mat-label for="semimajoraxis">Semi major axis in km</mat-label>
+                <input
+                    matInput
+                    type="number"
+                    name="semimajoraxis"
+                    class="form-control"
+                    [(ngModel)]="semiMajorAxisWithoutEarthRadius"
+                    #semiMajorAxis="ngModel"
+                    (ngModelChange)="calculatePeriod()"
+                    required
+                    [min]="(minAltitude - orbitService.earthRadius).toString()"
+                    [max]="orbitService.maxSMAEarth.toString()"
+                    [ngClass]="{
+                        'is-invalid': semiMajorAxis.invalid && semiMajorAxis.touched
+                    }"
+                />
+                <mat-error *ngIf="semiMajorAxis.invalid && semiMajorAxis.touched" class="invalid-feedback">
+                    <mat-error *ngIf="semiMajorAxis.errors!['required']">Semi major axis is required</mat-error>
+                    <!-- <mat-error *ngIf="semiMajorAxis.errors!['min']">Orbit must be at least 1 m.</mat-error> -->
+                </mat-error>
+            </mat-form-field>
+            <!-- period -->
+            <mat-form-field class="form-group orbit" appearance="fill">
+                <mat-label for="period">Period in days</mat-label>
+                <input
+                    matInput
+                    type="number"
+                    name="period"
+                    class="form-control"
+                    [(ngModel)]="satellite!.orbit.period"
+                    #period="ngModel"
+                    (ngModelChange)="calculateSemiMajorAxis()"
+                    required
+                    [ngClass]="{
+                        'is-invalid': period.invalid && period.touched
+                    }"
+                />
+                <mat-error *ngIf="period.invalid && period.touched" class="invalid-feedback">
+                    <mat-error *ngIf="period.errors!['required']">Semi major axis is required</mat-error>
+                    <!-- <mat-error *ngIf="semiMajorAxis.errors!['min']">Orbit must be at least 1 m.</mat-error> -->
+                </mat-error>
+            </mat-form-field>
+            <!-- inclination -->
+            <mat-form-field class="form-group orbit" appearance="fill">
+                <mat-label for="inclination">Inclination</mat-label>
+                <input
+                    matInput
+                    type="number"
+                    name="inclination"
+                    class="form-control"
+                    [(ngModel)]="satellite!.orbit.inclination"
+                    #inclination="ngModel"
+                    (ngModelChange)="changeInclination()"
+                    required
+                    min="0"
+                    max="180"
+                    [ngClass]="{
+                        'is-invalid': inclination.invalid && inclination.touched
+                    }"
+                />
+                <mat-error *ngIf="inclination.invalid && inclination.touched" class="invalid-feedback">
+                    <mat-error *ngIf="inclination.errors!['required']">Semi major axis is required</mat-error>
+                    <!-- <mat-error *ngIf="semiMajorAxis.errors!['min']">Orbit must be at least 1 m.</mat-error> -->
+                </mat-error>
+            </mat-form-field>
+            <!-- longitude (RA) -->
+            <mat-form-field class="form-group orbit" appearance="fill">
+                <mat-label for="longitude">Longitude of ascending node</mat-label>
+                <input
+                    matInput
+                    type="number"
+                    name="longitude"
+                    class="form-control"
+                    [(ngModel)]="satellite!.orbit.longitudeOfAscendingNode"
+                    #longitude="ngModel"
+                    (ngModelChange)="changeAngle()"
+                    required
+                    min="0"
+                    max="180"
+                    [ngClass]="{
+                        'is-invalid': longitude.invalid && longitude.touched
+                    }"
+                />
+                <mat-error *ngIf="longitude.invalid && longitude.touched" class="invalid-feedback">
+                    <mat-error *ngIf="longitude.errors!['required']">Semi major axis is required</mat-error>
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="form-group orbit" appearance="fill">
+                <mat-label for="perigee">Argument of perigee</mat-label>
+                <input
+                    matInput
+                    type="number"
+                    name="perigee"
+                    class="form-control"
+                    [(ngModel)]="satellite!.orbit.argumentOfPerigee"
+                    #perigee="ngModel"
+                    (ngModelChange)="changeAngle()"
+                    required
+                    min="0"
+                    max="180"
+                    [ngClass]="{
+                        'is-invalid': perigee.invalid && perigee.touched
+                    }"
+                />
+                <mat-error *ngIf="perigee.invalid && perigee.touched" class="invalid-feedback">
+                    <mat-error *ngIf="perigee.errors!['required']">Semi major axis is required</mat-error>
+                </mat-error>
+            </mat-form-field>
+            <!-- eccentricity -->
+            <mat-form-field class="form-group orbit" appearance="fill">
+                <mat-label for="eccentricity">Eccentricity</mat-label>
+                <input
+                    matInput
+                    type="number"
+                    name="eccentricity"
+                    class="form-control"
+                    [(ngModel)]="satellite!.orbit.eccentricity"
+                    #eccentricity="ngModel"
+                    (ngModelChange)="changeEccentricity()"
+                    required
+                    min="0"
+                    max="1"
+                    [ngClass]="{
+                        'is-invalid': eccentricity.invalid && eccentricity.touched
+                    }"
+                />
+                <mat-error *ngIf="eccentricity.invalid && eccentricity.touched" class="invalid-feedback">
+                    <mat-error *ngIf="eccentricity.errors!['required']">Semi major axis is required</mat-error>
+                    <!-- <mat-error *ngIf="semiMajorAxis.errors!['min']">Orbit must be at least 1 m.</mat-error> -->
+                </mat-error>
+            </mat-form-field>
+        </div>
+        <div id="scene-container"></div>
 
         <!-- Submit en Cancel buttons -->
         <div class="buttons">

@@ -89,7 +89,7 @@ export class AuthService {
         localStorage.removeItem('expires_at');
         localStorage.removeItem(this.CURRENT_USER);
         this.user$.next(undefined);
-        // this.router.navigate(['/login']);
+        this.router.navigate(['/login']);
     }
 
     getUserFromLocalStorage(): Observable<UserIdentity | undefined> {
