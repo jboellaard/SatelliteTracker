@@ -13,6 +13,9 @@ export class OrbitService {
     ellipse = new THREE.Line();
     ellipseCurve = new THREE.EllipseCurve(0, 0, 1, 1, 0, 2 * Math.PI, false, 0);
     satelliteMesh = new THREE.Mesh();
+    xLine = new THREE.Line(new THREE.BufferGeometry());
+    yLine = new THREE.Line(new THREE.BufferGeometry());
+    zLine = new THREE.Line(new THREE.BufferGeometry());
     equatorialPlane = new THREE.Mesh();
     fitCameraToOrbit: any;
     scale = 0.0001;
@@ -30,13 +33,13 @@ export class OrbitService {
         const controls = this.createControls(camera, renderer);
 
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(0, 0, 50);
+        directionalLight.position.set(50, 0, 0);
         directionalLight.lookAt(scene.position);
         scene.add(directionalLight);
 
         scene.add(new THREE.AmbientLight(0x333333));
 
-        const hemiLight = new THREE.HemisphereLight(0xfffff, 0xffffff, 0.6);
+        const hemiLight = new THREE.HemisphereLight(0xffffff, 0xffffff, 0.6);
         hemiLight.position.set(0, 500, 0);
         scene.add(hemiLight);
 
@@ -55,17 +58,17 @@ export class OrbitService {
         this.satelliteMesh = satelliteMesh;
 
         this.fitCameraToOrbit = function (newOrbit: IOrbit) {
-            const posZ = ((newOrbit.semiMajorAxis ? newOrbit.semiMajorAxis * this.scale * 2 : 0) + 3) * 1.1;
-            if (posZ < 5) {
-                camera.position.set(-1, 2, 5);
-                directionalLight.position.set(0, 0, 50);
+            const cameraPos = ((newOrbit.semiMajorAxis ? newOrbit.semiMajorAxis * this.scale * 2 : 0) + 3) * 1.1;
+            if (cameraPos < 5) {
+                camera.position.set(-5, -1, 2);
+                directionalLight.position.set(50, 0, 0);
                 camera.far = 100;
             } else {
-                camera.position.set(posZ - 6, posZ - 3, posZ);
-                directionalLight.position.set(0, 0, posZ + 50);
-                camera.far = posZ * 3;
+                camera.position.set(-cameraPos, cameraPos - 4, 0);
+                directionalLight.position.set(cameraPos + 50, 0, 0);
+                camera.far = cameraPos * 3;
             }
-            satelliteMesh.scale.setScalar(posZ / 2.5);
+            satelliteMesh.scale.setScalar(cameraPos / 2.5);
             camera.lookAt(0, 0, 0);
             controls.update();
         };
@@ -76,23 +79,19 @@ export class OrbitService {
         let time = 0;
         const earthRotation = 0.003;
 
-        // let guide = new THREE.Line(
-        //     new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(10, 10, 10)]),
-        //     new THREE.LineBasicMaterial({ color: 0xff0000 })
-        // );
-        // scene.add(guide);
-
-        let rotation = this.ellipse.rotation;
-
         console.log(orbit);
         const animate = function () {
             requestAnimationFrame(animate);
-            time += orbit.period ? earthRotation / orbit.period : 0;
-
             if (!orbit.eccentricity) orbit.eccentricity = 0;
             if (!orbit.inclination) orbit.inclination = 0;
             if (!orbit.longitudeOfAscendingNode) orbit.longitudeOfAscendingNode = 0;
             if (!orbit.argumentOfPerigee) orbit.argumentOfPerigee = 0;
+            if (!orbit.period) orbit.period = 0;
+
+            time -=
+                ((earthRotation / orbit.period) *
+                    (1 + 2 * orbit.eccentricity * Math.cos(time) + orbit.eccentricity ** 2)) /
+                (1 - orbit.eccentricity ** 2);
 
             const xR = 0;
             const yR = orbit.inclination * (Math.PI / 180);
@@ -104,12 +103,14 @@ export class OrbitService {
             const y0 = orbit.semiMajorAxis * scale * Math.sqrt(1 - orbit.eccentricity ** 2) * Math.sin(time);
             const z = 0;
 
-            const x =
-                x0 * Math.cos(-orbit.argumentOfPerigee * (Math.PI / 180)) -
-                y0 * Math.sin(-orbit.argumentOfPerigee * (Math.PI / 180));
-            const y =
-                x0 * Math.sin(-orbit.argumentOfPerigee * (Math.PI / 180)) +
-                y0 * Math.cos(-orbit.argumentOfPerigee * (Math.PI / 180));
+            const perigee =
+                -orbit.argumentOfPerigee * (Math.PI / 180) +
+                (orbit.inclination != 0
+                    ? 2 * Math.atan2(Math.sqrt(1 - orbit.eccentricity ** 2), 1 - orbit.eccentricity)
+                    : 0);
+
+            const x = x0 * Math.cos(perigee) - y0 * Math.sin(perigee);
+            const y = x0 * Math.sin(perigee) + y0 * Math.cos(perigee);
 
             const x1 = x;
             const y1 = y * Math.cos(xR) - z * Math.sin(xR);
@@ -123,16 +124,9 @@ export class OrbitService {
             const y3 = x2 * Math.sin(zR) + y2 * Math.cos(zR);
             const z3 = z2;
 
-            // guide.geometry.setAttribute(
-            //     'position',
-            //     new THREE.BufferAttribute(new Float32Array([x3, y3, z3, 0, 0, 0]), 3)
-            // );
-            // guide.rotation.y = orbit.longitudeOfAscendingNode * (Math.PI / 180);
-
             const pos = new THREE.Vector3(x3, y3, z3);
             pos.applyAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
             pos.applyAxisAngle(new THREE.Vector3(0, 1, 0), orbit.longitudeOfAscendingNode * (Math.PI / 180));
-            // pos.applyAxisAngle(new THREE.Vector3(0.5, 0.5, 0), orbit.argumentOfPerigee * (Math.PI / 180));
             satelliteMesh.position.set(pos.x, pos.y, pos.z);
 
             earth.rotation.y += earthRotation;
@@ -146,7 +140,7 @@ export class OrbitService {
 
     private createCamera() {
         const camera = new THREE.PerspectiveCamera(50, (window.innerWidth * 0.9) / window.innerHeight, 0.1, 1000);
-        camera.position.set(-1, 2, 5);
+        camera.position.set(-5, -1, 2);
         return camera;
     }
 
@@ -167,45 +161,20 @@ export class OrbitService {
 
     private createOrbit(orbit: IOrbit, scene: THREE.Scene) {
         this.ellipse.material = new THREE.LineBasicMaterial({ color: 0xa6a6a6 });
-        // this.ellipse.rotation.set(Math.PI / 2, Math.PI, Math.PI / 2);
-        // this.ellipse.rotation.x = Math.PI / 2;
-        // this.ellipse.rotation.y = Math.PI;
-        // this.ellipse.rotation.z = Math.PI / 2;
         this.ellipseObject.add(this.ellipse);
         this.changeEllipseRotation(orbit);
         scene.add(this.ellipseObject);
     }
 
     private createGuideLines(scene: THREE.Scene) {
-        scene.add(
-            new THREE.Line(
-                new THREE.BufferGeometry().setFromPoints([
-                    new THREE.Vector3(0, -(2 * this.earthRadius * this.scale), 0),
-                    new THREE.Vector3(0, 2 * this.earthRadius * this.scale, 0),
-                ]),
-                new THREE.LineBasicMaterial({ color: 0xa6a6a6 })
-            )
-        );
+        const lineColor = 0x5a5b5c;
+        this.xLine.material = new THREE.LineBasicMaterial({ color: lineColor });
+        this.yLine.material = new THREE.LineBasicMaterial({ color: lineColor });
+        this.zLine.material = new THREE.LineBasicMaterial({ color: lineColor });
 
-        scene.add(
-            new THREE.Line(
-                new THREE.BufferGeometry().setFromPoints([
-                    new THREE.Vector3(-(2 * this.earthRadius * this.scale), 0, 0),
-                    new THREE.Vector3(2 * this.earthRadius * this.scale, 0, 0),
-                ]),
-                new THREE.LineBasicMaterial({ color: 0xffff00 })
-            )
-        );
-
-        scene.add(
-            new THREE.Line(
-                new THREE.BufferGeometry().setFromPoints([
-                    new THREE.Vector3(0, 0, -(2 * this.earthRadius * this.scale)),
-                    new THREE.Vector3(0, 0, 2 * this.earthRadius * this.scale),
-                ]),
-                new THREE.LineBasicMaterial({ color: 0xff0000 })
-            )
-        );
+        scene.add(this.xLine);
+        scene.add(this.yLine);
+        scene.add(this.zLine);
 
         this.equatorialPlane.material = new THREE.MeshBasicMaterial({
             color: 0x000000,
@@ -228,6 +197,26 @@ export class OrbitService {
         let planeSize = orbit.semiMajorAxis * this.scale * 2;
         if (planeSize < 2) planeSize = 2;
         this.equatorialPlane.geometry = new THREE.PlaneGeometry(planeSize, planeSize, 32);
+        this.xLine.geometry.setFromPoints([
+            new THREE.Vector3(-planeSize / 2, 0, 0),
+            new THREE.Vector3(planeSize / 2, 0, 0),
+        ]);
+        this.yLine.geometry.setFromPoints([
+            new THREE.Vector3(
+                0,
+                planeSize / 4 > 2 * this.earthRadius * this.scale ? -planeSize / 4 : -2 * this.earthRadius * this.scale,
+                0
+            ),
+            new THREE.Vector3(
+                0,
+                planeSize / 4 > 2 * this.earthRadius * this.scale ? planeSize / 4 : 2 * this.earthRadius * this.scale,
+                0
+            ),
+        ]);
+        this.zLine.geometry.setFromPoints([
+            new THREE.Vector3(0, 0, -planeSize / 2),
+            new THREE.Vector3(0, 0, planeSize / 2),
+        ]);
         this.fitCameraToOrbit(orbit);
     }
 
@@ -235,8 +224,13 @@ export class OrbitService {
         if (!orbit.inclination) orbit.inclination = 0;
         if (!orbit.longitudeOfAscendingNode) orbit.longitudeOfAscendingNode = 0;
         if (!orbit.argumentOfPerigee) orbit.argumentOfPerigee = 0;
+        if (!orbit.eccentricity) orbit.eccentricity = 0;
 
-        this.ellipse.rotation.z = orbit.argumentOfPerigee * (Math.PI / 180);
+        this.ellipse.rotation.z =
+            orbit.argumentOfPerigee * (Math.PI / 180) -
+            (orbit.inclination != 0
+                ? 2 * Math.atan2(Math.sqrt(1 - orbit.eccentricity ** 2), 1 - orbit.eccentricity)
+                : 0); // TODO: argument of perigee zero (closest) at ascending node, not working yet
         this.ellipse.rotation.y = Math.PI + orbit.inclination * (Math.PI / 180);
 
         this.ellipseObject.rotation.z = -orbit.longitudeOfAscendingNode * (Math.PI / 180);

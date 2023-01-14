@@ -146,6 +146,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                 this.semiMajorAxisWithoutEarthRadius =
                     this.satellite.orbit.semiMajorAxis - this.orbitService.earthRadius;
                 this.orbitService.changeEllipseGeometry(this.satellite.orbit);
+                this.orbitService.changeEllipseRotation(this.satellite.orbit);
             }
         }
     }
