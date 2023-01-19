@@ -29,6 +29,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatSliderModule } from '@angular/material/slider';
 
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
@@ -71,6 +72,7 @@ import { httpInterceptorProviders } from './auth/auth.interceptor';
         MatGridListModule,
         MatListModule,
         MatSidenavModule,
+        MatSliderModule,
     ],
     providers: [AuthService, httpInterceptorProviders],
     bootstrap: [AppComponent],

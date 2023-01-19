@@ -9,248 +9,320 @@
     <!-- Edit form for satelliteimplemented model -->
 
     <form #satelliteEditForm="ngForm" name="form" (ngSubmit)="onSubmit()" novalidate>
-        <!-- name -->
-        <mat-form-field class="form-group" appearance="fill">
-            <mat-label for="name">Name</mat-label>
-            <input
-                matInput
-                type="text"
-                name="username"
-                class="form-control"
-                [(ngModel)]="satellite!.satelliteName"
-                #name="ngModel"
-                minlength="1"
-                required
-                [ngClass]="{
-                    'is-invalid': name.invalid && name.touched
-                }"
-            />
-            <mat-error *ngIf="name.invalid && name.touched" class="invalid-feedback">
-                <mat-error *ngIf="name.errors!['required']">Name is required</mat-error>
-                <mat-error *ngIf="name.errors!['minlength']">Username must be at least 1 character long.</mat-error>
-            </mat-error>
-        </mat-form-field>
-
-        <!-- purpose -->
-        <mat-form-field class="form-group" appearance="fill">
-            <mat-label for="purpose">Purpose</mat-label>
-            <input
-                matInput
-                type="text"
-                name="purpose"
-                class="form-control"
-                [(ngModel)]="satellite!.purpose"
-                #purpose="ngModel"
-                required
-                [ngClass]="{
-                    'is-invalid': purpose.invalid && purpose.touched
-                }"
-            />
-            <mat-error *ngIf="purpose.invalid && purpose.touched" class="invalid-feedback">
-                <mat-error *ngIf="purpose.errors!['required']">Purpose is required</mat-error>
-            </mat-error>
-        </mat-form-field>
-
-        <div class="cols-3">
-            <!-- mass -->
-            <mat-form-field class="form-group mass" appearance="fill">
-                <mat-label for="mass">Mass</mat-label>
+        <div id="satellite-info">
+            <!-- name -->
+            <mat-form-field class="form-group" appearance="fill">
+                <mat-label for="name">Name</mat-label>
                 <input
                     matInput
                     type="text"
-                    name="mass"
+                    name="username"
                     class="form-control"
-                    [(ngModel)]="satellite!.mass"
-                    #mass="ngModel"
+                    [(ngModel)]="satellite!.satelliteName"
+                    #name="ngModel"
+                    minlength="1"
                     required
-                    min="1"
                     [ngClass]="{
-                        'is-invalid': mass.invalid && mass.touched
+                        'is-invalid': name.invalid && name.touched
                     }"
                 />
-                <mat-error *ngIf="mass.invalid && mass.touched" class="invalid-feedback">
-                    <mat-error *ngIf="mass.errors!['required']">Mass is required</mat-error>
-                    <mat-error *ngIf="mass.errors!['min']">Mass must be at least 1 kg.</mat-error>
+                <mat-error *ngIf="name.invalid && name.touched" class="invalid-feedback">
+                    <mat-error *ngIf="name.errors!['required']">Name is required</mat-error>
+                    <mat-error *ngIf="name.errors!['minlength']">Username must be at least 1 character long.</mat-error>
                 </mat-error>
             </mat-form-field>
 
-            <!-- radiusOfBase -->
-            <mat-form-field class="form-group radius" appearance="fill">
-                <mat-label for="radiusB">Radius of base</mat-label>
+            <!-- purpose -->
+            <mat-form-field class="form-group" appearance="fill">
+                <mat-label for="purpose">Purpose</mat-label>
                 <input
                     matInput
                     type="text"
-                    name="radiusB"
+                    name="purpose"
                     class="form-control"
-                    [(ngModel)]="satellite!.sizeOfBase"
-                    #radiusB="ngModel"
+                    [(ngModel)]="satellite!.purpose"
+                    #purpose="ngModel"
                     required
-                    min="1"
                     [ngClass]="{
-                        'is-invalid': radiusB.invalid && radiusB.touched
+                        'is-invalid': purpose.invalid && purpose.touched
                     }"
                 />
-                <mat-error *ngIf="radiusB.invalid && radiusB.touched" class="invalid-feedback">
-                    <mat-error *ngIf="radiusB.errors!['required']">Radius of base is required</mat-error>
-                    <mat-error *ngIf="radiusB.errors!['min']">Radius of base must be at least 1 m.</mat-error>
+                <mat-error *ngIf="purpose.invalid && purpose.touched" class="invalid-feedback">
+                    <mat-error *ngIf="purpose.errors!['required']">Purpose is required</mat-error>
                 </mat-error>
             </mat-form-field>
+
+            <div class="cols-3">
+                <!-- mass -->
+                <mat-form-field class="form-group mass" appearance="fill">
+                    <mat-label for="mass">Mass</mat-label>
+                    <input
+                        matInput
+                        type="text"
+                        name="mass"
+                        class="form-control"
+                        [(ngModel)]="satellite!.mass"
+                        #mass="ngModel"
+                        required
+                        min="1"
+                        [ngClass]="{
+                            'is-invalid': mass.invalid && mass.touched
+                        }"
+                    />
+                    <mat-error *ngIf="mass.invalid && mass.touched" class="invalid-feedback">
+                        <mat-error *ngIf="mass.errors!['required']">Mass is required</mat-error>
+                        <mat-error *ngIf="mass.errors!['min']">Mass must be at least 1 kg.</mat-error>
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- radiusOfBase -->
+                <mat-form-field class="form-group radius" appearance="fill">
+                    <mat-label for="radiusB">Radius of base</mat-label>
+                    <input
+                        matInput
+                        type="text"
+                        name="radiusB"
+                        class="form-control"
+                        [(ngModel)]="satellite!.sizeOfBase"
+                        #radiusB="ngModel"
+                        required
+                        min="1"
+                        [ngClass]="{
+                            'is-invalid': radiusB.invalid && radiusB.touched
+                        }"
+                    />
+                    <mat-error *ngIf="radiusB.invalid && radiusB.touched" class="invalid-feedback">
+                        <mat-error *ngIf="radiusB.errors!['required']">Radius of base is required</mat-error>
+                        <mat-error *ngIf="radiusB.errors!['min']">Radius of base must be at least 1 m.</mat-error>
+                    </mat-error>
+                </mat-form-field>
+
+                <!-- colorOfBase -->
+                <mat-form-field class="form-group color" appearance="fill">
+                    <mat-label for="colorB">Color of base</mat-label>
+                    <input
+                        matInput
+                        type="color"
+                        name="colorB"
+                        class="form-control"
+                        [(ngModel)]="satellite!.colorOfBase"
+                        #colorB="ngModel"
+                        (ngModelChange)="changeColorSatellite()"
+                        [ngClass]="{
+                            'is-invalid': colorB.invalid && colorB.touched
+                        }"
+                    />
+                    <mat-error *ngIf="colorB.invalid && colorB.touched" class="invalid-feedback"> </mat-error>
+                </mat-form-field>
+            </div>
         </div>
 
-        <!-- colorOfBase -->
-        <mat-form-field class="form-group color" appearance="fill">
-            <mat-label for="colorB">Color of base</mat-label>
-            <input
-                matInput
-                type="color"
-                name="colorB"
-                class="form-control"
-                [(ngModel)]="satellite!.colorOfBase"
-                #colorB="ngModel"
-                (ngModelChange)="changeColorSatellite()"
-                [ngClass]="{
-                    'is-invalid': colorB.invalid && colorB.touched
-                }"
-            />
-            <mat-error *ngIf="colorB.invalid && colorB.touched" class="invalid-feedback"> </mat-error>
-        </mat-form-field>
+        <div
+            *ngIf="satellite.orbit"
+            id="orbit-info"
+            style="display: flex; justify-content: space-between; min-height: 520px"
+        >
+            <div style="width: 39%">
+                <!-- semi major axis -->
+                <div class="cols-2">
+                    <mat-form-field class="form-group orbit" appearance="fill" style="width: 62%">
+                        <mat-label for="semimajoraxis">Semimajor axis in km</mat-label>
+                        <input
+                            matInput
+                            type="number"
+                            name="semimajoraxis"
+                            class="form-control"
+                            [(ngModel)]="semiMajorAxisWithoutEarthRadius"
+                            #semiMajorAxis="ngModel"
+                            (ngModelChange)="calculatePeriod()"
+                            required
+                            [min]="(minAltitude - orbitService.earthRadius).toString()"
+                            [max]="orbitService.maxSMAEarth.toString()"
+                            step="100"
+                            [ngClass]="{
+                                'is-invalid': semiMajorAxis.invalid && semiMajorAxis.touched
+                            }"
+                        />
+                        <mat-error *ngIf="semiMajorAxis.invalid && semiMajorAxis.touched" class="invalid-feedback">
+                            <mat-error *ngIf="semiMajorAxis.errors!['required']">Semimajor axis is required</mat-error>
+                            <!-- <mat-error *ngIf="semiMajorAxis.errors!['min']">Orbit must be at least 1 m.</mat-error> -->
+                        </mat-error>
+                    </mat-form-field>
+                    <!-- period -->
+                    <mat-form-field class="form-group orbit" appearance="fill" style="width: 36%">
+                        <mat-label for="period">Period in days</mat-label>
+                        <input
+                            matInput
+                            type="number"
+                            name="period"
+                            class="form-control"
+                            [(ngModel)]="satellite!.orbit.period"
+                            #period="ngModel"
+                            required
+                            disabled
+                        />
+                    </mat-form-field>
+                </div>
 
-        <div *ngIf="satellite.orbit">
-            <!-- semi major axis -->
-            <mat-form-field class="form-group orbit" appearance="fill">
-                <mat-label for="semimajoraxis">Semi major axis in km</mat-label>
-                <input
-                    matInput
-                    type="number"
-                    name="semimajoraxis"
-                    class="form-control"
-                    [(ngModel)]="semiMajorAxisWithoutEarthRadius"
-                    #semiMajorAxis="ngModel"
-                    (ngModelChange)="calculatePeriod()"
-                    required
-                    [min]="(minAltitude - orbitService.earthRadius).toString()"
-                    [max]="orbitService.maxSMAEarth.toString()"
-                    [ngClass]="{
-                        'is-invalid': semiMajorAxis.invalid && semiMajorAxis.touched
-                    }"
-                />
-                <mat-error *ngIf="semiMajorAxis.invalid && semiMajorAxis.touched" class="invalid-feedback">
-                    <mat-error *ngIf="semiMajorAxis.errors!['required']">Semi major axis is required</mat-error>
-                    <!-- <mat-error *ngIf="semiMajorAxis.errors!['min']">Orbit must be at least 1 m.</mat-error> -->
-                </mat-error>
-            </mat-form-field>
-            <!-- period -->
-            <mat-form-field class="form-group orbit" appearance="fill">
-                <mat-label for="period">Period in days</mat-label>
-                <input
-                    matInput
-                    type="number"
-                    name="period"
-                    class="form-control"
-                    [(ngModel)]="satellite!.orbit.period"
-                    #period="ngModel"
-                    (ngModelChange)="calculateSemiMajorAxis()"
-                    required
-                    [ngClass]="{
-                        'is-invalid': period.invalid && period.touched
-                    }"
-                />
-                <mat-error *ngIf="period.invalid && period.touched" class="invalid-feedback">
-                    <mat-error *ngIf="period.errors!['required']">Semi major axis is required</mat-error>
-                    <!-- <mat-error *ngIf="semiMajorAxis.errors!['min']">Orbit must be at least 1 m.</mat-error> -->
-                </mat-error>
-            </mat-form-field>
-            <!-- inclination -->
-            <mat-form-field class="form-group orbit" appearance="fill">
-                <mat-label for="inclination">Inclination</mat-label>
-                <input
-                    matInput
-                    type="number"
-                    name="inclination"
-                    class="form-control"
-                    [(ngModel)]="satellite!.orbit.inclination"
-                    #inclination="ngModel"
-                    (ngModelChange)="changeInclination()"
-                    required
-                    min="0"
-                    max="180"
-                    [ngClass]="{
-                        'is-invalid': inclination.invalid && inclination.touched
-                    }"
-                />
-                <mat-error *ngIf="inclination.invalid && inclination.touched" class="invalid-feedback">
-                    <mat-error *ngIf="inclination.errors!['required']">Semi major axis is required</mat-error>
-                    <!-- <mat-error *ngIf="semiMajorAxis.errors!['min']">Orbit must be at least 1 m.</mat-error> -->
-                </mat-error>
-            </mat-form-field>
-            <!-- longitude (RA) -->
-            <mat-form-field class="form-group orbit" appearance="fill">
-                <mat-label for="longitude">Longitude of ascending node</mat-label>
-                <input
-                    matInput
-                    type="number"
-                    name="longitude"
-                    class="form-control"
-                    [(ngModel)]="satellite!.orbit.longitudeOfAscendingNode"
-                    #longitude="ngModel"
-                    (ngModelChange)="changeAngle()"
-                    required
-                    min="0"
-                    max="180"
-                    [ngClass]="{
-                        'is-invalid': longitude.invalid && longitude.touched
-                    }"
-                />
-                <mat-error *ngIf="longitude.invalid && longitude.touched" class="invalid-feedback">
-                    <mat-error *ngIf="longitude.errors!['required']">Semi major axis is required</mat-error>
-                </mat-error>
-            </mat-form-field>
-            <mat-form-field class="form-group orbit" appearance="fill">
-                <mat-label for="perigee">Argument of perigee</mat-label>
-                <input
-                    matInput
-                    type="number"
-                    name="perigee"
-                    class="form-control"
-                    [(ngModel)]="satellite!.orbit.argumentOfPerigee"
-                    #perigee="ngModel"
-                    (ngModelChange)="changeAngle()"
-                    required
-                    min="0"
-                    max="180"
-                    [ngClass]="{
-                        'is-invalid': perigee.invalid && perigee.touched
-                    }"
-                />
-                <mat-error *ngIf="perigee.invalid && perigee.touched" class="invalid-feedback">
-                    <mat-error *ngIf="perigee.errors!['required']">Semi major axis is required</mat-error>
-                </mat-error>
-            </mat-form-field>
-            <!-- eccentricity -->
-            <mat-form-field class="form-group orbit" appearance="fill">
-                <mat-label for="eccentricity">Eccentricity</mat-label>
-                <input
-                    matInput
-                    type="number"
-                    name="eccentricity"
-                    class="form-control"
-                    [(ngModel)]="satellite!.orbit.eccentricity"
-                    #eccentricity="ngModel"
-                    (ngModelChange)="changeEccentricity()"
-                    required
-                    min="0"
-                    max="1"
-                    [ngClass]="{
-                        'is-invalid': eccentricity.invalid && eccentricity.touched
-                    }"
-                />
-                <mat-error *ngIf="eccentricity.invalid && eccentricity.touched" class="invalid-feedback">
-                    <mat-error *ngIf="eccentricity.errors!['required']">Semi major axis is required</mat-error>
-                    <!-- <mat-error *ngIf="semiMajorAxis.errors!['min']">Orbit must be at least 1 m.</mat-error> -->
-                </mat-error>
-            </mat-form-field>
+                <!-- eccentricity -->
+                <div class="field-and-slider" style="display: flex; justify-content: space-between">
+                    <mat-slider
+                        style="width: 62%"
+                        class="example-margin"
+                        id="mat-eccentricity-slider"
+                        step="0.02"
+                        min="0"
+                        max="1"
+                    >
+                        <input
+                            matSliderThumb
+                            name="eccentricity-slider"
+                            id="eccentricity-slider"
+                            [(ngModel)]="satellite.orbit.eccentricity"
+                            (ngModelChange)="changeEccentricity()"
+                            #eccentricitySlider="ngModel"
+                        />
+                    </mat-slider>
+                    <mat-form-field class="form-group orbit" style="width: 36%" appearance="fill">
+                        <mat-label for="eccentricity">Eccentricity</mat-label>
+                        <input
+                            matInput
+                            type="number"
+                            name="eccentricity"
+                            id="eccentricity"
+                            class="form-control"
+                            [(ngModel)]="satellite!.orbit.eccentricity"
+                            #eccentricity="ngModel"
+                            (ngModelChange)="changeEccentricity()"
+                            required
+                            step="0.01"
+                            min="0"
+                            max="1"
+                            [ngClass]="{
+                                'is-invalid': eccentricity.invalid && eccentricity.touched
+                            }"
+                        />
+                        <mat-error *ngIf="eccentricity.invalid && eccentricity.touched" class="invalid-feedback">
+                            <mat-error *ngIf="eccentricity.errors!['required']">Semi major axis is required</mat-error>
+                            <!-- <mat-error *ngIf="semiMajorAxis.errors!['min']">Orbit must be at least 1 m.</mat-error> -->
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <!-- <div class="cols-2"> -->
+                <!-- inclination -->
+                <div class="field-and-slider" style="display: flex; justify-content: space-between">
+                    <mat-slider style="width: 62%" class="example-margin" step="2" min="0" max="180">
+                        <input
+                            matSliderThumb
+                            name="inclination-slider"
+                            id="inclination-slider"
+                            [(ngModel)]="satellite.orbit.inclination"
+                            (ngModelChange)="changeInclination()"
+                            #inclinationSlider="ngModel"
+                        />
+                    </mat-slider>
+                    <mat-form-field class="form-group orbit" style="width: 36%" appearance="fill">
+                        <mat-label for="inclination">Inclination</mat-label>
+                        <input
+                            matInput
+                            type="number"
+                            name="inclination"
+                            class="form-control"
+                            [(ngModel)]="satellite!.orbit.inclination"
+                            #inclination="ngModel"
+                            (ngModelChange)="changeInclination()"
+                            required
+                            min="0"
+                            max="180"
+                            step="1"
+                            [ngClass]="{
+                                'is-invalid': inclination.invalid && inclination.touched
+                            }"
+                        />
+                        <mat-error *ngIf="inclination.invalid && inclination.touched" class="invalid-feedback">
+                            <mat-error *ngIf="inclination.errors!['required']">Semi major axis is required</mat-error>
+                            <!-- <mat-error *ngIf="semiMajorAxis.errors!['min']">Orbit must be at least 1 m.</mat-error> -->
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <!-- </div> -->
+                <!-- <div class="cols-2"> -->
+                <!-- longitude (RA) -->
+                <div class="field-and-slider" style="display: flex; justify-content: space-between">
+                    <mat-slider style="width: 62%" class="example-margin" step="2" min="0" max="180">
+                        <input
+                            matSliderThumb
+                            name="longitude-slider"
+                            id="longitude-slider"
+                            [(ngModel)]="satellite.orbit.longitudeOfAscendingNode"
+                            (ngModelChange)="changeAngle()"
+                            #longitudeSlider="ngModel"
+                        />
+                    </mat-slider>
+
+                    <mat-form-field class="form-group orbit" style="width: 36%" appearance="fill">
+                        <mat-label for="longitude">RA of ascending node</mat-label>
+                        <input
+                            matInput
+                            type="number"
+                            name="longitude"
+                            class="form-control"
+                            [(ngModel)]="satellite!.orbit.longitudeOfAscendingNode"
+                            #longitude="ngModel"
+                            (ngModelChange)="changeAngle()"
+                            required
+                            min="0"
+                            max="180"
+                            step="1"
+                            [ngClass]="{
+                                'is-invalid': longitude.invalid && longitude.touched
+                            }"
+                        />
+                        <mat-error *ngIf="longitude.invalid && longitude.touched" class="invalid-feedback">
+                            <mat-error *ngIf="longitude.errors!['required']">Semi major axis is required</mat-error>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+                <!-- argumentOfPerigee -->
+                <div class="field-and-slider" style="display: flex; justify-content: space-between">
+                    <mat-slider style="width: 62%" class="example-margin" step="2" min="0" max="180">
+                        <input
+                            matSliderThumb
+                            name="perigee-slider"
+                            id="perigee-slider"
+                            [(ngModel)]="satellite.orbit.argumentOfPerigee"
+                            (ngModelChange)="changeAngle()"
+                            #perigeeSlider="ngModel"
+                        />
+                    </mat-slider>
+                    <mat-form-field class="form-group orbit" style="width: 36%" appearance="fill">
+                        <mat-label for="perigee">Argument of perigee</mat-label>
+                        <input
+                            matInput
+                            type="number"
+                            name="perigee"
+                            class="form-control"
+                            [(ngModel)]="satellite!.orbit.argumentOfPerigee"
+                            #perigee="ngModel"
+                            (ngModelChange)="changeAngle()"
+                            required
+                            min="0"
+                            max="180"
+                            step="1"
+                            [ngClass]="{
+                                'is-invalid': perigee.invalid && perigee.touched
+                            }"
+                        />
+                        <mat-error *ngIf="perigee.invalid && perigee.touched" class="invalid-feedback">
+                            <mat-error *ngIf="perigee.errors!['required']">Semi major axis is required</mat-error>
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+            </div>
+            <div id="canvas-wrapper" style="width: 59%"><canvas></canvas></div>
         </div>
-        <div id="scene-container"></div>
 
         <!-- Submit en Cancel buttons -->
         <div class="buttons">

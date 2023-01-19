@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Id, ISatellite } from 'shared/domain';
@@ -27,6 +27,8 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     userSub: Subscription | undefined;
     satelliteSub: Subscription | undefined;
 
+    paramSub: Subscription | undefined;
+
     semiMajorAxisWithoutEarthRadius = 0;
     minAltitude = 0;
 
@@ -40,7 +42,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit(): void {
-        this.route.paramMap.subscribe((params) => {
+        this.paramSub = this.route.paramMap.subscribe((params) => {
             this.id = params.get('satelliteId')!;
             this.username = params.get('username')!;
             if (this.id) {
@@ -51,15 +53,20 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                         this.satellite.id = this.satellite._id;
                         if (this.satellite.orbit) {
                             this.satellite.orbit.period = Number(this.satellite.orbit.period?.toFixed(3));
-                            this.semiMajorAxisWithoutEarthRadius =
-                                this.satellite.orbit.semiMajorAxis - this.orbitService.earthRadius;
-
-                            const container = document.querySelector('#scene-container');
-                            this.orbitService.createOrbitScene(
-                                container ? container : document.body,
-                                this.satellite.orbit,
-                                this.satellite.colorOfBase
+                            this.semiMajorAxisWithoutEarthRadius = Math.round(
+                                this.satellite.orbit.semiMajorAxis - this.orbitService.earthRadius
                             );
+
+                            setTimeout(() => {
+                                let canvas = document.querySelector('#canvas-wrapper canvas');
+                                console.log(canvas);
+                                this.orbitService.createOrbitScene(
+                                    canvas ? canvas : document.body,
+                                    this.satellite.orbit!,
+                                    this.satellite.colorOfBase
+                                );
+                                this.changeEccentricity();
+                            }, 0);
                         }
                     }
                 });
@@ -78,11 +85,17 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         return this.minAltitude;
     }
 
-    private getMaxEccentricity() {
+    getMaxEccentricity() {
         if (this.satellite.orbit) {
             return Math.max(
                 1 - this.minAltitude / this.satellite.orbit.semiMajorAxis,
-                Math.sqrt(1 - (this.satellite.orbit.semiMajorAxis / this.minAltitude) ** 2)
+                1 /
+                    Math.sqrt(
+                        (this.satellite.orbit.semiMajorAxis /
+                            (this.satellite.orbit.semiMajorAxis - this.minAltitude)) **
+                            2 +
+                            1
+                    )
             );
         }
         return 1;
@@ -104,26 +117,28 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                     (24 * 60 * 60)
                 ).toFixed(3)
             );
-            this.semiMajorAxisWithoutEarthRadius = this.satellite.orbit.semiMajorAxis - this.orbitService.earthRadius;
+            this.semiMajorAxisWithoutEarthRadius = Math.round(
+                this.satellite.orbit.semiMajorAxis - this.orbitService.earthRadius
+            );
             this.orbitService.changeEllipseGeometry(this.satellite.orbit);
         }
     }
 
-    calculateSemiMajorAxis() {
-        if (this.satellite.orbit?.period) {
-            this.satellite.orbit.semiMajorAxis = Number(
-                (
-                    Math.cbrt((this.getG() * (this.satellite.orbit.period * 24 * 60 * 60) ** 2) / (4 * Math.PI ** 2)) /
-                    1000
-                ).toFixed(0)
-            );
-            if (this.satellite.orbit.semiMajorAxis < this.getMinSemiMajorAxis()) {
-                this.satellite.orbit.semiMajorAxis = this.getMinSemiMajorAxis();
-            }
-            this.semiMajorAxisWithoutEarthRadius = this.satellite.orbit.semiMajorAxis - this.orbitService.earthRadius;
-            this.orbitService.changeEllipseGeometry(this.satellite.orbit);
-        }
-    }
+    // calculateSemiMajorAxis() {
+    //     if (this.satellite.orbit?.period) {
+    //         this.satellite.orbit.semiMajorAxis = Number(
+    //             (
+    //                 Math.cbrt((this.getG() * (this.satellite.orbit.period * 24 * 60 * 60) ** 2) / (4 * Math.PI ** 2)) /
+    //                 1000
+    //             ).toFixed(0)
+    //         );
+    //         if (this.satellite.orbit.semiMajorAxis < this.getMinSemiMajorAxis()) {
+    //             this.satellite.orbit.semiMajorAxis = this.getMinSemiMajorAxis();
+    //         }
+    //         this.semiMajorAxisWithoutEarthRadius = this.satellite.orbit.semiMajorAxis - this.orbitService.earthRadius;
+    //         this.orbitService.changeEllipseGeometry(this.satellite.orbit);
+    //     }
+    // }
 
     changeInclination() {
         if (this.satellite.orbit) {
@@ -133,18 +148,25 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
 
     changeEccentricity() {
         if (this.satellite.orbit) {
+            const maxEccentricity = this.getMaxEccentricity();
+            document
+                .querySelector('mat-slider#mat-eccentricity-slider')!
+                .setAttribute('max', maxEccentricity.toString());
+            document.querySelector('input#eccentricity')!.setAttribute('max', maxEccentricity.toString());
             if (!this.satellite.orbit.eccentricity) this.satellite.orbit.eccentricity = 0;
             if (this.satellite.orbit.eccentricity >= 0 && this.satellite.orbit.eccentricity <= 1) {
                 const minSMA = this.getMinSemiMajorAxis();
                 if (minSMA == Infinity || minSMA > this.orbitService.maxSMAEarth) {
                     this.satellite.orbit.semiMajorAxis = this.orbitService.maxSMAEarth;
-                    this.satellite.orbit.eccentricity = this.getMaxEccentricity();
+                    this.satellite.orbit.eccentricity = maxEccentricity;
                     console.log(this.satellite.orbit.eccentricity);
                 } else if (this.satellite.orbit.semiMajorAxis < minSMA) {
                     this.satellite.orbit.semiMajorAxis = minSMA;
                 }
-                this.semiMajorAxisWithoutEarthRadius =
-                    this.satellite.orbit.semiMajorAxis - this.orbitService.earthRadius;
+                this.semiMajorAxisWithoutEarthRadius = Math.round(
+                    this.satellite.orbit.semiMajorAxis - this.orbitService.earthRadius
+                );
+                this.calculatePeriod();
                 this.orbitService.changeEllipseGeometry(this.satellite.orbit);
                 this.orbitService.changeEllipseRotation(this.satellite.orbit);
             }
@@ -186,6 +208,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
+        if (this.paramSub) this.paramSub.unsubscribe();
         if (this.userSub) this.userSub.unsubscribe();
         if (this.satelliteSub) this.satelliteSub.unsubscribe();
     }

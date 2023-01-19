@@ -24,9 +24,20 @@ export class OrbitService {
 
     createOrbitScene(container: Element, orbit: IOrbit, color: string = '#000000') {
         const scene = new THREE.Scene();
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setSize(window.innerWidth * 0.9, window.innerHeight);
-        container.appendChild(renderer.domElement);
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas: container });
+        // renderer.setPixelRatio(window.devicePixelRatio);
+        if (container.clientWidth < container.clientHeight)
+            renderer.setSize(
+                (container.clientWidth * window.innerWidth) / window.innerWidth,
+                (container.clientWidth * window.innerHeight) / window.innerWidth
+            );
+        else
+            renderer.setSize(
+                (container.clientHeight * window.innerWidth) / window.innerHeight,
+                (container.clientHeight * window.innerHeight) / window.innerHeight
+            );
+        // renderer.setSize()
+        // renderer.setSize(window.innerWidth * 0.4, window.innerHeight * 0.4);
 
         let camera = this.createCamera();
 
@@ -58,7 +69,7 @@ export class OrbitService {
         this.satelliteMesh = satelliteMesh;
 
         this.fitCameraToOrbit = function (newOrbit: IOrbit) {
-            const cameraPos = ((newOrbit.semiMajorAxis ? newOrbit.semiMajorAxis * this.scale * 2 : 0) + 3) * 1.1;
+            const cameraPos = ((newOrbit.semiMajorAxis ? newOrbit.semiMajorAxis * this.scale * 1.7 : 0) + 3) * 1.1;
             if (cameraPos < 5) {
                 camera.position.set(-5, -1, 2);
                 directionalLight.position.set(50, 0, 0);
@@ -103,11 +114,7 @@ export class OrbitService {
             const y0 = orbit.semiMajorAxis * scale * Math.sqrt(1 - orbit.eccentricity ** 2) * Math.sin(time);
             const z = 0;
 
-            const perigee =
-                -orbit.argumentOfPerigee * (Math.PI / 180) +
-                (orbit.inclination != 0
-                    ? 2 * Math.atan2(Math.sqrt(1 - orbit.eccentricity ** 2), 1 - orbit.eccentricity)
-                    : 0);
+            const perigee = -orbit.argumentOfPerigee * (Math.PI / 180) + Math.PI / 2;
 
             const x = x0 * Math.cos(perigee) - y0 * Math.sin(perigee);
             const y = x0 * Math.sin(perigee) + y0 * Math.cos(perigee);
@@ -226,11 +233,9 @@ export class OrbitService {
         if (!orbit.argumentOfPerigee) orbit.argumentOfPerigee = 0;
         if (!orbit.eccentricity) orbit.eccentricity = 0;
 
-        this.ellipse.rotation.z =
-            orbit.argumentOfPerigee * (Math.PI / 180) -
-            (orbit.inclination != 0
-                ? 2 * Math.atan2(Math.sqrt(1 - orbit.eccentricity ** 2), 1 - orbit.eccentricity)
-                : 0); // TODO: argument of perigee zero (closest) at ascending node, not working yet
+        this.ellipse.rotation.z = orbit.argumentOfPerigee * (Math.PI / 180) - Math.PI / 2;
+        // ? 2 * Math.atan2(Math.sqrt(1 - orbit.eccentricity ** 2), 1 - orbit.eccentricity)
+        // : 0); // TODO: argument of perigee zero (closest) at ascending node, not working yet
         this.ellipse.rotation.y = Math.PI + orbit.inclination * (Math.PI / 180);
 
         this.ellipseObject.rotation.z = -orbit.longitudeOfAscendingNode * (Math.PI / 180);
