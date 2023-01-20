@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { IOrbit } from 'shared/domain';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GUI } from 'dat.gui';
 
 @Injectable({
     providedIn: 'root',
@@ -68,18 +69,15 @@ export class OrbitService {
         scene.add(satelliteMesh);
         this.satelliteMesh = satelliteMesh;
 
-        this.fitCameraToOrbit = function (newOrbit: IOrbit) {
-            const cameraPos = ((newOrbit.semiMajorAxis ? newOrbit.semiMajorAxis * this.scale * 1.7 : 0) + 3) * 1.1;
-            if (cameraPos < 5) {
-                camera.position.set(-5, -1, 2);
-                directionalLight.position.set(50, 0, 0);
-                camera.far = 100;
-            } else {
-                camera.position.set(-cameraPos, cameraPos - 4, 0);
-                directionalLight.position.set(cameraPos + 50, 0, 0);
-                camera.far = cameraPos * 3;
+        this.fitCameraToOrbit = function (newOrbit: IOrbit, zoom = 1) {
+            let cameraPos = newOrbit.semiMajorAxis ? newOrbit.semiMajorAxis * this.scale : 1;
+            if (cameraPos < 1.1) {
+                cameraPos = 1.1;
             }
-            satelliteMesh.scale.setScalar(cameraPos / 2.5);
+            camera.position.set((-2.2 * cameraPos) / zoom, (1.2 * cameraPos) / zoom, (1.2 * cameraPos) / zoom);
+            directionalLight.position.set(50 + cameraPos / zoom, 0, 0);
+            camera.far = (cameraPos / zoom) * 3;
+            satelliteMesh.scale.setScalar((cameraPos / zoom) * 1.1);
             camera.lookAt(0, 0, 0);
             controls.update();
         };
@@ -89,6 +87,39 @@ export class OrbitService {
         const scale = this.scale;
         let time = 0;
         const earthRotation = 0.003;
+
+        const gui = new GUI();
+        const orbitFolder = gui.addFolder('Orbit');
+        orbitFolder.add(orbit, 'eccentricity', 0, 1, 0.01).onChange(() => {
+            this.changeEllipseRotation(orbit);
+            this.changeEllipseGeometry(orbit);
+        });
+        orbitFolder.add(orbit, 'inclination', 0, 180, 1).onChange(() => {
+            this.changeEllipseRotation(orbit);
+            this.changeEllipseGeometry(orbit);
+        });
+        orbitFolder.add(orbit, 'longitudeOfAscendingNode', 0, 360, 1).onChange(() => {
+            this.changeEllipseRotation(orbit);
+            this.changeEllipseGeometry(orbit);
+        });
+        orbitFolder.add(orbit, 'argumentOfPerigee', 0, 360, 1).onChange(() => {
+            this.changeEllipseRotation(orbit);
+            this.changeEllipseGeometry(orbit);
+        });
+        orbitFolder.open();
+        const cameraFolder = gui.addFolder('Camera');
+        cameraFolder.add(camera, 'zoom', 0.5, 1.5, 0.01).onChange((zoom) => {
+            this.fitCameraToOrbit(orbit, zoom);
+        });
+        cameraFolder.open();
+        const guideFolder = gui.addFolder('Guide Lines');
+        guideFolder.add(this.xLine, 'visible').onChange(() => {
+            const visible = this.xLine.visible;
+            this.yLine.visible = visible;
+            this.zLine.visible = visible;
+            this.equatorialPlane.visible = visible;
+        });
+        guideFolder.open();
 
         console.log(orbit);
         const animate = function () {

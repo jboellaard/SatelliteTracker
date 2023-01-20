@@ -125,19 +125,18 @@
             <div style="width: 39%">
                 <!-- semi major axis -->
                 <div class="cols-2">
-                    <mat-form-field class="form-group orbit" appearance="fill" style="width: 62%">
-                        <mat-label for="semimajoraxis">Semimajor axis in km</mat-label>
+                    <mat-form-field class="form-group orbit slider" appearance="fill">
+                        <mat-label for="semimajoraxis">a (km)</mat-label>
                         <input
                             matInput
                             type="number"
                             name="semimajoraxis"
+                            id="semimajoraxis"
                             class="form-control"
-                            [(ngModel)]="semiMajorAxisWithoutEarthRadius"
+                            [(ngModel)]="satellite.orbit.semiMajorAxis"
                             #semiMajorAxis="ngModel"
-                            (ngModelChange)="calculatePeriod()"
+                            (ngModelChange)="changeOrbitSize()"
                             required
-                            [min]="(minAltitude - orbitService.earthRadius).toString()"
-                            [max]="orbitService.maxSMAEarth.toString()"
                             step="100"
                             [ngClass]="{
                                 'is-invalid': semiMajorAxis.invalid && semiMajorAxis.touched
@@ -149,8 +148,8 @@
                         </mat-error>
                     </mat-form-field>
                     <!-- period -->
-                    <mat-form-field class="form-group orbit" appearance="fill" style="width: 36%">
-                        <mat-label for="period">Period in days</mat-label>
+                    <mat-form-field class="form-group orbit input-after-slider" appearance="fill">
+                        <mat-label for="period">P (days)</mat-label>
                         <input
                             matInput
                             type="number"
@@ -166,25 +165,18 @@
 
                 <!-- eccentricity -->
                 <div class="field-and-slider" style="display: flex; justify-content: space-between">
-                    <mat-slider
-                        style="width: 62%"
-                        class="example-margin"
-                        id="mat-eccentricity-slider"
-                        step="0.02"
-                        min="0"
-                        max="1"
-                    >
+                    <mat-slider class="slider" id="mat-eccentricity-slider" step="0.02" min="0" max="1">
                         <input
                             matSliderThumb
                             name="eccentricity-slider"
                             id="eccentricity-slider"
                             [(ngModel)]="satellite.orbit.eccentricity"
-                            (ngModelChange)="changeEccentricity()"
+                            (ngModelChange)="changeOrbitSize()"
                             #eccentricitySlider="ngModel"
                         />
                     </mat-slider>
-                    <mat-form-field class="form-group orbit" style="width: 36%" appearance="fill">
-                        <mat-label for="eccentricity">Eccentricity</mat-label>
+                    <mat-form-field class="form-group orbit input-after-slider" appearance="fill">
+                        <mat-label for="eccentricity">e</mat-label>
                         <input
                             matInput
                             type="number"
@@ -193,7 +185,7 @@
                             class="form-control"
                             [(ngModel)]="satellite!.orbit.eccentricity"
                             #eccentricity="ngModel"
-                            (ngModelChange)="changeEccentricity()"
+                            (ngModelChange)="changeOrbitSize()"
                             required
                             step="0.01"
                             min="0"
@@ -212,7 +204,7 @@
                 <!-- <div class="cols-2"> -->
                 <!-- inclination -->
                 <div class="field-and-slider" style="display: flex; justify-content: space-between">
-                    <mat-slider style="width: 62%" class="example-margin" step="2" min="0" max="180">
+                    <mat-slider class="slider" step="2" min="0" max="180">
                         <input
                             matSliderThumb
                             name="inclination-slider"
@@ -222,8 +214,8 @@
                             #inclinationSlider="ngModel"
                         />
                     </mat-slider>
-                    <mat-form-field class="form-group orbit" style="width: 36%" appearance="fill">
-                        <mat-label for="inclination">Inclination</mat-label>
+                    <mat-form-field class="form-group orbit input-after-slider" appearance="fill">
+                        <mat-label for="inclination">i (degrees)</mat-label>
                         <input
                             matInput
                             type="number"
@@ -251,7 +243,7 @@
                 <!-- <div class="cols-2"> -->
                 <!-- longitude (RA) -->
                 <div class="field-and-slider" style="display: flex; justify-content: space-between">
-                    <mat-slider style="width: 62%" class="example-margin" step="2" min="0" max="180">
+                    <mat-slider class="slider" step="2" min="0" max="360">
                         <input
                             matSliderThumb
                             name="longitude-slider"
@@ -262,8 +254,8 @@
                         />
                     </mat-slider>
 
-                    <mat-form-field class="form-group orbit" style="width: 36%" appearance="fill">
-                        <mat-label for="longitude">RA of ascending node</mat-label>
+                    <mat-form-field class="form-group orbit input-after-slider" appearance="fill">
+                        <mat-label for="longitude">Ω (degrees)</mat-label>
                         <input
                             matInput
                             type="number"
@@ -274,7 +266,7 @@
                             (ngModelChange)="changeAngle()"
                             required
                             min="0"
-                            max="180"
+                            max="360"
                             step="1"
                             [ngClass]="{
                                 'is-invalid': longitude.invalid && longitude.touched
@@ -287,7 +279,7 @@
                 </div>
                 <!-- argumentOfPerigee -->
                 <div class="field-and-slider" style="display: flex; justify-content: space-between">
-                    <mat-slider style="width: 62%" class="example-margin" step="2" min="0" max="180">
+                    <mat-slider class="slider" step="2" min="0" max="360">
                         <input
                             matSliderThumb
                             name="perigee-slider"
@@ -297,8 +289,8 @@
                             #perigeeSlider="ngModel"
                         />
                     </mat-slider>
-                    <mat-form-field class="form-group orbit" style="width: 36%" appearance="fill">
-                        <mat-label for="perigee">Argument of perigee</mat-label>
+                    <mat-form-field class="form-group orbit input-after-slider" appearance="fill">
+                        <mat-label for="perigee">ω (degrees)</mat-label>
                         <input
                             matInput
                             type="number"
@@ -309,7 +301,7 @@
                             (ngModelChange)="changeAngle()"
                             required
                             min="0"
-                            max="180"
+                            max="360"
                             step="1"
                             [ngClass]="{
                                 'is-invalid': perigee.invalid && perigee.touched
