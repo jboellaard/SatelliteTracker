@@ -30,6 +30,7 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSliderModule } from '@angular/material/slider';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
@@ -73,6 +74,7 @@ import { httpInterceptorProviders } from './auth/auth.interceptor';
         MatListModule,
         MatSidenavModule,
         MatSliderModule,
+        MatCheckboxModule,
     ],
     providers: [AuthService, httpInterceptorProviders],
     bootstrap: [AppComponent],

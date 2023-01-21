@@ -28,6 +28,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     satelliteSub: Subscription | undefined;
 
     paramSub: Subscription | undefined;
+    scene = false;
     minAltitude = 0;
 
     constructor(
@@ -50,6 +51,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                         this.satellite = { ...satellite };
                         this.satellite.id = this.satellite._id;
                         if (this.satellite.orbit) {
+                            this.scene = true;
                             this.satellite.orbit.period = Number(this.satellite.orbit.period?.toFixed(3));
                             this.satellite.orbit.semiMajorAxis = Math.round(this.satellite.orbit.semiMajorAxis);
 
@@ -64,6 +66,12 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                                 document
                                     .querySelector('input#semimajoraxis')!
                                     .setAttribute('max', this.orbitService.maxSMAEarth.toFixed(0));
+                                document
+                                    .querySelector('input#semimajoraxis')!
+                                    .setAttribute(
+                                        'maxlength',
+                                        this.orbitService.maxSMAEarth.toFixed(0).length.toString()
+                                    );
                             }, 0);
                         }
                     }
@@ -106,9 +114,6 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
 
     calculatePeriod() {
         if (this.satellite.orbit?.semiMajorAxis) {
-            if (this.satellite.orbit.semiMajorAxis < this.getMinSemiMajorAxis()) {
-                this.satellite.orbit.semiMajorAxis = this.getMinSemiMajorAxis();
-            }
             this.satellite.orbit.period = Number(
                 (
                     (2 * Math.PI * Math.sqrt((this.satellite.orbit.semiMajorAxis * 1000) ** 3 / this.getG())) /
@@ -119,52 +124,54 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         }
     }
 
-    // calculateSemiMajorAxis() {
-    //     if (this.satellite.orbit?.period) {
-    //         this.satellite.orbit.semiMajorAxis = Number(
-    //             (
-    //                 Math.cbrt((this.getG() * (this.satellite.orbit.period * 24 * 60 * 60) ** 2) / (4 * Math.PI ** 2)) /
-    //                 1000
-    //             ).toFixed(0)
-    //         );
-    //         if (this.satellite.orbit.semiMajorAxis < this.getMinSemiMajorAxis()) {
-    //             this.satellite.orbit.semiMajorAxis = this.getMinSemiMajorAxis();
-    //         }
-    //         this.semiMajorAxisWithoutEarthRadius = this.satellite.orbit.semiMajorAxis - this.orbitService.earthRadius;
-    //         this.orbitService.changeEllipseGeometry(this.satellite.orbit);
-    //     }
-    // }
-
     changeInclination() {
         if (this.satellite.orbit) {
             this.orbitService.changeEllipseRotation(this.satellite.orbit);
         }
     }
 
-    changeOrbitSize() {
+    changeEccentricity() {
         if (this.satellite.orbit) {
             const maxEccentricity = this.getMaxEccentricity();
             if (!this.satellite.orbit.eccentricity) this.satellite.orbit.eccentricity = 0;
-            if (this.satellite.orbit.eccentricity >= 0 && this.satellite.orbit.eccentricity <= 1) {
-                const minSMA = this.getMinSemiMajorAxis();
-                if (minSMA == Infinity || minSMA > this.orbitService.maxSMAEarth) {
-                    this.satellite.orbit.semiMajorAxis = this.orbitService.maxSMAEarth;
-                    this.satellite.orbit.eccentricity = maxEccentricity;
-                } else if (this.satellite.orbit.semiMajorAxis < minSMA) {
-                    this.satellite.orbit.semiMajorAxis = minSMA;
-                }
-                this.satellite.orbit.semiMajorAxis = Math.round(this.satellite.orbit.semiMajorAxis);
-                document
-                    .querySelector('mat-slider#mat-eccentricity-slider')!
-                    .setAttribute('max', maxEccentricity.toString());
-                document.querySelector('input#eccentricity')!.setAttribute('max', maxEccentricity.toString());
-                document
-                    .querySelector('input#semimajoraxis')!
-                    .setAttribute('min', (this.getMinSemiMajorAxis() - this.orbitService.earthRadius).toFixed(0));
-                this.calculatePeriod();
-                this.orbitService.changeEllipseGeometry(this.satellite.orbit);
-                this.orbitService.changeEllipseRotation(this.satellite.orbit);
+            const minSMA = this.getMinSemiMajorAxis();
+            let sma = this.satellite.orbit.semiMajorAxis;
+            if (minSMA == Infinity || minSMA > this.orbitService.maxSMAEarth) {
+                sma = this.orbitService.maxSMAEarth;
+                this.satellite.orbit.eccentricity = maxEccentricity;
+            } else if (sma < minSMA) {
+                sma = minSMA;
             }
+
+            this.satellite.orbit.semiMajorAxis = sma;
+            this.changeOrbitSize(maxEccentricity, minSMA);
+        }
+    }
+
+    changeSemimajorAxis() {
+        if (this.satellite.orbit) {
+            const maxEccentricity = this.getMaxEccentricity();
+            this.satellite.orbit.semiMajorAxis = Math.round(this.satellite.orbit.semiMajorAxis);
+            if (!this.satellite.orbit.eccentricity) this.satellite.orbit.eccentricity = 0;
+            if (this.satellite.orbit.eccentricity > maxEccentricity) {
+                this.satellite.orbit.eccentricity = Number(maxEccentricity.toFixed(2));
+            }
+            this.changeOrbitSize(maxEccentricity);
+        }
+    }
+
+    changeOrbitSize(maxEccentricity = this.getMaxEccentricity(), minSMA = this.getMinSemiMajorAxis()) {
+        if (this.satellite.orbit) {
+            document
+                .querySelector('mat-slider#mat-eccentricity-slider')!
+                .setAttribute('max', maxEccentricity.toString());
+            document.querySelector('input#semimajoraxis')!.setAttribute('min', minSMA.toFixed(0));
+            document
+                .querySelector('input#semimajoraxis')!
+                .setAttribute('minlength', minSMA.toFixed(0).length.toString());
+
+            this.calculatePeriod();
+            this.orbitService.changeEllipseRotation(this.satellite.orbit);
         }
     }
 

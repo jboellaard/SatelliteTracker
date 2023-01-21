@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { IOrbit } from 'shared/domain';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { GUI } from 'dat.gui';
 
 @Injectable({
     providedIn: 'root',
@@ -10,6 +9,9 @@ import { GUI } from 'dat.gui';
 export class OrbitService {
     earthRadius = 6371;
     maxSMAEarth = 1600000;
+    scale = 0.0001;
+    moonRadius = 1737.4;
+
     ellipseObject = new THREE.Object3D();
     ellipse = new THREE.Line();
     ellipseCurve = new THREE.EllipseCurve(0, 0, 1, 1, 0, 2 * Math.PI, false, 0);
@@ -18,31 +20,33 @@ export class OrbitService {
     yLine = new THREE.Line(new THREE.BufferGeometry());
     zLine = new THREE.Line(new THREE.BufferGeometry());
     equatorialPlane = new THREE.Mesh();
+
+    camera = new THREE.PerspectiveCamera();
     fitCameraToOrbit: any;
-    scale = 0.0001;
+    guidelines = true;
+    zoom = 1;
 
     constructor() {}
 
     createOrbitScene(container: Element, orbit: IOrbit, color: string = '#000000') {
         const scene = new THREE.Scene();
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas: container });
-        // renderer.setPixelRatio(window.devicePixelRatio);
-        if (container.clientWidth < container.clientHeight)
-            renderer.setSize(
-                (container.clientWidth * window.innerWidth) / window.innerWidth,
-                (container.clientWidth * window.innerHeight) / window.innerWidth
-            );
-        else
-            renderer.setSize(
-                (container.clientHeight * window.innerWidth) / window.innerHeight,
-                (container.clientHeight * window.innerHeight) / window.innerHeight
-            );
-        // renderer.setSize()
-        // renderer.setSize(window.innerWidth * 0.4, window.innerHeight * 0.4);
+        renderer.setSize(container.clientWidth, container.clientHeight);
 
-        let camera = this.createCamera();
+        this.createCamera();
+        let camera = this.camera;
 
         const controls = this.createControls(camera, renderer);
+
+        const bgTexture = new THREE.TextureLoader().load('assets/images/background3.jpg');
+        bgTexture.repeat.set(16, 16);
+        bgTexture.wrapS = THREE.RepeatWrapping;
+        bgTexture.wrapT = THREE.RepeatWrapping;
+        const sphereGeometry = new THREE.SphereGeometry(1000, 32, 32);
+        sphereGeometry.scale(-1, 1, 1);
+        const sphereMaterial = new THREE.MeshBasicMaterial({ map: bgTexture });
+        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        scene.add(sphere);
 
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
         directionalLight.position.set(50, 0, 0);
@@ -58,11 +62,13 @@ export class OrbitService {
         const earth = this.createEarth();
         scene.add(earth);
 
+        const moon = this.createMoon();
+        scene.add(moon);
+
         this.createOrbit(orbit, scene);
         this.createGuideLines(scene);
 
         const satelliteMesh = new THREE.Mesh(
-            // new THREE.SphereGeometry(200 * this.scale, 32, 32),
             new THREE.BoxGeometry(200 * this.scale, 200 * this.scale, 200 * this.scale),
             new THREE.MeshPhongMaterial({ color: color, shininess: 100 })
         );
@@ -70,16 +76,19 @@ export class OrbitService {
         this.satelliteMesh = satelliteMesh;
 
         this.fitCameraToOrbit = function (newOrbit: IOrbit, zoom = 1) {
-            let cameraPos = newOrbit.semiMajorAxis ? newOrbit.semiMajorAxis * this.scale : 1;
-            if (cameraPos < 1.1) {
-                cameraPos = 1.1;
-            }
-            camera.position.set((-2.2 * cameraPos) / zoom, (1.2 * cameraPos) / zoom, (1.2 * cameraPos) / zoom);
-            directionalLight.position.set(50 + cameraPos / zoom, 0, 0);
-            camera.far = (cameraPos / zoom) * 3;
-            satelliteMesh.scale.setScalar((cameraPos / zoom) * 1.1);
+            let cameraPos = (newOrbit.semiMajorAxis ? newOrbit.semiMajorAxis * this.scale : 1) / zoom;
+            if (cameraPos * zoom < 1.1) cameraPos = 1.1;
+            camera.position.set(-2.2 * cameraPos, 1.2 * cameraPos, 1.2 * cameraPos);
+            directionalLight.position.set(50 + cameraPos, 0, 0);
+
+            sphere.geometry = new THREE.SphereGeometry(cameraPos + 700, 32, 32);
+            sphere.geometry.scale(-1, 1, 1);
+            camera.far = cameraPos * 2 + 1100;
+
+            satelliteMesh.scale.setScalar(cameraPos * 1.1);
             camera.lookAt(0, 0, 0);
             controls.update();
+            camera.updateProjectionMatrix();
         };
 
         this.changeEllipseGeometry(orbit);
@@ -87,43 +96,17 @@ export class OrbitService {
         const scale = this.scale;
         let time = 0;
         const earthRotation = 0.003;
+        let moonTime = 0;
+        let moonOrbit = {
+            semiMajorAxis: 384400,
+            eccentricity: 0.0549,
+            inclination: 24,
+            longitudeOfAscendingNode: 39, // changes 360 degrees (regressing) every 18.61 years
+            argumentOfPerigee: 318.15, // changes 360 degrees (progressing) every 8.85 years
+            period: 27.554551,
+        };
 
-        const gui = new GUI();
-        const orbitFolder = gui.addFolder('Orbit');
-        orbitFolder.add(orbit, 'eccentricity', 0, 1, 0.01).onChange(() => {
-            this.changeEllipseRotation(orbit);
-            this.changeEllipseGeometry(orbit);
-        });
-        orbitFolder.add(orbit, 'inclination', 0, 180, 1).onChange(() => {
-            this.changeEllipseRotation(orbit);
-            this.changeEllipseGeometry(orbit);
-        });
-        orbitFolder.add(orbit, 'longitudeOfAscendingNode', 0, 360, 1).onChange(() => {
-            this.changeEllipseRotation(orbit);
-            this.changeEllipseGeometry(orbit);
-        });
-        orbitFolder.add(orbit, 'argumentOfPerigee', 0, 360, 1).onChange(() => {
-            this.changeEllipseRotation(orbit);
-            this.changeEllipseGeometry(orbit);
-        });
-        orbitFolder.open();
-        const cameraFolder = gui.addFolder('Camera');
-        cameraFolder.add(camera, 'zoom', 0.5, 1.5, 0.01).onChange((zoom) => {
-            this.fitCameraToOrbit(orbit, zoom);
-        });
-        cameraFolder.open();
-        const guideFolder = gui.addFolder('Guide Lines');
-        guideFolder.add(this.xLine, 'visible').onChange(() => {
-            const visible = this.xLine.visible;
-            this.yLine.visible = visible;
-            this.zLine.visible = visible;
-            this.equatorialPlane.visible = visible;
-        });
-        guideFolder.open();
-
-        console.log(orbit);
-        const animate = function () {
-            requestAnimationFrame(animate);
+        let getPositionInOrbit = function (orbit: IOrbit, earthRotation: number): THREE.Vector3 {
             if (!orbit.eccentricity) orbit.eccentricity = 0;
             if (!orbit.inclination) orbit.inclination = 0;
             if (!orbit.longitudeOfAscendingNode) orbit.longitudeOfAscendingNode = 0;
@@ -165,7 +148,16 @@ export class OrbitService {
             const pos = new THREE.Vector3(x3, y3, z3);
             pos.applyAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
             pos.applyAxisAngle(new THREE.Vector3(0, 1, 0), orbit.longitudeOfAscendingNode * (Math.PI / 180));
+            return pos;
+        };
+
+        const animate = function () {
+            requestAnimationFrame(animate);
+            const pos = getPositionInOrbit(orbit, earthRotation);
             satelliteMesh.position.set(pos.x, pos.y, pos.z);
+
+            const moonPos = getPositionInOrbit(moonOrbit, earthRotation);
+            moon.position.set(moonPos.x, moonPos.y, moonPos.z);
 
             earth.rotation.y += earthRotation;
 
@@ -177,24 +169,35 @@ export class OrbitService {
     }
 
     private createCamera() {
-        const camera = new THREE.PerspectiveCamera(50, (window.innerWidth * 0.9) / window.innerHeight, 0.1, 1000);
-        camera.position.set(-5, -1, 2);
-        return camera;
+        this.camera.fov = 50;
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.near = 0.1;
+        this.camera.far = 1100;
+        this.camera.position.set(-5, -1, 2);
+        this.camera.updateProjectionMatrix();
     }
 
     private createControls(camera: THREE.PerspectiveCamera, renderer: THREE.WebGLRenderer) {
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableZoom = false;
-        controls.enablePan = false;
+        controls.enablePan = true;
         return controls;
     }
 
     private createEarth() {
         const earthGeometry = new THREE.SphereGeometry(this.earthRadius * this.scale, 32, 32);
         const earthMaterial = new THREE.MeshBasicMaterial({
-            map: new THREE.TextureLoader().load('../../../assets/images/earth.png'),
+            map: new THREE.TextureLoader().load('assets/images/earth.png'),
         });
         return new THREE.Mesh(earthGeometry, earthMaterial);
+    }
+
+    private createMoon() {
+        const moonGeometry = new THREE.SphereGeometry(this.moonRadius * this.scale, 32, 32);
+        const moonMaterial = new THREE.MeshBasicMaterial({
+            map: new THREE.TextureLoader().load('assets/images/moon.jpg'),
+        });
+        return new THREE.Mesh(moonGeometry, moonMaterial);
     }
 
     private createOrbit(orbit: IOrbit, scene: THREE.Scene) {
@@ -215,14 +218,15 @@ export class OrbitService {
         scene.add(this.zLine);
 
         this.equatorialPlane.material = new THREE.MeshBasicMaterial({
-            color: 0x000000,
+            color: lineColor,
             side: THREE.DoubleSide,
-            opacity: 0.4,
+            opacity: 0.1,
             transparent: true,
         });
         this.equatorialPlane.rotation.x = Math.PI / 2;
-
         scene.add(this.equatorialPlane);
+
+        this.toggleGuideLines();
     }
 
     changeEllipseGeometry(orbit: IOrbit) {
@@ -265,8 +269,6 @@ export class OrbitService {
         if (!orbit.eccentricity) orbit.eccentricity = 0;
 
         this.ellipse.rotation.z = orbit.argumentOfPerigee * (Math.PI / 180) - Math.PI / 2;
-        // ? 2 * Math.atan2(Math.sqrt(1 - orbit.eccentricity ** 2), 1 - orbit.eccentricity)
-        // : 0); // TODO: argument of perigee zero (closest) at ascending node, not working yet
         this.ellipse.rotation.y = Math.PI + orbit.inclination * (Math.PI / 180);
 
         this.ellipseObject.rotation.z = -orbit.longitudeOfAscendingNode * (Math.PI / 180);
@@ -277,5 +279,18 @@ export class OrbitService {
         this.satelliteMesh.material = new THREE.MeshBasicMaterial({
             color: color,
         });
+    }
+
+    toggleGuideLines() {
+        this.xLine.visible = this.guidelines;
+        this.yLine.visible = this.guidelines;
+        this.zLine.visible = this.guidelines;
+        this.equatorialPlane.visible = this.guidelines;
+    }
+
+    changeZoom(orbit: IOrbit) {
+        this.camera.fov = 50 / this.zoom;
+        this.camera.far = orbit.semiMajorAxis * this.scale * 2 + 1100;
+        this.camera.updateProjectionMatrix();
     }
 }

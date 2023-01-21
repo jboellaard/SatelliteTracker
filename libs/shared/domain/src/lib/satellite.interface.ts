@@ -34,6 +34,7 @@ export interface IOrbit {
     argumentOfPerigee?: number;
     period?: number;
     dateTimeOfLaunch?: Date;
+    dateTimeOfPerigeePassage?: Date;
     createdAt?: Date;
     updatedAt?: Date;
 }

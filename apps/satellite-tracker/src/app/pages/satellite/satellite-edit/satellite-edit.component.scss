@@ -44,11 +44,22 @@ mat-form-field {
     height: 100%;
 }
 
-.slider,
 mat-form-field.form-group.slider {
-    width: 72%;
+    width: 60%;
 }
 
 mat-form-field.form-group.input-after-slider {
-    width: 26%;
+    width: 38%;
+}
+
+.label-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 10px 0;
+    max-width: 100%;
+}
+
+.slider {
+    width: 96%;
+    margin: 0 2%;
 }
