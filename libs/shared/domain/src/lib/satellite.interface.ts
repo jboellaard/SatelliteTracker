@@ -1,17 +1,20 @@
 import { Id } from './id.type';
-import { ILocation, IUser } from './user.interface';
+import { IUser } from './user.interface';
 
-export type Purpose =
-    | 'Research'
-    | 'Communication'
-    | 'Navigation'
-    | 'Weather forecasting'
-    | 'Mapping'
-    | 'Experimentation'
-    | 'Space cleanup'
-    | 'TBD';
+export const Purpose = [
+    'TBD',
+    'Research',
+    'Communication',
+    'Navigation',
+    'Weather forecasting',
+    'Mapping',
+    'Experimentation',
+    'Space cleanup',
+];
 
 export interface ISatellitePart {
+    _id?: Id;
+    id?: Id;
     partName: string;
     description?: string;
     function?: string;
@@ -31,10 +34,9 @@ export interface IOrbit {
     eccentricity?: number;
     inclination?: number;
     longitudeOfAscendingNode?: number;
-    argumentOfPerigee?: number;
+    argumentOfPerigee?: number; // argument of latitude if e==0 and true latitude if e==0 and i==0
     period?: number;
     dateTimeOfLaunch?: Date;
-    dateTimeOfPerigeePassage?: Date;
     createdAt?: Date;
     updatedAt?: Date;
 }

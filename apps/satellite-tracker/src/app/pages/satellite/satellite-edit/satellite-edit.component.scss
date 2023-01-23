@@ -10,14 +10,6 @@
     margin: auto;
 }
 
-#scene-container {
-    max-width: 49%;
-    height: auto;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 mat-form-field {
     width: 100%;
 }
@@ -37,29 +29,4 @@ mat-form-field {
 
 .buttons button {
     margin-inline: 5px;
-}
-
-#canvas-wrapper canvas {
-    width: 100%;
-    height: 100%;
-}
-
-mat-form-field.form-group.slider {
-    width: 60%;
-}
-
-mat-form-field.form-group.input-after-slider {
-    width: 38%;
-}
-
-.label-container {
-    display: flex;
-    justify-content: space-between;
-    margin: 0 10px 0;
-    max-width: 100%;
-}
-
-.slider {
-    width: 96%;
-    margin: 0 2%;
 }

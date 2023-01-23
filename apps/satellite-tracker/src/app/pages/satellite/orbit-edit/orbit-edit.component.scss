@@ -1,0 +1,17 @@
+#canvas-wrapper canvas {
+    width: 100%;
+    height: 100%;
+}
+
+.label-container {
+    display: flex;
+    justify-content: space-between;
+    margin: 0 10px 0;
+    max-width: 100%;
+}
+
+.slider,
+.between-sliders {
+    width: 96%;
+    margin: 0 2%;
+}

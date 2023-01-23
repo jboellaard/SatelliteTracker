@@ -61,11 +61,11 @@ export class Orbit {
     @Prop({ required: true, default: 0, min: 0, max: 180 })
     inclination?: number;
 
-    @Prop({ required: true, default: 0, min: 0, max: 360 })
+    @Prop({ required: false, default: 0, min: 0, max: 360 })
     longitudeOfAscendingNode?: number;
 
     @Prop({ required: true, default: 0, min: 0, max: 360 })
-    argumentOfPerigee?: number;
+    argumentOfPerigee?: number; // argument of latitude if e==0 and true latitude if e==0 and i==0
 
     @Prop({ required: false })
     dateTimeOfLaunch?: Date;

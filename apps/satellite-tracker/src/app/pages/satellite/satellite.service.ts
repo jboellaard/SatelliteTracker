@@ -1,8 +1,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'apps/satellite-tracker/src/environments/environment';
-import { map, Observable, tap } from 'rxjs';
-import { APIResponse, Id, ISatellite } from 'shared/domain';
+import { map, Observable, partition, tap } from 'rxjs';
+import { APIResponse, Id, ISatellite, ISatellitePart } from 'shared/domain';
 import { EntityService } from 'ui/entity';
 
 @Injectable({
@@ -19,5 +19,15 @@ export class SatelliteService extends EntityService<ISatellite> {
         return this.http
             .get<ISatellite[]>(environment.API_URL + `users/${username}/satellites`)
             .pipe(tap((response: any) => console.log(response)));
+    }
+
+    getSatelliteParts(): Observable<ISatellitePart[]> {
+        return this.http.get<ISatellitePart[]>(environment.API_URL + 'satellites/parts').pipe(
+            tap((response: ISatellitePart[]) => {
+                response.forEach((part: ISatellitePart) => {
+                    part.id = part._id;
+                });
+            })
+        );
     }
 }

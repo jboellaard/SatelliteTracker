@@ -10,6 +10,7 @@ import { SatelliteEditComponent } from './pages/satellite/satellite-edit/satelli
 import { AboutComponent } from './pages/about/about.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
+import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.component';
 
 const routes: Routes = [
     { path: '', pathMatch: 'full', redirectTo: 'users' },
@@ -41,6 +42,11 @@ const routes: Routes = [
         path: 'users/:username/satellites/:satelliteId/edit',
         pathMatch: 'full',
         component: SatelliteEditComponent,
+    },
+    {
+        path: 'users/:username/satellites/:satelliteId/orbit',
+        pathMatch: 'full',
+        component: OrbitEditComponent,
     },
     { path: 'users/:username/satellites/:satelliteId', pathMatch: 'full', component: SatelliteDetailComponent },
     // {

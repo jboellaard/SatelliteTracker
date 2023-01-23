@@ -4,6 +4,7 @@
     </div>
     <div *ngIf="!componentExists">
         <h1>Creating new satellite for {{ username }}</h1>
+        x
     </div>
 
     <!-- Edit form for satellite model -->
@@ -33,24 +34,24 @@
             </mat-form-field>
 
             <!-- purpose -->
-            <mat-form-field class="form-group" appearance="fill">
-                <mat-label for="purpose">Purpose</mat-label>
-                <input
-                    matInput
-                    type="text"
-                    name="purpose"
-                    class="form-control"
-                    [(ngModel)]="satellite!.purpose"
-                    #purpose="ngModel"
-                    required
-                    [ngClass]="{
-                        'is-invalid': purpose.invalid && purpose.touched
-                    }"
-                />
-                <mat-error *ngIf="purpose.invalid && purpose.touched" class="invalid-feedback">
-                    <mat-error *ngIf="purpose.errors!['required']">Purpose is required</mat-error>
-                </mat-error>
-            </mat-form-field>
+            <div style="display: flex; justify-content: space-between">
+                <mat-form-field appearance="fill" style="width: 85%">
+                    <mat-label for="purpose">Purpose</mat-label>
+                    <mat-select name="purpose" [(ngModel)]="satellite!.purpose" #purpose="ngModel" required>
+                        <mat-option *ngFor="let purpose of purposes" [value]="purpose">{{ purpose }}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+                <button
+                    type="button"
+                    style="width: 13%; height: 100%; padding: 20px 8px"
+                    mat-button
+                    (click)="openDialog()"
+                    #tooltip="matTooltip"
+                    matTooltip="Add new purpose"
+                >
+                    <mat-icon style="margin: auto">add</mat-icon>
+                </button>
+            </div>
 
             <div class="cols-3">
                 <!-- mass -->
@@ -115,176 +116,26 @@
                     <mat-error *ngIf="colorB.invalid && colorB.touched" class="invalid-feedback"> </mat-error>
                 </mat-form-field>
             </div>
-        </div>
-
-        <div
-            *ngIf="satellite.orbit"
-            id="orbit-info"
-            style="display: flex; justify-content: space-between; min-height: 520px"
-        >
-            <div style="width: 39%">
-                <section style="margin-bottom: 10px">
-                    <div style="float: left; width: 260px; margin-top: 4px">
-                        <mat-checkbox [(ngModel)]="scene" name="scene" color="'accent'">Show orbit</mat-checkbox>
-                        <mat-checkbox
-                            [(ngModel)]="orbitService.guidelines"
-                            name="guidelines"
-                            (ngModelChange)="orbitService.toggleGuideLines()"
-                            color="'accent'"
-                            >Add guidelines</mat-checkbox
-                        >
-                    </div>
-                    <div style="margin-left: 270px; display: flex; justify-content: end; gap: 10px">
-                        <mat-label for="mat-zoom-slider" style="align-self: center">Zoom</mat-label>
-                        <mat-slider
-                            class="slider"
-                            id="mat-zoom-slider"
-                            step="0.02"
-                            min="0.5"
-                            max="1.5"
-                            discrete="true"
-                            style="max-width: 60%"
-                        >
-                            <input
-                                matSliderThumb
-                                name="zoom-slider"
-                                id="zoom-slider"
-                                [(ngModel)]="orbitService.zoom"
-                                (ngModelChange)="orbitService.changeZoom(satellite.orbit)"
-                                #eccentricitySlider="ngModel"
-                            />
-                        </mat-slider>
-                    </div>
-                </section>
-                <!-- semi major axis -->
-                <div class="cols-2">
-                    <mat-form-field class="form-group orbit slider" appearance="fill">
-                        <mat-label for="semimajoraxis">Semimajor axis (a) in km</mat-label>
-                        <input
-                            matInput
-                            type="number"
-                            name="semimajoraxis"
-                            id="semimajoraxis"
-                            class="form-control"
-                            [(ngModel)]="satellite.orbit.semiMajorAxis"
-                            #semiMajorAxis="ngModel"
-                            (ngModelChange)="changeSemimajorAxis()"
-                            required
-                            step="100"
-                            [ngClass]="{
-                                'is-invalid': semiMajorAxis.invalid && semiMajorAxis.touched
-                            }"
-                        />
-                        <mat-error
-                            class="invalid-feedback"
-                            *ngIf="semiMajorAxis.invalid && semiMajorAxis.touched && semiMajorAxis.errors!['required']"
-                            >Semimajor axis is required</mat-error
-                        >
-                    </mat-form-field>
-                    <!-- period -->
-                    <mat-form-field class="form-group orbit input-after-slider" appearance="fill">
-                        <mat-label for="period">Period (P) in days</mat-label>
-                        <input
-                            matInput
-                            type="number"
-                            name="period"
-                            class="form-control"
-                            [(ngModel)]="satellite!.orbit.period"
-                            #period="ngModel"
-                            required
-                            disabled
-                        />
-                    </mat-form-field>
-                </div>
-
-                <!-- eccentricity -->
-                <div class="label-container">
-                    <label class="label" for="eccentricity-slider">Eccentricity (e)</label>
-                    <span class="label-value" id="eccentricity-value">{{ satellite.orbit.eccentricity }}</span>
-                </div>
-                <mat-slider class="slider" id="mat-eccentricity-slider" step="0.01" min="0" max="1" discrete="true">
-                    <input
-                        matSliderThumb
-                        name="eccentricity-slider"
-                        id="eccentricity-slider"
-                        [(ngModel)]="satellite.orbit.eccentricity"
-                        (ngModelChange)="changeEccentricity()"
-                        #eccentricitySlider="ngModel"
-                    />
-                </mat-slider>
-
-                <!-- <div class="cols-2"> -->
-                <!-- inclination -->
-                <div class="label-container">
-                    <label class="label" for="inclination-slider">Inclination (i)</label>
-                    <span class="label-value" id="inclination-value">{{ satellite.orbit.inclination }}</span>
-                </div>
-                <mat-slider class="slider" step="2" min="0" max="180" discrete="true">
-                    <input
-                        matSliderThumb
-                        name="inclination-slider"
-                        id="inclination-slider"
-                        [(ngModel)]="satellite.orbit.inclination"
-                        (ngModelChange)="changeInclination()"
-                        #inclinationSlider="ngModel"
-                    />
-                </mat-slider>
-
-                <!-- </div> -->
-                <!-- <div class="cols-2"> -->
-                <!-- longitude (RA) -->
-                <div class="label-container">
-                    <label class="label" for="inclination-slider">Longitude of ascending node (Ω)</label>
-                    <span class="label-value" id="inclination-value">{{
-                        satellite.orbit.longitudeOfAscendingNode
-                    }}</span>
-                </div>
-                <mat-slider class="slider" step="2" min="0" max="360" discrete="true">
-                    <input
-                        matSliderThumb
-                        name="longitude-slider"
-                        id="longitude-slider"
-                        [(ngModel)]="satellite.orbit.longitudeOfAscendingNode"
-                        (ngModelChange)="changeAngle()"
-                        #longitudeSlider="ngModel"
-                    />
-                </mat-slider>
-
-                <!-- argumentOfPerigee -->
-                <div class="label-container">
-                    <label class="label" for="inclination-slider">Argument of perigee (ω)</label>
-                    <span class="label-value" id="inclination-value">{{
-                        satellite.orbit.longitudeOfAscendingNode
-                    }}</span>
-                </div>
-                <mat-slider class="slider" step="2" min="0" max="360" discrete="true">
-                    <input
-                        matSliderThumb
-                        name="perigee-slider"
-                        id="perigee-slider"
-                        [(ngModel)]="satellite.orbit.argumentOfPerigee"
-                        (ngModelChange)="changeAngle()"
-                        #perigeeSlider="ngModel"
-                    />
-                </mat-slider>
-                <mat-form-field appearance="fill">
-                    <mat-label for="launch-date">Date time at perigee</mat-label>
-                    <input
-                        matInput
-                        type="datetime-local"
-                        name="launch-date"
-                        id="launch-date"
-                        class="form-control"
-                        [(ngModel)]="satellite.orbit.dateTimeOfPerigeePassage"
-                        #dateAtPerigee="ngModel"
-                        required
-                        [ngClass]="{
-                            'is-invalid': dateAtPerigee.invalid && dateAtPerigee.touched
-                        }"
-                    />
-                </mat-form-field>
-            </div>
-            <div id="canvas-wrapper" style="width: 59%"><canvas></canvas></div>
+            <mat-form-field appearance="fill">
+                <mat-label for="satelliteParts">Satellite parts</mat-label>
+                <mat-select
+                    name="satelliteParts"
+                    [(ngModel)]="satellite!.satelliteParts"
+                    #satelliteParts="ngModel"
+                    multiple
+                >
+                    <mat-option *ngFor="let part of allSatelliteParts" [value]="part"
+                        ><mat-expansion-panel>
+                            <mat-expansion-panel-header>
+                                <mat-panel-title>
+                                    {{ part.partName }}
+                                </mat-panel-title>
+                            </mat-expansion-panel-header>
+                            {{ part.description }}
+                        </mat-expansion-panel></mat-option
+                    >
+                </mat-select>
+            </mat-form-field>
         </div>
 
         <!-- Submit en Cancel buttons -->

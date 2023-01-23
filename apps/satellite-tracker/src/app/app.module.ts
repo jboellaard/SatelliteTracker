@@ -5,7 +5,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
-import { SatelliteComponent } from './pages/satellite/satellite.component';
 import { SatelliteDetailComponent } from './pages/satellite/satellite-detail/satellite-detail.component';
 import { SatelliteEditComponent } from './pages/satellite/satellite-edit/satellite-edit.component';
 import { SatelliteListComponent } from './pages/satellite/satellite-list/satellite-list.component';
@@ -31,18 +30,23 @@ import { MatListModule } from '@angular/material/list';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSelectModule } from '@angular/material/select';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 
 import { AuthService } from './auth/auth.service';
 import { httpInterceptorProviders } from './auth/auth.interceptor';
+import { AddPurposeDialogComponent } from './pages/satellite/satellite-edit/add-purpose-dialog/add-purpose-dialog.component';
+import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.component';
 
 @NgModule({
     declarations: [
         AppComponent,
         DashboardComponent,
-        SatelliteComponent,
         SatelliteDetailComponent,
         SatelliteEditComponent,
         SatelliteListComponent,
@@ -55,6 +59,8 @@ import { httpInterceptorProviders } from './auth/auth.interceptor';
         UserListComponent,
         LoginComponent,
         RegisterComponent,
+        AddPurposeDialogComponent,
+        OrbitEditComponent,
     ],
     imports: [
         BrowserModule,
@@ -75,6 +81,10 @@ import { httpInterceptorProviders } from './auth/auth.interceptor';
         MatSidenavModule,
         MatSliderModule,
         MatCheckboxModule,
+        MatSelectModule,
+        MatExpansionModule,
+        MatDialogModule,
+        MatTooltipModule,
     ],
     providers: [AuthService, httpInterceptorProviders],
     bootstrap: [AppComponent],

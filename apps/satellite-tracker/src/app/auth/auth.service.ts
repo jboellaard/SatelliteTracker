@@ -131,10 +131,10 @@ export class AuthService {
                         localStorage.setItem('access_token', res.accessToken);
                         localStorage.setItem('refresh_token', res.refreshToken);
                         this.user$.next(res.user);
-                        // this.user$ = new BehaviorSubject<UserIdentity | undefined>(res.user);
                         const expiresAt = this.getExpirationDate(res.refreshTokenExpiresIn);
                         localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
                     }
+                    console.log(res);
                     return of(res);
                 }),
                 catchError((err) => {

@@ -29,11 +29,17 @@ export class OrbitService {
     constructor() {}
 
     createOrbitScene(container: Element, orbit: IOrbit, color: string = '#000000') {
+        console.log(orbit);
         const scene = new THREE.Scene();
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas: container });
-        renderer.setSize(container.clientWidth, container.clientHeight);
+        // renderer.setSize(container.clientWidth, container.clientHeight);
+        const width = container.clientWidth;
+        const height = container.clientHeight;
+        renderer.setSize(width, height);
+        // renderer.setPixelRatio(window.devicePixelRatio);
 
         this.createCamera();
+        this.camera.aspect = width / height;
         let camera = this.camera;
 
         const controls = this.createControls(camera, renderer);
@@ -62,9 +68,6 @@ export class OrbitService {
         const earth = this.createEarth();
         scene.add(earth);
 
-        const moon = this.createMoon();
-        scene.add(moon);
-
         this.createOrbit(orbit, scene);
         this.createGuideLines(scene);
 
@@ -74,10 +77,24 @@ export class OrbitService {
         );
         scene.add(satelliteMesh);
         this.satelliteMesh = satelliteMesh;
+        console.log(satelliteMesh);
+
+        const perigeeLine = new THREE.Line(
+            new THREE.BufferGeometry(),
+            new THREE.LineBasicMaterial({ color: 0x5a5b5c })
+        );
+        scene.add(perigeeLine);
+
+        const perigee = new THREE.Mesh(
+            new THREE.SphereGeometry(100 * this.scale, 32, 32),
+            new THREE.MeshPhongMaterial({ color: 0x5a5b5c })
+        );
+        scene.add(perigee);
 
         this.fitCameraToOrbit = function (newOrbit: IOrbit, zoom = 1) {
-            let cameraPos = (newOrbit.semiMajorAxis ? newOrbit.semiMajorAxis * this.scale : 1) / zoom;
-            if (cameraPos * zoom < 1.1) cameraPos = 1.1;
+            let cameraPos = newOrbit.semiMajorAxis * this.scale;
+            if (cameraPos < 1.5) cameraPos = 1.5;
+            cameraPos /= zoom;
             camera.position.set(-2.2 * cameraPos, 1.2 * cameraPos, 1.2 * cameraPos);
             directionalLight.position.set(50 + cameraPos, 0, 0);
 
@@ -87,8 +104,8 @@ export class OrbitService {
 
             satelliteMesh.scale.setScalar(cameraPos * 1.1);
             camera.lookAt(0, 0, 0);
-            controls.update();
             camera.updateProjectionMatrix();
+            controls.update();
         };
 
         this.changeEllipseGeometry(orbit);
@@ -96,39 +113,23 @@ export class OrbitService {
         const scale = this.scale;
         let time = 0;
         const earthRotation = 0.003;
-        let moonTime = 0;
-        let moonOrbit = {
-            semiMajorAxis: 384400,
-            eccentricity: 0.0549,
-            inclination: 24,
-            longitudeOfAscendingNode: 39, // changes 360 degrees (regressing) every 18.61 years
-            argumentOfPerigee: 318.15, // changes 360 degrees (progressing) every 8.85 years
-            period: 27.554551,
-        };
 
-        let getPositionInOrbit = function (orbit: IOrbit, earthRotation: number): THREE.Vector3 {
-            if (!orbit.eccentricity) orbit.eccentricity = 0;
-            if (!orbit.inclination) orbit.inclination = 0;
-            if (!orbit.longitudeOfAscendingNode) orbit.longitudeOfAscendingNode = 0;
-            if (!orbit.argumentOfPerigee) orbit.argumentOfPerigee = 0;
-            if (!orbit.period) orbit.period = 0;
+        const center = new THREE.Vector3(0, 0, 0);
+        const xDirection = new THREE.Vector3(1, 0, 0);
+        const yDirection = new THREE.Vector3(0, 1, 0);
 
-            time -=
-                ((earthRotation / orbit.period) *
-                    (1 + 2 * orbit.eccentricity * Math.cos(time) + orbit.eccentricity ** 2)) /
-                (1 - orbit.eccentricity ** 2);
-
+        let getPositionInOrbit = function (orbit: IOrbit, time: number): THREE.Vector3 {
             const xR = 0;
-            const yR = orbit.inclination * (Math.PI / 180);
+            const yR = orbit.inclination! * (Math.PI / 180);
             const zR = 0;
 
-            const xTranslation = orbit.eccentricity * orbit.semiMajorAxis * scale;
+            const xTranslation = orbit.eccentricity! * orbit.semiMajorAxis * scale;
 
             const x0 = orbit.semiMajorAxis * scale * Math.cos(time) - xTranslation;
-            const y0 = orbit.semiMajorAxis * scale * Math.sqrt(1 - orbit.eccentricity ** 2) * Math.sin(time);
+            const y0 = orbit.semiMajorAxis * scale * Math.sqrt(1 - orbit.eccentricity! ** 2) * Math.sin(time);
             const z = 0;
 
-            const perigee = -orbit.argumentOfPerigee * (Math.PI / 180) + Math.PI / 2;
+            const perigee = -orbit.argumentOfPerigee! * (Math.PI / 180) + Math.PI / 2;
 
             const x = x0 * Math.cos(perigee) - y0 * Math.sin(perigee);
             const y = x0 * Math.sin(perigee) + y0 * Math.cos(perigee);
@@ -146,18 +147,29 @@ export class OrbitService {
             const z3 = z2;
 
             const pos = new THREE.Vector3(x3, y3, z3);
-            pos.applyAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI / 2);
-            pos.applyAxisAngle(new THREE.Vector3(0, 1, 0), orbit.longitudeOfAscendingNode * (Math.PI / 180));
+            pos.applyAxisAngle(xDirection, Math.PI / 2);
+            if (orbit.inclination != 0)
+                pos.applyAxisAngle(yDirection, orbit.longitudeOfAscendingNode! * (Math.PI / 180));
             return pos;
         };
 
         const animate = function () {
             requestAnimationFrame(animate);
-            const pos = getPositionInOrbit(orbit, earthRotation);
+            if (!orbit.eccentricity) orbit.eccentricity = 0;
+            if (!orbit.inclination) orbit.inclination = 0;
+            if (!orbit.longitudeOfAscendingNode) orbit.longitudeOfAscendingNode = 0;
+            if (!orbit.argumentOfPerigee) orbit.argumentOfPerigee = 0;
+            if (!orbit.period) orbit.period = 1;
+
+            time -=
+                ((earthRotation / orbit.period) *
+                    (1 + 2 * orbit.eccentricity * Math.cos(time) + orbit.eccentricity ** 2)) /
+                (1 - orbit.eccentricity ** 2);
+            const pos = getPositionInOrbit(orbit, time);
             satelliteMesh.position.set(pos.x, pos.y, pos.z);
 
-            const moonPos = getPositionInOrbit(moonOrbit, earthRotation);
-            moon.position.set(moonPos.x, moonPos.y, moonPos.z);
+            const perigeePos = getPositionInOrbit(orbit, 0);
+            perigeeLine.geometry = new THREE.BufferGeometry().setFromPoints([perigeePos, center]);
 
             earth.rotation.y += earthRotation;
 
@@ -192,14 +204,6 @@ export class OrbitService {
         return new THREE.Mesh(earthGeometry, earthMaterial);
     }
 
-    private createMoon() {
-        const moonGeometry = new THREE.SphereGeometry(this.moonRadius * this.scale, 32, 32);
-        const moonMaterial = new THREE.MeshBasicMaterial({
-            map: new THREE.TextureLoader().load('assets/images/moon.jpg'),
-        });
-        return new THREE.Mesh(moonGeometry, moonMaterial);
-    }
-
     private createOrbit(orbit: IOrbit, scene: THREE.Scene) {
         this.ellipse.material = new THREE.LineBasicMaterial({ color: 0xa6a6a6 });
         this.ellipseObject.add(this.ellipse);
@@ -220,7 +224,7 @@ export class OrbitService {
         this.equatorialPlane.material = new THREE.MeshBasicMaterial({
             color: lineColor,
             side: THREE.DoubleSide,
-            opacity: 0.1,
+            opacity: 0.15,
             transparent: true,
         });
         this.equatorialPlane.rotation.x = Math.PI / 2;
@@ -237,7 +241,7 @@ export class OrbitService {
         this.ellipse.geometry = new THREE.BufferGeometry().setFromPoints(this.ellipseCurve.getPoints(100));
 
         let planeSize = orbit.semiMajorAxis * this.scale * 2;
-        if (planeSize < 2) planeSize = 2;
+        if (planeSize < 3) planeSize = 3;
         this.equatorialPlane.geometry = new THREE.PlaneGeometry(planeSize, planeSize, 32);
         this.xLine.geometry.setFromPoints([
             new THREE.Vector3(-planeSize / 2, 0, 0),
