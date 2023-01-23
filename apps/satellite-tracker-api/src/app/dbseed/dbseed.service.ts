@@ -292,7 +292,7 @@ export class DbseedService implements OnModuleInit {
                     partName: 'Thermal system',
                     description: 'A device that regulates temperature',
                     function: 'Temperature regulation',
-                    dependsOn: [satellitePart17],
+                    dependsOn: [satellitePart18],
                 });
                 const satellitePart20 = new this.satellitePartModel({
                     partName: 'Radiation sensor',
@@ -312,6 +312,8 @@ export class DbseedService implements OnModuleInit {
                     material: 'Aluminum Bronze and molybdenum',
                     dependsOn: [satellitePart20],
                 });
+
+                satellitePart18.dependsOn.push(satellitePart19);
 
                 await this.satellitePartModel.insertMany([
                     satellitePart1,

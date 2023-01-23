@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Id, IOrbit, ISatellite, ISatellitePart, Purpose } from 'shared/domain';
+import { Id, IOrbit, ISatellite, ISatellitePart, Purpose, Shape } from 'shared/domain';
 import { SatelliteService } from '../satellite.service';
 import { OrbitService } from '../orbit-scene.service';
 import { AddPurposeDialogComponent } from './add-purpose-dialog/add-purpose-dialog.component';
@@ -18,12 +18,14 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     id!: Id | null | undefined;
     allSatelliteParts: ISatellitePart[] = [];
     purposes = Purpose;
+    shapes = Object.values(Shape);
     satellite: ISatellite = {
         satelliteName: '',
-        purpose: '',
+        purpose: 'TBD',
         mass: 0,
         sizeOfBase: 0,
         colorOfBase: '#000000',
+        shapeOfBase: Shape.Cube,
         orbit: undefined,
     };
     userId!: Id | null | undefined;
@@ -44,7 +46,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.satellitePartSub = this.satelliteService.getSatelliteParts().subscribe((satelliteParts) => {
-            this.allSatelliteParts = satelliteParts;
+            this.allSatelliteParts = satelliteParts.sort((a, b) => a.partName.localeCompare(b.partName));
         });
         this.paramSub = this.route.paramMap.subscribe((params) => {
             this.id = params.get('satelliteId')!;

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document, ObjectId, Schema as MongooseSchema } from 'mongoose';
+import { Shape } from 'shared/domain';
 
 export type SatellitePartDocument = SatellitePart & Document;
 export type CustomSatellitePartDocument = CustomSatellitePart & Document;
@@ -132,6 +133,9 @@ export class Satellite {
 
     @Prop({ required: true })
     colorOfBase!: string;
+
+    @Prop({ required: true, default: Shape.Cube })
+    shapeOfBase?: string;
 
     @Prop({ required: true, default: 'TBD' })
     purpose?: string;

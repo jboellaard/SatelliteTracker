@@ -12,6 +12,11 @@ export const Purpose = [
     'Space cleanup',
 ];
 
+export enum Shape {
+    Sphere = 'Sphere',
+    Cube = 'Cube',
+}
+
 export interface ISatellitePart {
     _id?: Id;
     id?: Id;
@@ -57,6 +62,7 @@ export interface ISatellite {
     mass: number;
     sizeOfBase: number;
     colorOfBase: string;
+    shapeOfBase: Shape;
     purpose?: string;
     satelliteParts?: ICustomSatellitePart[];
     orbit?: IOrbit;

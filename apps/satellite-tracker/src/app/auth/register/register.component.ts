@@ -11,7 +11,6 @@ import { AuthService } from '../auth.service';
 })
 export class RegisterComponent implements OnInit {
     registerForm!: FormGroup;
-    // @Output() formSubmitted = new EventEmitter<UserIdentity>();
 
     constructor(private formBuilder: FormBuilder, private authService: AuthService, private router: Router) {}
 
@@ -25,7 +24,6 @@ export class RegisterComponent implements OnInit {
 
     onSubmit(): void {
         if (this.registerForm.valid) {
-            // this.formSubmitted.emit(this.registerForm.value);
             console.log(this.registerForm.value);
             this.authService.register(this.registerForm.value).subscribe((res) => {
                 console.log(res);
