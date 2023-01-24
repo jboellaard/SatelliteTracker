@@ -22,7 +22,7 @@ export class Identity {
     hash?: string;
 
     @Prop({
-        required: true,
+        required: false,
         unique: true,
     })
     emailAddress?: string;

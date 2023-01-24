@@ -10,8 +10,9 @@ export class UserService {
     private logger = new Logger(UserService.name);
     constructor(@InjectModel(User.name, 'satellitetrackerdb') private userModel: Model<UserDocument>) {}
 
-    async findAll(): Promise<User[]> {
-        return await this.userModel.find();
+    async findAll() {
+        const users = await this.userModel.find();
+        return { status: HttpStatus.OK, users };
     }
 
     async findOne(id: Id) {
@@ -22,10 +23,11 @@ export class UserService {
         if (!user) {
             return new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
-        return user;
+        return { status: HttpStatus.OK, user };
     }
 
     async update(id: Id, updateUserDto: UpdateUserDto) {
-        return this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
+        const updatedUser = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
+        return { status: HttpStatus.OK, updatedUser };
     }
 }

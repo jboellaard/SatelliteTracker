@@ -421,7 +421,7 @@ export class DbseedService implements OnModuleInit {
                     //     launchDate: new Date(2023, 11, 20),
                     //     launchSite: { coordinates: { latitude: 28.608, longitude: -80.604 } },
                     // },
-                    createdById: user1.user._id,
+                    createdBy: user1.user._id,
                 });
                 const satellite2 = new this.satelliteModel({
                     satelliteName: 'Spaceduck',
@@ -429,7 +429,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 200,
                     colorOfBase: '#ffffff',
-                    createdById: user2.user._id,
+                    createdBy: user2.user._id,
                 });
                 const satellite3 = new this.satelliteModel({
                     satelliteName: 'Skyscraper',
@@ -437,7 +437,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 200,
                     colorOfBase: '#ffffff',
-                    createdById: user1.user._id,
+                    createdBy: user1.user._id,
                 });
                 const satellite4 = new this.satelliteModel({
                     satelliteName: 'stardrop',
@@ -445,7 +445,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 200,
                     colorOfBase: '#0000cc',
-                    createdById: user4.user._id,
+                    createdBy: user4.user._id,
                 });
                 const satellite5 = new this.satelliteModel({
                     satelliteName: 'cloud',
@@ -453,7 +453,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 200,
                     colorOfBase: '#0000cc',
-                    createdById: user4.user._id,
+                    createdBy: user4.user._id,
                 });
                 const satellite6 = new this.satelliteModel({
                     satelliteName: 'sunrise',
@@ -461,7 +461,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 200,
                     colorOfBase: '#d84390',
-                    createdById: user1.user._id,
+                    createdBy: user1.user._id,
                 });
                 const satellite7 = new this.satelliteModel({
                     satelliteName: 'sunset',
@@ -469,7 +469,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 200,
                     colorOfBase: '#130449',
-                    createdById: user1.user._id,
+                    createdBy: user1.user._id,
                 });
                 const satellite8 = new this.satelliteModel({
                     satelliteName: 'shuttle',
@@ -477,7 +477,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 200,
                     colorOfBase: '#a198a5',
-                    createdById: user1.user._id,
+                    createdBy: user1.user._id,
                 });
                 const satellite9 = new this.satelliteModel({
                     satelliteName: 'big bird',
@@ -485,7 +485,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 10000,
                     sizeOfBase: 10000,
                     colorOfBase: '#e1f92c',
-                    createdById: user1.user._id,
+                    createdBy: user1.user._id,
                 });
                 const satellite10 = new this.satelliteModel({
                     satelliteName: 'little bird',
@@ -493,7 +493,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 100,
                     sizeOfBase: 100,
                     colorOfBase: '#e1f92c',
-                    createdById: user1.user,
+                    createdBy: user1.user,
                 });
                 const satellite11 = new this.satelliteModel({
                     satelliteName: 'High flyer',
@@ -501,7 +501,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 300,
                     sizeOfBase: 100,
                     colorOfBase: '#9cdaff',
-                    createdById: user6.user,
+                    createdBy: user6.user,
                     orbit: {
                         semiMajorAxis: 167740,
                         eccentricity: 0.5,
@@ -517,7 +517,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 300,
                     sizeOfBase: 100,
                     colorOfBase: '#027e00',
-                    createdById: user6.user,
+                    createdBy: user6.user,
                     orbit: {
                         semiMajorAxis: 6800,
                         eccentricity: 0,
@@ -533,7 +533,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 30,
                     colorOfBase: '#6e6e6e',
-                    createdById: user6.user,
+                    createdBy: user6.user,
                 });
                 const satellite14 = new this.satelliteModel({
                     satelliteName: 'Find the way',
@@ -541,7 +541,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 30,
                     colorOfBase: '#027e00',
-                    createdById: user6.user,
+                    createdBy: user6.user,
                 });
                 const satellite15 = new this.satelliteModel({
                     satelliteName: 'Second earth',
@@ -549,7 +549,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 5.972 * 10 ** 24,
                     sizeOfBase: 6371 * 2,
                     colorOfBase: '#0020d5',
-                    createdById: user6.user,
+                    createdBy: user6.user,
                     orbit: {
                         semiMajorAxis: 1599000,
                         eccentricity: 0.7,
@@ -579,47 +579,47 @@ export class DbseedService implements OnModuleInit {
 
                 await this.neo4jService.write(
                     `
-                MATCH (u1:User {username: $username1}) 
+                MATCH (u1:User {username: $username1})
                 MATCH (u2:User {username: $username2})
                 MATCH (u3:User {username: $username3})
                 MATCH (u4:User {username: $username4})
                 MATCH (u5:User {username: $username5})
                 MATCH (u6:User {username: $username6})
 
-                CREATE (s:Satellite {satelliteName: $name1, createdBy: $username1 })                
-                MERGE (s)<-[:CREATED {createdAt: $date1}]-(u1) 
-                SET s.launchDate = $launchDate
-                CREATE (s2:Satellite {satelliteName: $name2, createdBy: $username2 })                
-                MERGE (s2)<-[:CREATED {createdAt: $date2}]-(u2)                
+                CREATE (s:Satellite {satelliteName: $name1, createdBy: $username1 })
+                MERGE (s)<-[:CREATED {createdAt: datetime()}]-(u1)
+                SET s.launchDate = datetime($launchDate)
+                CREATE (s2:Satellite {satelliteName: $name2, createdBy: $username2 })
+                MERGE (s2)<-[:CREATED {createdAt: datetime()}]-(u2)
                 CREATE (s3:Satellite {satelliteName: $name3, createdBy: $username1 })
-                MERGE (s3)<-[:CREATED {createdAt: $date1}]-(u1)
+                MERGE (s3)<-[:CREATED {createdAt: datetime()}]-(u1)
                 CREATE (s4:Satellite {satelliteName: $name4, createdBy: $username4 })
                 MERGE (s4)<-[:CREATED {createdAt: datetime()}]-(u4)
                 CREATE (s5:Satellite {satelliteName: $name5, createdBy: $username4 })
-                MERGE (s5)<-[:CREATED {createdAt: $date2}]-(u4)
+                MERGE (s5)<-[:CREATED {createdAt: datetime()}]-(u4)
                 CREATE (s6:Satellite {satelliteName: $name6, createdBy: $username1 })
-                MERGE (s6)<-[:CREATED {createdAt: $date3}]-(u1)
+                MERGE (s6)<-[:CREATED {createdAt: datetime()}]-(u1)
                 CREATE (s7:Satellite {satelliteName: $name7, createdBy: $username1 })
                 MERGE (s7)<-[:CREATED {createdAt: datetime()}]-(u1)
                 CREATE (s8:Satellite {satelliteName: $name8, createdBy: $username1 })
-                MERGE (s8)<-[:CREATED {createdAt: $date2}]-(u1)
+                MERGE (s8)<-[:CREATED {createdAt: datetime()}]-(u1)
                 CREATE (s9:Satellite {satelliteName: $name9, createdBy: $username1 })
                 MERGE (s9)<-[:CREATED {createdAt: datetime()}]-(u1)
                 CREATE (s10:Satellite {satelliteName: $name10, createdBy: $username1 })
                 MERGE (s10)<-[:CREATED {createdAt: datetime()}]-(u1)
                 CREATE (s11:Satellite {satelliteName: $name11, createdBy: $username6 })
-                MERGE (s11)<-[:CREATED {createdAt: $date1}]-(u6)
-                SET s11.launchDate = $launchDate1
+                MERGE (s11)<-[:CREATED {createdAt: datetime()}]-(u6)
+                SET s11.launchDate = datetime($launchDate1)
                 CREATE (s12:Satellite {satelliteName: $name12, createdBy: $username6 })
                 MERGE (s12)<-[:CREATED {createdAt: datetime()}]-(u6)
-                SET s12.launchDate = $launchDate1
+                SET s12.launchDate = datetime($launchDate1)
                 CREATE (s13:Satellite {satelliteName: $name13, createdBy: $username6 })
                 MERGE (s13)<-[:CREATED {createdAt: datetime()}]-(u6)
                 CREATE (s14:Satellite {satelliteName: $name14, createdBy: $username6 })
                 MERGE (s14)<-[:CREATED {createdAt: datetime()}]-(u6)
                 CREATE (s15:Satellite {satelliteName: $name15, createdBy: $username6 })
                 MERGE (s15)<-[:CREATED {createdAt: datetime()}]-(u6)
-                SET s15.launchDate = $launchDate2
+                SET s15.launchDate = datetime($launchDate2)
                 MERGE (u1)-[:TRACKS]->(s)
                 MERGE (u2)-[:TRACKS]->(s2)
                 MERGE (u1)-[:TRACKS]->(s3)
@@ -670,12 +670,9 @@ export class DbseedService implements OnModuleInit {
                         name13: satellite13.satelliteName,
                         name14: satellite14.satelliteName,
                         name15: satellite15.satelliteName,
-                        launchDate: satellite1.orbit?.dateTimeOfLaunch,
-                        launchDate1: satellite11.orbit?.dateTimeOfLaunch,
-                        launchDate2: satellite15.orbit?.dateTimeOfLaunch,
-                        date1: satellite11.createdAt,
-                        date2: satellite8.createdAt,
-                        date3: satellite9.createdAt,
+                        launchDate: satellite1.orbit?.dateTimeOfLaunch.toISOString(),
+                        launchDate1: satellite11.orbit?.dateTimeOfLaunch.toISOString(),
+                        launchDate2: satellite15.orbit?.dateTimeOfLaunch.toISOString(),
                         username1: user1.user.username,
                         username2: user2.user.username,
                         username3: user3.user.username,

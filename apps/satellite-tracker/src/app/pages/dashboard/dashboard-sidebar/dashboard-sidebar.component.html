@@ -1,0 +1,43 @@
+<div class="side-bar-container">
+    <div class="side-bar">
+        <div class="side-bar-header">
+            <div class="side-bar-header-title">
+                <h3>Dashboard</h3>
+            </div>
+        </div>
+        <div class="side-bar-content">
+            <!-- <div class="side-bar-content-item">
+                <button mat-button routerLink="/dashboard" routerLinkActive="active">
+                    <mat-icon>dashboard</mat-icon>
+                    <span>Dashboard</span>
+                </button>
+            </div>
+            <div class="side-bar-content-item">
+                <button mat-button routerLink="/dashboard/satellites" routerLinkActive="active">
+                    <mat-icon>satellite</mat-icon>
+                    <span>Satellites</span>
+                </button>
+            </div>
+            <div class="side-bar-content-item">
+                <button mat-button routerLink="/dashboard/locations" routerLinkActive="active">
+                    <mat-icon>location_on</mat-icon>
+                    <span>Locations</span>
+                </button>
+            </div>
+            <div class="side-bar-content-item">
+                <button mat-button routerLink="/dashboard/profile" routerLinkActive="active">
+                    <mat-icon>person</mat-icon>
+                    <span>Profile</span>
+                </button>
+            </div> -->
+        </div>
+        <div *ngFor="let satellite of satellites">
+            <a routerLink="/users/{{ user?.username }}/satellites/{{ satellite.id }}" routerLinkActive="active">
+                <div class="side-bar-content-item">
+                    <span>{{ satellite.satelliteName }}</span>
+                </div>
+                <mat-divider></mat-divider>
+            </a>
+        </div>
+    </div>
+</div>

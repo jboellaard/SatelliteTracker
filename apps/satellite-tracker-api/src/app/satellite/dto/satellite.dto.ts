@@ -12,14 +12,13 @@ export class SatelliteDto implements ISatellite {
     satelliteParts?: ICustomSatellitePart[] | undefined;
     orbit?: IOrbit | undefined;
     // launch?: ILaunch | undefined;
-    createdById?: Id;
-    createdBy?: IUser | undefined;
+    createdBy?: Id;
     createdAt?: Date | undefined;
     updatedAt?: Date | undefined;
 }
 
 export class UpdateSatelliteDto extends PartialType(SatelliteDto) {
-    override createdById!: Id;
+    override createdBy!: Id;
     override satelliteName?: string;
     override mass?: number;
     override sizeOfBase?: number;

@@ -7,7 +7,7 @@ import {
     HttpErrorResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, switchMap, tap } from 'rxjs';
+import { catchError, Observable, switchMap, tap, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 
 @Injectable()
@@ -22,7 +22,13 @@ export class AuthInterceptor implements HttpInterceptor {
         }
         return next.handle(authReq).pipe(
             catchError((error) => {
-                if (error instanceof HttpErrorResponse && error.status === 401) {
+                if (
+                    error instanceof HttpErrorResponse &&
+                    error.status === 401 &&
+                    !req.url.includes('refresh') &&
+                    !req.url.includes('login') &&
+                    !req.url.includes('register')
+                ) {
                     return this.handle401Error(authReq, next);
                 }
                 return next.handle(authReq);
@@ -33,11 +39,16 @@ export class AuthInterceptor implements HttpInterceptor {
     private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return this.authService.refreshToken().pipe(
             switchMap((res) => {
-                if (res.accessToken) {
-                    return next.handle(request.clone({ setHeaders: { Authorization: `Bearer ${res.accessToken}` } }));
+                if (res) {
+                    if (res.accessToken) {
+                        return next.handle(
+                            request.clone({ setHeaders: { Authorization: `Bearer ${res.accessToken}` } })
+                        );
+                    } else {
+                        return throwError(() => new Error('Could not refresh token, please login again'));
+                    }
                 } else {
-                    console.log('Something went wrong');
-                    return next.handle(request);
+                    return throwError(() => new Error('Refresh token is not valid'));
                 }
             })
         );

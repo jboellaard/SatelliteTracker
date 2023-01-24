@@ -2,6 +2,7 @@ import { Id } from './id.type';
 import { ISatellite } from './satellite.interface';
 
 export interface IUserInfo {
+    _id?: Id;
     id?: Id;
     username: string;
     location?: ILocation;

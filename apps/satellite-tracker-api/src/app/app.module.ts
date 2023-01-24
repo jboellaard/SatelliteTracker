@@ -39,10 +39,10 @@ import { APIResponseInterceptor } from './api-response.interceptor';
     controllers: [AppController],
     providers: [
         AppService,
-        {
-            provide: APP_INTERCEPTOR,
-            useClass: APIResponseInterceptor,
-        },
+        // {
+        //     provide: APP_INTERCEPTOR,
+        //     useClass: APIResponseInterceptor,
+        // },
     ],
 })
 export class AppModule {}

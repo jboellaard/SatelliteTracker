@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, Observable, of, switchMap, tap } from 'rxjs';
 import { UserCredentials, UserIdentity, UserRegistration } from 'shared/domain';
 import { environment } from 'apps/satellite-tracker/src/environments/environment';
+import { SnackBarService } from '../utils/snack-bar.service';
 
 @Injectable({
     providedIn: 'root',
@@ -13,7 +14,7 @@ export class AuthService {
     private readonly CURRENT_USER = 'currentUser';
     user$ = new BehaviorSubject<UserIdentity | undefined>(undefined);
 
-    constructor(private http: HttpClient, private router: Router) {
+    constructor(private http: HttpClient, private router: Router, private snackBar: SnackBarService) {
         this.getUserFromLocalStorage()
             .pipe(
                 switchMap((user: UserIdentity | undefined) => {
@@ -50,7 +51,7 @@ export class AuthService {
 
     login(credentials: UserCredentials) {
         return this.http.post<any>(`${environment.API_URL}login`, { ...credentials }, { headers: this.headers }).pipe(
-            tap((res) => {
+            switchMap((res) => {
                 console.log(res);
                 if (res.accessToken) {
                     localStorage.setItem('access_token', res.accessToken);
@@ -59,28 +60,43 @@ export class AuthService {
                     this.user$.next(res.user);
                     const expiresAt = this.getExpirationDate(res.refreshTokenExpiresIn);
                     localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
-                    this.router.navigate(['/']);
+                    return of(res.user);
+                } else {
+                    // this.snackBar.error(res.message);
+                    if (res.status === 401)
+                        return of(
+                            "Invalid username or password, please try again or register if you don't have an account yet."
+                        );
+                    return of(res.message);
                 }
             }),
             catchError((err) => {
-                console.log('login error', err);
-                return of(undefined);
+                console.log('Error logging in:', err);
+                // this.snackBar.error('Login failed, please try again later');
+                return of('Something went wrong, please try again later.');
             })
         );
     }
 
-    register(user: UserRegistration): Observable<UserRegistration | undefined> {
-        return this.http
-            .post<UserRegistration>(`${environment.API_URL}register`, { ...user }, { headers: this.headers })
-            .pipe(
-                tap((user) => {
-                    return user;
-                }),
-                catchError((err) => {
-                    console.log('register error', err);
+    register(user: UserRegistration) {
+        return this.http.post<any>(`${environment.API_URL}register`, { ...user }, { headers: this.headers }).pipe(
+            tap((res) => console.log(res)),
+            switchMap((res) => {
+                console.log(res);
+                if (res.status === 201) {
+                    return this.login({ username: user.username, password: user.password });
+                } else {
+                    if (res.message) this.snackBar.error(res.message);
+                    else this.snackBar.error('Registration failed');
                     return of(undefined);
-                })
-            );
+                }
+            }),
+            catchError((err) => {
+                console.log('register error', err);
+                this.snackBar.error('Registration failed');
+                return of(undefined);
+            })
+        );
     }
 
     logout(): void {
@@ -90,6 +106,10 @@ export class AuthService {
         localStorage.removeItem(this.CURRENT_USER);
         this.user$.next(undefined);
         this.router.navigate(['/login']);
+    }
+
+    getUser(): Observable<UserIdentity | undefined> {
+        return this.user$.asObservable();
     }
 
     getUserFromLocalStorage(): Observable<UserIdentity | undefined> {
@@ -119,6 +139,8 @@ export class AuthService {
     refreshToken(): Observable<any> {
         const refreshToken = localStorage.getItem('refresh_token');
         if (!refreshToken || this.isLoggedOut()) {
+            this.logout();
+            this.snackBar.error('Session expired, please login again');
             return of(undefined);
         }
         return this.http
@@ -139,7 +161,7 @@ export class AuthService {
                 }),
                 catchError((err) => {
                     console.log('refresh error', err);
-                    return of(undefined);
+                    return of(err);
                 })
             );
     }

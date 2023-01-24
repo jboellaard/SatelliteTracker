@@ -1,12 +1,14 @@
 <div class="edit-container">
     <h1>Register</h1>
-
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" name="form" novalidate>
-        <div class="max-500">
+    <form [formGroup]="registerForm" name="form" (ngSubmit)="onSubmit()">
+        <div class="" style="margin-top: 16px">
+            <div *ngIf="error" style="color: #f44336">
+                <p>{{ error }}</p>
+            </div>
             <div class="cols-2">
                 <!-- name -->
                 <mat-form-field class="form-group" appearance="fill">
-                    <mat-label for="username">User name</mat-label>
+                    <mat-label for="username">Username</mat-label>
                     <input
                         matInput
                         type="text"
@@ -61,6 +63,23 @@
                 </mat-form-field>
             </div>
 
+            <div
+                style="
+                    display: flex;
+                    justify-content: center;
+                    width: 100%;
+                    flex-direction: row;
+                    align-items: center;
+                    padding-bottom: 20px;
+                "
+            >
+                <div style="flex: 1"><mat-divider></mat-divider></div>
+                <div class="mat-typography" style="padding-left: 10px; padding-right: 10px">
+                    <i>optional</i>
+                </div>
+                <div style="flex: 1"><mat-divider></mat-divider></div>
+            </div>
+
             <!-- email -->
             <mat-form-field class="form-group" appearance="fill">
                 <mat-label for="email">Email</mat-label>
@@ -71,57 +90,46 @@
                     class="form-control"
                     formControlName="emailAddress"
                     email
-                    required
                     [ngClass]="{
                         'is-invalid':
                             registerForm.get('emailAddress')?.invalid && registerForm.get('emailAddress')?.touched
                     }"
                 />
                 <mat-error
-                    *ngIf="registerForm.get('emailAddress')?.invalid && registerForm.get('emailAddress')?.touched"
-                    class="invalid-feedback"
+                    *ngIf="
+                        registerForm.get('emailAddress')?.invalid &&
+                        registerForm.get('emailAddress')?.touched &&
+                        registerForm.get('emailAddress')?.hasError('email')
+                    "
+                    >Please enter a valid email address.</mat-error
                 >
-                    <ng-container *ngIf="registerForm.get('emailAddress')?.hasError('required')"
-                        >Email address is required</ng-container
-                    >
-                    <ng-container *ngIf="registerForm.get('emailAddress')?.hasError('email')"
-                        >Please enter a valid email address.</ng-container
-                    >
-                    <!-- <mat-error *ngIf="registerForm.get('emailAddress')?.hasError('required')"
-                >Email address is required</mat-error
-            >
-            <mat-error *ngIf="registerForm.get('emailAddress')?.hasError('email')"
-                >Please enter a valid email address.</mat-error
-            > -->
-                </mat-error>
             </mat-form-field>
-
+        </div>
+        <div>
             <!-- location -->
-            <!-- <div>
-            <label>Location</label>
-            <div class="cols-2">
+            <div class="cols-3">
                 <mat-form-field class="form-group" appearance="fill">
                     <mat-label for="latitude">Latitude</mat-label>
                     <input
                         matInput
                         type="number"
                         name="latitude"
-                        class="form-control"
-                        [(ngModel)]="user!.location!.coordinates!.latitude"
-                        #latitude="ngModel"
+                        formControlName="latitude"
                         min="-90"
                         max="90"
-                        required
                         [ngClass]="{
-                            'is-invalid': latitude.invalid && latitude.touched
+                            'is-invalid': registerForm.get('latitude')?.invalid && registerForm.get('latitude')?.touched
                         }"
                     />
-                    <mat-error *ngIf="latitude.invalid && latitude.touched" class="invalid-feedback">
-                        <div *ngIf="latitude.errors!['required']">Latitude is required</div>
-                        <div *ngIf="latitude.errors!['type']">Please enter a number.</div>
-                        <div *ngIf="latitude.errors!['min'] || latitude.errors!['max']">
-                            Latitude must be between -90 and 90.
-                        </div>
+                    <mat-error
+                        *ngIf="
+                            registerForm.get('latitude')?.invalid &&
+                            registerForm.get('latitude')?.touched &&
+                            (registerForm.get('latitude')?.hasError('min') ||
+                                registerForm.get('latitude')?.hasError('max'))
+                        "
+                    >
+                        Latitude must be between -90 and 90.
                     </mat-error>
                 </mat-form-field>
                 <mat-form-field class="form-group" appearance="fill">
@@ -130,55 +138,49 @@
                         matInput
                         type="number"
                         name="longitude"
-                        class="form-control"
-                        [(ngModel)]="user!.location!.coordinates!.longitude"
-                        #longitude="ngModel"
+                        formControlName="longitude"
                         min="-180"
                         max="180"
-                        required
                         [ngClass]="{
-                            'is-invalid': longitude.invalid && longitude.touched
+                            'is-invalid':
+                                registerForm.get('longitude')?.invalid && registerForm.get('longitude')?.touched
                         }"
                     />
-                    <mat-error *ngIf="longitude.invalid && longitude.touched" class="invalid-feedback">
-                        <div *ngIf="longitude.errors!['required']">Longitude is required</div>
-                        <div *ngIf="longitude.errors!['type']">Please enter a number.</div>
-                        <div *ngIf="longitude.errors!['min'] || longitude.errors!['max']">
-                            Longitude must be between -180 and 180.
-                        </div>
+                    <mat-error
+                        *ngIf="
+                            registerForm.get('longitude')?.invalid &&
+                            registerForm.get('longitude')?.touched &&
+                            (registerForm.get('longitude')?.hasError('min') ||
+                                registerForm.get('longitude')?.hasError('max'))
+                        "
+                    >
+                        Longitude must be between -180 and 180.
                     </mat-error>
                 </mat-form-field>
+                <button mat-flat-button (click)="getLocation()">Use your device's location</button>
             </div>
-        </div> -->
 
-            <!-- email -->
-            <!-- <mat-form-field class="form-group" appearance="fill">
-            <mat-label for="profiledescription">Profile description</mat-label>
-            <textarea
-                matInput
-                name="profiledescription"
-                class="form-control"
-                [(ngModel)]="user!.profileDescription"
-                #profiledescription="ngModel"
-            ></textarea>
-        </mat-form-field> -->
+            <!-- profile description -->
+            <mat-form-field class="form-group" appearance="fill">
+                <mat-label for="profiledescription">Profile description</mat-label>
+                <textarea matInput name="profiledescription" formControlName="profileDescription"></textarea>
+            </mat-form-field>
+        </div>
 
-            <!-- Submit en Cancel buttons -->
-            <div class="buttons">
-                <div class="">
-                    <button
-                        mat-flat-button
-                        color="primary"
-                        type="submit"
-                        class="btn btn-primary"
-                        [disabled]="!registerForm.valid"
-                    >
-                        Submit
-                    </button>
-                    <button mat-flat-button class="btn btn-warning" routerLink="..">Cancel</button>
-                    <!-- .. = parent route, .... parent of parent -->
-                </div>
-            </div>
+        <!-- Register and login buttons -->
+        <div style="display: flex; justify-content: space-between">
+            <button
+                mat-flat-button
+                color="primary"
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="!registerForm.valid"
+            >
+                Register
+            </button>
+            <p style="align-self: center; margin: auto 0">
+                Already have an account? <a routerLink="/login">Login instead</a>
+            </p>
         </div>
     </form>
 </div>

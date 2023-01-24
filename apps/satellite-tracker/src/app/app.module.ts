@@ -34,6 +34,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatBadgeModule } from '@angular/material/badge';
 
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
@@ -42,6 +45,8 @@ import { AuthService } from './auth/auth.service';
 import { httpInterceptorProviders } from './auth/auth.interceptor';
 import { AddPurposeDialogComponent } from './pages/satellite/satellite-edit/add-purpose-dialog/add-purpose-dialog.component';
 import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.component';
+import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
+import { DashboardSidebarComponent } from './pages/dashboard/dashboard-sidebar/dashboard-sidebar.component';
 
 @NgModule({
     declarations: [
@@ -61,10 +66,11 @@ import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.comp
         RegisterComponent,
         AddPurposeDialogComponent,
         OrbitEditComponent,
+        PageNotFoundComponent,
+        DashboardSidebarComponent,
     ],
     imports: [
         BrowserModule,
-        AppRoutingModule,
         HttpClientModule,
         BrowserAnimationsModule,
         FormsModule,
@@ -85,6 +91,10 @@ import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.comp
         MatExpansionModule,
         MatDialogModule,
         MatTooltipModule,
+        MatMenuModule,
+        MatSnackBarModule,
+        MatBadgeModule,
+        AppRoutingModule,
     ],
     providers: [AuthService, httpInterceptorProviders],
     bootstrap: [AppComponent],

@@ -49,7 +49,7 @@ export class SatelliteService {
 
             await transaction.commit();
             await stSession.commitTransaction();
-            return satellite;
+            return { status: HttpStatus.CREATED, satellite };
         } catch (error) {
             this.logger.error(error);
             await stSession.abortTransaction();
@@ -62,36 +62,38 @@ export class SatelliteService {
     }
 
     async findAll() {
-        return await this.satelliteModel
+        const satellites = await this.satelliteModel
             .find()
-            .populate('createdById', 'username')
+            .populate('createdBy', 'username')
             .populate('satelliteParts.satellitePart');
+        return { status: HttpStatus.OK, satellites };
     }
 
     async findOne(id: Id) {
-        const satellite = await this.satelliteModel
-            .findById(id)
-            .populate('createdById', 'username')
-            .populate('satelliteParts.satellitePart');
+        const satellite = await this.satelliteModel.findById(id).populate('satelliteParts.satellitePart');
         if (satellite) {
-            return satellite;
+            return { status: HttpStatus.OK, satellite };
         } else {
             return new HttpException('Satellite not found', HttpStatus.NOT_FOUND);
         }
     }
 
     async getSatellitesOfUserWithId(id: Id) {
-        return await this.satelliteModel.find({ createdBy: id }).populate('satelliteParts.satellitePart');
+        const satellites = await this.satelliteModel.find({ createdBy: id }).populate('satelliteParts.satellitePart');
+        return { status: HttpStatus.OK, satellites };
     }
 
     async getSatellitesOfUserWithUsername(username: string) {
         const user = await this.userModel.findOne({ username });
-        return await this.satelliteModel.find({ createdById: user._id }).populate('satelliteParts.satellitePart');
+        const satellites = await this.satelliteModel
+            .find({ createdBy: user._id })
+            .populate('satelliteParts.satellitePart');
+        return { status: HttpStatus.OK, satellites };
     }
 
     async update(userId: Id, id: Id, updateSatelliteDto: UpdateSatelliteDto) {
         const satellite = await this.satelliteModel.findById(id);
-        if (satellite?.createdById?.toString() == userId) {
+        if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
             const neo4jSession = this.neo4jService.getWriteSession();
             stSession.startTransaction();
@@ -110,13 +112,6 @@ export class SatelliteService {
                             newSatelliteName: updateSatelliteDto.satelliteName,
                         });
                     }
-                    // if (updateSatelliteDto.launch?.launchSite) {
-                    //     transaction.run(SatelliteNeoQueries.updateSatelliteLaunchLocation, {
-                    //         satelliteName: satellite?.satelliteName,
-                    //         launchLongitude: updateSatelliteDto.launch.launchSite.coordinates?.longitude,
-                    //         launchLatitude: updateSatelliteDto.launch.launchSite.coordinates?.latitude,
-                    //     });
-                    // }
                 } catch (error) {
                     transaction.rollback();
                     if (error instanceof Error) throw new Error(error.message);
@@ -131,7 +126,7 @@ export class SatelliteService {
 
                 await transaction.commit();
                 await stSession.commitTransaction();
-                return updatedSatellite;
+                return { status: HttpStatus.OK, updatedSatellite };
             } catch (error) {
                 await stSession.abortTransaction();
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -146,7 +141,7 @@ export class SatelliteService {
 
     async remove(userId: Id, id: Id) {
         const satellite = await this.satelliteModel.findById(id);
-        if (satellite?.createdById?.toString() == userId) {
+        if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
             const neo4jSession = this.neo4jService.getWriteSession();
             stSession.startTransaction();
@@ -170,29 +165,32 @@ export class SatelliteService {
                 }
                 await transaction.commit();
                 await stSession.commitTransaction();
-                return satellite;
-            } catch {
-                stSession.abortTransaction();
-                throw new Error('Could not delete satellite');
+                return { status: HttpStatus.OK, satellite };
+            } catch (error) {
+                await stSession.abortTransaction();
+                if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
+                return new HttpException('Could not delete satellite', HttpStatus.INTERNAL_SERVER_ERROR);
             } finally {
                 await Promise.all([stSession.endSession(), neo4jSession.close()]);
             }
         } else {
-            throw new Error('Unauthorized');
+            throw new HttpException('You are not authorized to delete this satellite', HttpStatus.UNAUTHORIZED);
         }
     }
 
     async getAllSatelliteParts() {
-        return await this.satellitePartModel.find().populate('dependsOn');
+        const satelliteParts = await this.satellitePartModel.find().populate('dependsOn');
+        return { status: HttpStatus.OK, satelliteParts };
     }
 
     async getSatellitePart(id: Id) {
-        return await this.satellitePartModel.findById(id);
+        const satellitePart = await this.satellitePartModel.findById(id);
+        return { status: HttpStatus.OK, satellitePart };
     }
 
     async createOrbit(userId: Id, id: Id, orbit: OrbitDto) {
         const satellite = await this.satelliteModel.findById(id);
-        if (satellite?.createdById?.toString() == userId) {
+        if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
             stSession.startTransaction();
             try {
@@ -219,9 +217,9 @@ export class SatelliteService {
                 }
 
                 await stSession.commitTransaction();
-                return updatedSatellite;
+                return { status: HttpStatus.OK, updatedSatellite };
             } catch (error) {
-                stSession.abortTransaction();
+                await stSession.abortTransaction();
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
                 return new HttpException('Could not create orbit', HttpStatus.INTERNAL_SERVER_ERROR);
             } finally {
@@ -237,7 +235,7 @@ export class SatelliteService {
 
     async updateOrbit(userId: Id, id: Id, orbit: UpdateOrbitDto) {
         const satellite = await this.satelliteModel.findById(id);
-        if (satellite?.createdById?.toString() == userId) {
+        if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
             stSession.startTransaction();
             try {
@@ -264,9 +262,9 @@ export class SatelliteService {
                 }
 
                 await stSession.commitTransaction();
-                return updatedSatellite;
+                return { status: HttpStatus.OK, updatedSatellite };
             } catch (error) {
-                stSession.abortTransaction();
+                await stSession.abortTransaction();
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
                 return new HttpException('Could not update orbit', HttpStatus.INTERNAL_SERVER_ERROR);
             } finally {
@@ -279,7 +277,7 @@ export class SatelliteService {
 
     async removeOrbit(userId: Id, id: Id) {
         const satellite = await this.satelliteModel.findById(id);
-        if (satellite?.createdById?.toString() == userId) {
+        if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
             stSession.startTransaction();
             try {
@@ -301,9 +299,9 @@ export class SatelliteService {
                 await neo4jSession.close();
 
                 await stSession.commitTransaction();
-                return updatedSatellite;
+                return { status: HttpStatus.OK, updatedSatellite };
             } catch (error) {
-                stSession.abortTransaction();
+                await stSession.abortTransaction();
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
                 return new HttpException('Could not remove orbit', HttpStatus.INTERNAL_SERVER_ERROR);
             } finally {
@@ -313,57 +311,4 @@ export class SatelliteService {
             return new HttpException('You are not authorized to remove this orbit', HttpStatus.UNAUTHORIZED);
         }
     }
-
-    /**
-     * Launch is temporarily disabled, as it has little use in the current state of the application
-     * (instead an orbit now has a datetime of launch)
-     * In the future it could be re-enabled, with more attributes and front-end support
-     */
-
-    /**
-    async createLaunch(userId: Id, id: Id, launch: LaunchDto) {
-        const satellite = await this.satelliteModel.findById(id);
-        if (satellite?.createdById?.toString() == userId) {
-            satellite?.updateOne({ launch: launch }, { new: true });
-            if (launch.launchSite) {
-                this.neo4jService.write(SatelliteNeoQueries.updateSatelliteLaunchLocation, {
-                    satelliteName: satellite?.satelliteName,
-                    launchLongitude: launch.launchSite.coordinates?.longitude,
-                    launchLatitude: launch.launchSite.coordinates?.latitude,
-                });
-            }
-            return satellite;
-        } else {
-            throw new Error('Unauthorized');
-        }
-    }
-
-    async updateLaunch(userId: Id, id: Id, launch: UpdateLaunchDto) {
-        const satellite = await this.satelliteModel.findById(id);
-        if (satellite?.createdById?.toString() == userId) {
-            satellite?.updateOne({ launch: { ...launch } }, { new: true });
-            if (launch.launchSite) {
-                this.neo4jService.write(SatelliteNeoQueries.updateSatelliteLaunchLocation, {
-                    satelliteName: satellite?.satelliteName,
-                    launchLongitude: launch.launchSite.coordinates?.longitude,
-                    launchLatitude: launch.launchSite.coordinates?.latitude,
-                });
-            }
-            return satellite;
-        } else {
-            throw new Error('Unauthorized');
-        }
-    }
-
-    async removeLaunch(userId: any, id: string) {
-        const satellite = await this.satelliteModel.findById(id);
-        if (satellite?.createdById?.toString() == userId) {
-            satellite?.updateOne({ $unset: { launch: 1 } }, { new: true });
-            this.neo4jService.write(SatelliteNeoQueries.removeSatelliteLaunchLocation, {});
-            return satellite;
-        } else {
-            throw new Error('Unauthorized');
-        }
-    }
-     */
 }

@@ -1,18 +1,5 @@
-import {
-    Controller,
-    Post,
-    Body,
-    Request,
-    HttpStatus,
-    UseGuards,
-    Get,
-    Delete,
-    Param,
-    Patch,
-    Logger,
-    Res,
-} from '@nestjs/common';
-import { UserRegistration, ResourceId, Token, UserCredentials } from 'shared/domain';
+import { Controller, Post, Body, Request, UseGuards, Get, Delete, Param, Patch, Logger } from '@nestjs/common';
+import { UserRegistration, Token, UserCredentials } from 'shared/domain';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
@@ -27,105 +14,88 @@ export class AuthController {
     constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
 
     @Post('register')
-    async register(@Res() res: any, @Body() credentials: UserRegistration): Promise<ResourceId> {
+    async register(@Body() credentials: UserRegistration): Promise<any> {
         this.logger.log('POST register called');
-        this.logger.error(credentials);
-        const user = await this.authService.registerUser(credentials);
-        return res.status(HttpStatus.CREATED).json(user);
+        return await this.authService.registerUser(credentials);
     }
 
     @Post('login')
-    async login(@Res() res: any, @Body() credentials: UserCredentials): Promise<Token> {
+    async login(@Body() credentials: UserCredentials): Promise<Token> {
         this.logger.log('POST login called');
-        const token = await this.authService.generateToken(credentials.username, credentials.password);
-        return res.status(HttpStatus.OK).json(token);
+        return await this.authService.generateToken(credentials.username, credentials.password);
     }
 
     @UseGuards(RefreshJwtAuthGuard)
     @Get('token')
-    async token(@Res() res: any, @Request() req: any): Promise<Token> {
+    async token(@Request() req: any): Promise<Token> {
         this.logger.log('POST token called');
-        const token = await this.authService.refreshToken(req.user.username);
-        return res.status(HttpStatus.OK).json(token);
+        return await this.authService.refreshToken(req.user.username);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Get('self')
-    async getSelf(@Res() res: any, @Request() req: any): Promise<UserRegistration | null> {
+    async getSelf(@Request() req: any) {
         this.logger.log('GET self called');
-        const identity = await this.authService.getIdentity(req.user.username);
-        return res.status(HttpStatus.OK).json(identity);
+        return await this.authService.getIdentity(req.user.username);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Patch('self')
-    async patchSelf(@Res() res: any, @Request() req: any, @Body() updatedCredentials: UserRegistration) {
+    async patchSelf(@Request() req: any, @Body() updatedCredentials: UserRegistration) {
         this.logger.log('PATCH self called');
-        const identity = await this.authService.updateIdentity(req.user.username, updatedCredentials);
-        return res.status(HttpStatus.OK).json(identity);
+        return await this.authService.updateIdentity(req.user.username, updatedCredentials);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Get('self/info')
-    async getProfileInfo(@Res() res: any, @Request() req: any) {
+    async getProfileInfo(@Request() req: any) {
         this.logger.log('GET self/info called');
-        const user = await this.userService.findOne(req.user.userId);
-        return res.status(HttpStatus.OK).json(user);
+        return await this.userService.findOne(req.user.userId);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Patch('self/info')
-    async patchInfo(@Res() res: any, @Request() req: any, @Body() updatedUser: UpdateUserDto) {
+    async patchInfo(@Request() req: any, @Body() updatedUser: UpdateUserDto) {
         this.logger.log('PATCH self/info called');
-        const user = await this.userService.update(req.user.userId, updatedUser);
-        return res.status(HttpStatus.OK).json(user);
+        return await this.userService.update(req.user.userId, updatedUser);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Delete('self')
-    async deleteSelf(@Res() res: any, @Request() req: any) {
+    async deleteSelf(@Request() req: any) {
         this.logger.log('DELETE self called');
-        const user = await this.authService.delete(req.user.username);
-        return res.status(HttpStatus.OK).json(user);
+        return await this.authService.delete(req.user.username);
     }
 
     @UseGuards(AccessJwtAuthGuard, RolesGuard)
     @Roles('admin')
     @Get('users')
-    async getAll(@Res() res: any) {
+    async getAll() {
         this.logger.log('GET users called');
-        const users = await this.userService.findAll();
-        return res.status(HttpStatus.OK).json(users);
+        return await this.userService.findAll();
     }
 
     @UseGuards(AccessJwtAuthGuard, RolesGuard)
     @Roles('admin')
     @Patch('users/:username')
-    async patchByUsername(@Res() res: any, @Param('username') username: string, @Body() updatedUser: UpdateUserDto) {
+    async patchByUsername(@Param('username') username: string, @Body() updatedUser: UpdateUserDto) {
         this.logger.log(`PATCH users/${username} called`);
-        const user = await this.userService.update(username, updatedUser);
-        return res.status(HttpStatus.OK).json(user);
+        return await this.userService.update(username, updatedUser);
     }
 
     @UseGuards(AccessJwtAuthGuard, RolesGuard)
     @Roles('admin')
     @Patch('users/:username/identity')
-    async patchIdentityByUsername(
-        @Res() res: any,
-        @Param('username') username: string,
-        @Body() updatedIdentity: UserRegistration
-    ) {
+    async patchIdentityByUsername(@Param('username') username: string, @Body() updatedIdentity: UserRegistration) {
         this.logger.log(`PATCH users/${username}/identity called`);
-        const identity = await this.authService.updateIdentity(username, updatedIdentity);
-        return res.status(HttpStatus.OK).json(identity);
+        return await this.authService.updateIdentity(username, updatedIdentity);
     }
 
     @UseGuards(AccessJwtAuthGuard, RolesGuard)
     @Roles('admin')
     @Delete('users/:username')
-    async deleteByUsername(@Res() res: any, @Param('username') username: string) {
+    async deleteByUsername(@Param('username') username: string) {
         this.logger.log(`DELETE users/${username} called`);
-        const user = await this.authService.delete(username);
-        return res.status(HttpStatus.OK).json(user);
+        return await this.authService.delete(username);
     }
 }

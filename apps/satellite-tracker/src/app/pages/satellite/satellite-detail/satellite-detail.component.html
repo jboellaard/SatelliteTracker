@@ -1,7 +1,7 @@
 <div class="component-container" *ngIf="satellite; else loadingMessage">
     <div class="header">
         <h1>{{ satellite.satelliteName }} created by {{ username }}</h1>
-        <div class="buttons">
+        <div *ngIf="canEdit" class="buttons">
             <button mat-flat-button color="accent" routerLink="edit"><mat-icon>edit</mat-icon> Edit</button>
             <button mat-flat-button color="warn" (click)="removeSatellite(satellite!.id)">
                 <mat-icon>delete</mat-icon> Remove

@@ -8,11 +8,66 @@
 // Be sure that you only ever include this mixin once!
 @include mat.core();
 
+@function modify-background($theme, $background-color) {
+    // Replace the background in the color object's background palette.
+    $theme-color: map-get($theme, color);
+    $color-background-palette: map-get($theme-color, background);
+    $color-background-palette: map-merge(
+        $color-background-palette,
+        (
+            background: $background-color,
+        )
+    );
+    $color-background-palette: map-merge(
+        $color-background-palette,
+        (
+            raised-button: $background-color,
+        )
+    );
+
+    // Replace the background in the background palette.
+    $background-palette: map-get($theme, background);
+    $background-palette: map-merge(
+        $background-palette,
+        (
+            background: $background-color,
+        )
+    );
+    $background-palette: map-merge(
+        $background-palette,
+        (
+            raised-button: $background-color,
+        )
+    );
+
+    // Merge the changes into a new theme.
+    $modified-theme-color: map-merge(
+        $theme-color,
+        (
+            background: $color-background-palette,
+        )
+    );
+    $modified-theme: map-merge(
+        $theme,
+        (
+            color: $modified-theme-color,
+        )
+    );
+    $modified-theme: map-merge(
+        $modified-theme,
+        (
+            background: $background-palette,
+        )
+    );
+
+    @return $modified-theme;
+}
+
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
-$SatelliteTracker-primary: mat.define-palette(mat.$indigo-palette);
-$SatelliteTracker-accent: mat.define-palette(mat.$blue-grey-palette, A200, A100, A400);
+$SatelliteTracker-primary: mat.define-palette(mat.$indigo-palette, 500, 300, 800);
+$SatelliteTracker-accent: mat.define-palette(mat.$yellow-palette, 500, 200, 700);
 
 // The warn palette is optional (defaults to red).
 $SatelliteTracker-warn: mat.define-palette(mat.$red-palette);
@@ -46,6 +101,7 @@ $SatelliteTracker-dark-theme: mat.define-dark-theme(
 
 .darkMode {
     @include mat.all-component-colors($SatelliteTracker-dark-theme);
+    // @include mat.all-component-colors(modify-background($SatelliteTracker-dark-theme, #010409));
 }
 
 /* You can add global styles to this file, and also import other style files */
@@ -59,6 +115,10 @@ body {
     font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
+.darkMode .mat-toolbar {
+    background: #161b22;
+}
+
 table {
     margin-bottom: 20px;
     // width: 100%;
@@ -66,6 +126,20 @@ table {
 
 .component-container {
     padding: 20px;
+}
+
+button {
+    font-size: 16px;
+}
+
+a {
+    color: #8b99e4;
+    text-decoration: none;
+}
+
+a:hover {
+    color: #6d7bcf;
+    text-decoration: none;
 }
 
 button:hover {
@@ -100,6 +174,15 @@ mat-form-field {
     width: 49%;
 }
 
+.cols-3 {
+    display: flex;
+    justify-content: space-between;
+}
+
+.cols-3 mat-form-field {
+    width: 32%;
+}
+
 .buttons button {
     margin-inline: 5px;
 }
@@ -117,9 +200,23 @@ table button {
 }
 
 app-root {
+    display: flex;
+    flex-direction: column;
     min-height: 100%;
-    display: block;
-    position: relative;
-    padding-bottom: 48px;
-    box-sizing: border-box;
+}
+
+// .mat-mdc-snack-bar-container.snackbar-error .mdc-snackbar__label {
+//     color: white !important;
+// }
+
+.mdc-snackbar.snackbar-error div.mdc-snackbar__surface {
+    background-color: #dfb1b1;
+}
+
+.mdc-snackbar.snackbar-success div.mdc-snackbar__surface {
+    background-color: #a3cba3;
+}
+
+.mdc-snackbar.snackbar-info div.mdc-snackbar__surface {
+    background-color: #b4b3d4;
 }

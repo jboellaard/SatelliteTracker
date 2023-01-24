@@ -11,7 +11,7 @@ import { AuthService } from '../auth.service';
 })
 export class LoginComponent implements OnInit {
     loginForm!: FormGroup;
-    submitted = false;
+    error: string | undefined = undefined;
 
     constructor(private authService: AuthService, private router: Router) {}
 
@@ -30,16 +30,16 @@ export class LoginComponent implements OnInit {
 
     onSubmit(): void {
         if (this.loginForm.valid) {
-            this.submitted = true;
             this.authService.login(this.loginForm.value).subscribe((res) => {
-                if (res) {
+                console.log(res);
+                if (res.username) {
                     this.router.navigate(['/']);
+                } else {
+                    this.error = res;
                 }
-                this.submitted = false;
             });
         } else {
-            console.log('invalid form');
-            this.submitted = false;
+            console.log('Invalid form');
         }
     }
 }

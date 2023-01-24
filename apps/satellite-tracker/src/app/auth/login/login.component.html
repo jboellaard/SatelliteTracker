@@ -1,12 +1,14 @@
 <div class="edit-container">
-    <h1>Login</h1>
-
     <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" name="form" novalidate>
-        <div class="max-500">
+        <div class="">
+            <h1>Login</h1>
+            <div *ngIf="error" style="color: #f44336">
+                <p>{{ error }}</p>
+            </div>
             <div class="cols-2">
-                <!-- name -->
+                <!-- username -->
                 <mat-form-field class="form-group" appearance="fill">
-                    <mat-label for="username">User name</mat-label>
+                    <mat-label for="username">Username</mat-label>
                     <input
                         matInput
                         type="text"
@@ -61,20 +63,20 @@
                 </mat-form-field>
             </div>
 
-            <!-- Submit en Cancel buttons -->
-            <div class="buttons">
-                <div class="">
-                    <button
-                        mat-flat-button
-                        color="primary"
-                        type="submit"
-                        class="btn btn-primary"
-                        [disabled]="!loginForm.valid"
-                    >
-                        Submit
-                    </button>
-                    <button mat-flat-button class="btn btn-warning" routerLink="..">Cancel</button>
-                </div>
+            <!-- Login and register buttons -->
+            <div style="display: flex; justify-content: space-between">
+                <button
+                    mat-flat-button
+                    color="primary"
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="!loginForm.valid"
+                >
+                    Login
+                </button>
+                <p style="align-self: center; margin: auto 0">
+                    No account yet? <a routerLink="/register">Register instead</a>
+                </p>
             </div>
         </div>
     </form>

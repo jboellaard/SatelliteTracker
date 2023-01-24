@@ -68,8 +68,7 @@ export interface ISatellite {
     orbit?: IOrbit;
     // launch?: ILaunch;
 
-    createdById?: Id;
-    createdBy?: IUser;
+    createdBy?: Id;
     createdAt?: Date;
     updatedAt?: Date;
 }

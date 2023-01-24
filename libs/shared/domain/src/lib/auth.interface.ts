@@ -7,6 +7,7 @@ export interface UserCredentials {
 }
 
 export interface UserRegistration extends UserCredentials {
+    _id?: Id;
     id?: Id;
     emailAddress?: string;
     roles?: string[];
@@ -14,6 +15,7 @@ export interface UserRegistration extends UserCredentials {
 }
 
 export interface UserIdentity {
+    _id?: Id;
     id?: Id;
     username?: string;
     emailAddress?: string;

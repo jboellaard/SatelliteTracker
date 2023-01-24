@@ -33,7 +33,7 @@ export const SatellitePartSchema = SchemaFactory.createForClass(SatellitePart);
 @Schema({ _id: false })
 export class CustomSatellitePart {
     //extends SatellitePart
-    @Prop({ required: true, type: SatellitePartSchema, ref: 'SatellitePart' })
+    @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'SatellitePart' })
     satellitePart!: SatellitePart;
 
     // @Prop({unique: false })
@@ -114,7 +114,7 @@ LaunchSchema.path('succeeded').validate(function () {
 @Schema({ timestamps: true })
 export class Satellite {
     @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'User' })
-    createdById?: string;
+    createdBy?: string;
 
     @Prop({
         required: true,
@@ -155,7 +155,7 @@ export class Satellite {
 }
 
 export const SatelliteSchema = SchemaFactory.createForClass(Satellite);
-SatelliteSchema.index({ createdById: 1, satelliteName: 1 }, { unique: true });
+SatelliteSchema.index({ createdBy: 1, satelliteName: 1 }, { unique: true });
 
 // SatelliteSchema.pre('validate', function (next) {
 //     if (this.launch && !this.orbit) {
@@ -180,7 +180,7 @@ SatelliteSchema.pre('validate', async function (next) {
                 for (const sp of this.satelliteParts) {
                     if (
                         part.satellitePart.dependsOn
-                            .map((p) => p._id?.toString())
+                            .map((p) => p?.toString())
                             .includes(sp.satellitePart._id?.toString())
                     ) {
                         next();
@@ -199,5 +199,5 @@ SatelliteSchema.pre('validate', async function (next) {
 
 SatelliteSchema.post('save', async function (doc) {
     const User = this.$model('User');
-    await User.updateOne({ _id: doc.createdById }, { $push: { satellites: doc._id } });
+    await User.updateOne({ _id: doc.createdBy }, { $push: { satellites: doc._id } });
 });

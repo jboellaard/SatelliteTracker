@@ -11,3 +11,13 @@ button:hover {
     background-color: rgba(0, 0, 0, 0.4);
     opacity: 1;
 }
+
+.title:hover {
+    cursor: pointer;
+}
+
+.mat-icon {
+    height: 20px !important;
+    width: 20px !important;
+    font-size: 20px !important;
+}

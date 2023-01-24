@@ -1,10 +1,31 @@
 <mat-toolbar color="primary" class="mat-elevation-z6 navbar">
     <div>
-        <button mat-button routerLink="/" routerLinkActive="active" ariaCurrentWhenActive="page">Home</button>
-        <!-- <span class="title">Satellite Tracker</span> -->
+        <span
+            mat-button
+            routerLink="/"
+            routerLinkActive="active"
+            ariaCurrentWhenActive="page"
+            class="title"
+            style="margin-right: 10px"
+            ><mat-icon>location_on</mat-icon> Satellite Tracker</span
+        >
     </div>
-    <div *ngIf="user; else anonymous">
-        <button mat-button (click)="logout()" ariaCurrentWhenActive="page">Logout</button>
+    <div *ngIf="user; else anonymous" style="display: flex">
+        <button mat-icon-button routerLink="/home" routerLinkActive="active" ariaCurrentWhenActive="page">
+            <mat-icon matBadge="1" [matBadgeHidden]="true" matBadgeColor="warn">notifications_none</mat-icon>
+            <span class="cdk-visually-hidden"> Notifications (1) </span>
+        </button>
+        <button mat-button [matMenuTriggerFor]="beforeMenu" style="align-self: center">
+            <mat-icon>person</mat-icon><mat-icon style="margin-right: 0">arrow_drop_down</mat-icon>
+        </button>
+        <mat-menu #beforeMenu="matMenu" xPosition="before">
+            <p style="margin: 8px 16px; padding-bottom: 4px">
+                Logged in as <b style="font-weight: 500">{{ user.username }}</b>
+            </p>
+            <mat-divider></mat-divider>
+            <button mat-menu-item>Profile</button>
+            <button mat-menu-item (click)="logout()" ariaCurrentWhenActive="page">Logout</button>
+        </mat-menu>
     </div>
     <ng-template #anonymous
         ><div>
