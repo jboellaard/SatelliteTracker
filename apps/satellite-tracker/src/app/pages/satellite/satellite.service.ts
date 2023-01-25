@@ -11,22 +11,21 @@ import { EntityService } from 'ui/entity';
 export class SatelliteService extends EntityService<ISatellite> {
     constructor(http: HttpClient) {
         super(http, environment.API_URL, 'satellites');
-        console.log('SatelliteService created');
     }
 
     getSatellitesOfUserWithUsername(username: string): Observable<ISatellite[] | undefined> {
-        console.log('getUserByUsername');
         return this.http
-            .get<ISatellite[]>(environment.API_URL + `users/${username}/satellites`)
-            .pipe(tap((response: any) => console.log(response)));
+            .get<APIResponse<ISatellite[] | undefined>>(environment.API_URL + `users/${username}/satellites`)
+            .pipe(map((response: any) => response.result));
     }
 
     getSatelliteParts(): Observable<ISatellitePart[]> {
-        return this.http.get<ISatellitePart[]>(environment.API_URL + 'satellites/parts').pipe(
-            tap((response: ISatellitePart[]) => {
-                response.forEach((part: ISatellitePart) => {
+        return this.http.get<APIResponse<ISatellitePart[]>>(environment.API_URL + 'satellites/parts').pipe(
+            map((response: any) => {
+                response.result.forEach((part: ISatellitePart) => {
                     part.id = part._id;
                 });
+                return response.result;
             })
         );
     }

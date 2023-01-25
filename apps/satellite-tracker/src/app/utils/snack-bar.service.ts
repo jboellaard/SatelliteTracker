@@ -6,7 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class SnackBarService {
     horizontalPosition: 'start' | 'center' | 'end' | 'left' | 'right' = 'center';
-    verticalPosition: 'top' | 'bottom' = 'top';
+    verticalPosition: 'top' | 'bottom' = 'bottom';
 
     constructor(private snackBar: MatSnackBar) {}
 

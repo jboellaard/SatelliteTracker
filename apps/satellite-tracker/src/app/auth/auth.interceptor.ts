@@ -40,7 +40,7 @@ export class AuthInterceptor implements HttpInterceptor {
         return this.authService.refreshToken().pipe(
             switchMap((res) => {
                 if (res) {
-                    if (res.accessToken) {
+                    if (res.result.accessToken) {
                         return next.handle(
                             request.clone({ setHeaders: { Authorization: `Bearer ${res.accessToken}` } })
                         );

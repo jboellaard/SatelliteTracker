@@ -31,10 +31,7 @@ export class UserDetailComponent implements OnInit {
         public userService: UserService,
         public satelliteService: SatelliteService,
         private breakpointObserver: BreakpointObserver
-    ) {
-        console.log(this.userService.admin);
-        this.admin = this.userService.admin;
-    }
+    ) {}
 
     ngOnInit(): void {
         console.log('UserDetailComponent.ngOnInit()');
@@ -63,7 +60,7 @@ export class UserDetailComponent implements OnInit {
             if (result.matches) {
                 this.satelliteColumns = ['name', 'orbit'];
             } else {
-                this.breakpointObserver.observe(['(max-width: 900px)']).subscribe((result) => {
+                this.breakpointObserver.observe(['(max-width: 1000px)']).subscribe((result) => {
                     if (result.matches) {
                         this.satelliteColumns = ['name', 'mass', 'radius', 'orbit'];
                     } else {

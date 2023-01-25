@@ -16,12 +16,15 @@ import { AuthGuard } from './auth/auth.guard';
 import { AdminAuthGuard } from './auth/admin-auth.guard';
 import { OwnerAuthGuard } from './auth/owner-auth.guard';
 import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
+import { ProfileComponent } from './profile/profile.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 const routes: Routes = [
-    { path: 'home', pathMatch: 'full', component: AboutComponent },
+    { path: 'home', pathMatch: 'full', canActivate: [AuthGuard], component: DashboardComponent },
     { path: 'about', pathMatch: 'full', component: AboutComponent },
     { path: 'login', pathMatch: 'full', component: LoginComponent },
     { path: 'register', pathMatch: 'full', component: RegisterComponent },
+    { path: 'profile', pathMatch: 'full', canActivate: [OwnerAuthGuard], component: ProfileComponent },
     { path: 'users', pathMatch: 'full', canActivate: [AdminAuthGuard], component: UserListComponent },
     {
         path: 'users/new',
@@ -37,7 +40,7 @@ const routes: Routes = [
     {
         path: 'users/:username/edit',
         pathMatch: 'full',
-        canActivate: [OwnerAuthGuard],
+        canActivate: [AdminAuthGuard],
         component: UserEditComponent,
     },
     {

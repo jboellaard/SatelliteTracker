@@ -53,14 +53,14 @@ export class AuthService {
         return this.http.post<any>(`${environment.API_URL}login`, { ...credentials }, { headers: this.headers }).pipe(
             switchMap((res) => {
                 console.log(res);
-                if (res.accessToken) {
-                    localStorage.setItem('access_token', res.accessToken);
-                    localStorage.setItem('refresh_token', res.refreshToken);
-                    this.saveUserToLocalStorage(res.user);
-                    this.user$.next(res.user);
-                    const expiresAt = this.getExpirationDate(res.refreshTokenExpiresIn);
+                if (res.result.accessToken) {
+                    localStorage.setItem('access_token', res.result.accessToken);
+                    localStorage.setItem('refresh_token', res.result.refreshToken);
+                    this.saveUserToLocalStorage(res.result.user);
+                    this.user$.next(res.result.user);
+                    const expiresAt = this.getExpirationDate(res.result.refreshTokenExpiresIn);
                     localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
-                    return of(res.user);
+                    return of(res.result.user);
                 } else {
                     // this.snackBar.error(res.message);
                     if (res.status === 401)
@@ -149,15 +149,15 @@ export class AuthService {
             })
             .pipe(
                 tap((res) => {
-                    if (res.accessToken) {
-                        localStorage.setItem('access_token', res.accessToken);
-                        localStorage.setItem('refresh_token', res.refreshToken);
-                        this.user$.next(res.user);
-                        const expiresAt = this.getExpirationDate(res.refreshTokenExpiresIn);
+                    if (res.result.accessToken) {
+                        localStorage.setItem('access_token', res.result.accessToken);
+                        localStorage.setItem('refresh_token', res.result.refreshToken);
+                        this.user$.next(res.result.user);
+                        const expiresAt = this.getExpirationDate(res.result.refreshTokenExpiresIn);
                         localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
                     }
-                    console.log(res);
-                    return of(res);
+                    console.log(res.result);
+                    return of(res.result);
                 }),
                 catchError((err) => {
                     console.log('refresh error', err);

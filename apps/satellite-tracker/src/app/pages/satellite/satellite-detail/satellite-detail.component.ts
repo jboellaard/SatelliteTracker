@@ -42,7 +42,6 @@ export class SatelliteDetailComponent implements OnInit {
                     if (satellite) {
                         this.satellite = satellite;
                         this.satellite.id = satellite._id;
-                        console.log(this.userId, this.satellite.createdBy);
                         if (this.satellite.createdBy == this.userId) {
                             this.canEdit = true;
                         }

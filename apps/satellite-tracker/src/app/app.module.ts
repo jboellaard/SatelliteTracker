@@ -37,6 +37,30 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatBadgeModule } from '@angular/material/badge';
+import { MatTabsModule } from '@angular/material/tabs';
+
+const materialModules = [
+    MatToolbarModule,
+    MatIconModule,
+    MatTableModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatCardModule,
+    MatGridListModule,
+    MatListModule,
+    MatSidenavModule,
+    MatSliderModule,
+    MatCheckboxModule,
+    MatSelectModule,
+    MatExpansionModule,
+    MatDialogModule,
+    MatTooltipModule,
+    MatMenuModule,
+    MatSnackBarModule,
+    MatBadgeModule,
+    MatTabsModule,
+];
 
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
@@ -46,7 +70,8 @@ import { httpInterceptorProviders } from './auth/auth.interceptor';
 import { AddPurposeDialogComponent } from './pages/satellite/satellite-edit/add-purpose-dialog/add-purpose-dialog.component';
 import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.component';
 import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
-import { DashboardSidebarComponent } from './pages/dashboard/dashboard-sidebar/dashboard-sidebar.component';
+import { ProfileComponent } from './profile/profile.component';
+import { SidebarComponent } from './profile/sidebar/sidebar.component';
 
 @NgModule({
     declarations: [
@@ -67,7 +92,8 @@ import { DashboardSidebarComponent } from './pages/dashboard/dashboard-sidebar/d
         AddPurposeDialogComponent,
         OrbitEditComponent,
         PageNotFoundComponent,
-        DashboardSidebarComponent,
+        ProfileComponent,
+        SidebarComponent,
     ],
     imports: [
         BrowserModule,
@@ -75,25 +101,7 @@ import { DashboardSidebarComponent } from './pages/dashboard/dashboard-sidebar/d
         BrowserAnimationsModule,
         FormsModule,
         ReactiveFormsModule,
-        MatToolbarModule,
-        MatIconModule,
-        MatTableModule,
-        MatFormFieldModule,
-        MatInputModule,
-        MatButtonModule,
-        MatCardModule,
-        MatGridListModule,
-        MatListModule,
-        MatSidenavModule,
-        MatSliderModule,
-        MatCheckboxModule,
-        MatSelectModule,
-        MatExpansionModule,
-        MatDialogModule,
-        MatTooltipModule,
-        MatMenuModule,
-        MatSnackBarModule,
-        MatBadgeModule,
+        ...materialModules,
         AppRoutingModule,
     ],
     providers: [AuthService, httpInterceptorProviders],

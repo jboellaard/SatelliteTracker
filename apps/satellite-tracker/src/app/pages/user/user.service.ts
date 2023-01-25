@@ -9,18 +9,13 @@ import { EntityService } from 'ui/entity';
     providedIn: 'root',
 })
 export class UserService extends EntityService<IUser> {
-    users: IUser[] = [];
-    admin = localStorage.getItem('admin') === 'true';
-    private exampleDataSource = new BehaviorSubject<any>(null);
-    readonly exampleData$ = this.exampleDataSource.asObservable();
-
     constructor(http: HttpClient) {
         super(http, environment.API_URL, 'users');
     }
 
     getByUsername(username: string): Observable<IUser> {
-        const endpoint = `${environment.API_URL}${'users'}/${username}`;
-        console.log(`get one ${endpoint}`);
-        return this.http.get<IUser>(endpoint).pipe(tap((response: any) => console.log(response)));
+        return this.http
+            .get<IUser>(`${environment.API_URL}${'users'}/${username}`)
+            .pipe(map((response: any) => response.result));
     }
 }

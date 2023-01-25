@@ -68,6 +68,7 @@
 // hue. Available color palettes: https://material.io/design/color/
 $SatelliteTracker-primary: mat.define-palette(mat.$indigo-palette, 500, 300, 800);
 $SatelliteTracker-accent: mat.define-palette(mat.$yellow-palette, 500, 200, 700);
+$SatelliteTracker-grey: mat.define-palette(mat.$grey-palette, 500, 300, 800);
 
 // The warn palette is optional (defaults to red).
 $SatelliteTracker-warn: mat.define-palette(mat.$red-palette);

@@ -6,6 +6,7 @@ import { SatelliteService } from '../satellite.service';
 import { OrbitService } from '../orbit-scene.service';
 import { AddPurposeDialogComponent } from './add-purpose-dialog/add-purpose-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { SnackBarService } from '../../../utils/snack-bar.service';
 
 @Component({
     selector: 'app-satellite-edit',
@@ -41,7 +42,8 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         private router: Router,
         private satelliteService: SatelliteService,
         public orbitService: OrbitService,
-        public dialog: MatDialog
+        public dialog: MatDialog,
+        public snackBarService: SnackBarService
     ) {}
 
     ngOnInit(): void {
@@ -89,12 +91,21 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         console.log('Submitting the form');
         if (this.componentExists) {
             this.satelliteService.update(this.satellite!).subscribe((satellite) => {
-                this.router.navigate(['/users/' + this.username + '/satellites/' + this.id]);
+                if (satellite) {
+                    this.snackBarService.success('Satellite updated successfully');
+                    this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                } else {
+                    this.snackBarService.error('Satellite could not be updated');
+                }
             });
         } else {
             this.satelliteService.create(this.satellite!).subscribe((satellite) => {
-                this.satellite = { ...satellite };
-                this.router.navigate(['/users/' + this.username + '/satellites/' + this.satellite._id]);
+                if (satellite) {
+                    this.snackBarService.success('Satellite created successfully');
+                    this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                } else {
+                    this.snackBarService.error('Satellite could not be created');
+                }
             });
         }
     }

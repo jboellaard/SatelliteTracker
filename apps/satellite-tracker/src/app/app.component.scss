@@ -11,11 +11,11 @@ app-footer {
     flex: 1 1 auto;
 }
 
-app-dashboard-sidebar {
+app-sidebar {
     position: relative;
     height: 100%;
     background-color: #212121;
-    z-index: 100;
+    // z-index: 100;
     display: flex;
 }
 
