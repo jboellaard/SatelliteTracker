@@ -49,7 +49,7 @@ export class SatelliteService {
 
             await transaction.commit();
             await stSession.commitTransaction();
-            return { status: HttpStatus.CREATED, satellite };
+            return { status: HttpStatus.CREATED, result: satellite };
         } catch (error) {
             this.logger.error(error);
             await stSession.abortTransaction();
@@ -66,13 +66,13 @@ export class SatelliteService {
             .find()
             .populate('createdBy', 'username')
             .populate('satelliteParts.satellitePart');
-        return { status: HttpStatus.OK, satellites };
+        return { status: HttpStatus.OK, result: satellites };
     }
 
     async findOne(id: Id) {
         const satellite = await this.satelliteModel.findById(id).populate('satelliteParts.satellitePart');
         if (satellite) {
-            return { status: HttpStatus.OK, satellite };
+            return { status: HttpStatus.OK, result: satellite };
         } else {
             return new HttpException('Satellite not found', HttpStatus.NOT_FOUND);
         }
@@ -80,7 +80,7 @@ export class SatelliteService {
 
     async getSatellitesOfUserWithId(id: Id) {
         const satellites = await this.satelliteModel.find({ createdBy: id }).populate('satelliteParts.satellitePart');
-        return { status: HttpStatus.OK, satellites };
+        return { status: HttpStatus.OK, result: satellites };
     }
 
     async getSatellitesOfUserWithUsername(username: string) {
@@ -88,7 +88,7 @@ export class SatelliteService {
         const satellites = await this.satelliteModel
             .find({ createdBy: user._id })
             .populate('satelliteParts.satellitePart');
-        return { status: HttpStatus.OK, satellites };
+        return { status: HttpStatus.OK, result: satellites };
     }
 
     async update(userId: Id, id: Id, updateSatelliteDto: UpdateSatelliteDto) {
@@ -126,7 +126,7 @@ export class SatelliteService {
 
                 await transaction.commit();
                 await stSession.commitTransaction();
-                return { status: HttpStatus.OK, updatedSatellite };
+                return { status: HttpStatus.OK, result: updatedSatellite };
             } catch (error) {
                 await stSession.abortTransaction();
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -165,7 +165,7 @@ export class SatelliteService {
                 }
                 await transaction.commit();
                 await stSession.commitTransaction();
-                return { status: HttpStatus.OK, satellite };
+                return { status: HttpStatus.OK, result: satellite };
             } catch (error) {
                 await stSession.abortTransaction();
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -180,12 +180,12 @@ export class SatelliteService {
 
     async getAllSatelliteParts() {
         const satelliteParts = await this.satellitePartModel.find().populate('dependsOn');
-        return { status: HttpStatus.OK, satelliteParts };
+        return { status: HttpStatus.OK, result: satelliteParts };
     }
 
     async getSatellitePart(id: Id) {
         const satellitePart = await this.satellitePartModel.findById(id);
-        return { status: HttpStatus.OK, satellitePart };
+        return { status: HttpStatus.OK, result: satellitePart };
     }
 
     async createOrbit(userId: Id, id: Id, orbit: OrbitDto) {
@@ -217,7 +217,7 @@ export class SatelliteService {
                 }
 
                 await stSession.commitTransaction();
-                return { status: HttpStatus.OK, updatedSatellite };
+                return { status: HttpStatus.OK, result: updatedSatellite };
             } catch (error) {
                 await stSession.abortTransaction();
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -262,7 +262,7 @@ export class SatelliteService {
                 }
 
                 await stSession.commitTransaction();
-                return { status: HttpStatus.OK, updatedSatellite };
+                return { status: HttpStatus.OK, result: updatedSatellite };
             } catch (error) {
                 await stSession.abortTransaction();
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
@@ -299,7 +299,7 @@ export class SatelliteService {
                 await neo4jSession.close();
 
                 await stSession.commitTransaction();
-                return { status: HttpStatus.OK, updatedSatellite };
+                return { status: HttpStatus.OK, result: updatedSatellite };
             } catch (error) {
                 await stSession.abortTransaction();
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);

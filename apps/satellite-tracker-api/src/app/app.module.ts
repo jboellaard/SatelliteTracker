@@ -9,6 +9,8 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { APP_INTERCEPTOR } from '@nestjs/core';
 import { APIResponseInterceptor } from './api-response.interceptor';
+import { RecommendationsModule } from './recommendations/recommendations.module';
+import { FeedModule } from './feed/feed.module';
 
 @Module({
     imports: [
@@ -35,14 +37,16 @@ import { APIResponseInterceptor } from './api-response.interceptor';
         SatelliteModule,
         AuthModule,
         DbseedModule,
+        RecommendationsModule,
+        FeedModule,
     ],
     controllers: [AppController],
     providers: [
         AppService,
-        // {
-        //     provide: APP_INTERCEPTOR,
-        //     useClass: APIResponseInterceptor,
-        // },
+        {
+            provide: APP_INTERCEPTOR,
+            useClass: APIResponseInterceptor,
+        },
     ],
 })
 export class AppModule {}

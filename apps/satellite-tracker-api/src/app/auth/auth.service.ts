@@ -1,17 +1,13 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-
 import mongoose, { Model } from 'mongoose';
 import { InjectModel, InjectConnection } from '@nestjs/mongoose';
-
 import { Identity, IdentityDocument } from './schemas/identity.schema';
 import { User, UserDocument } from '../user/schemas/user.schema';
-
 import { hash, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { Id, UserIdentity, UserRegistration } from 'shared/domain';
+import { UserIdentity, UserRegistration } from 'shared/domain';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { AuthNeoQueries } from './neo4j/auth.cypher';
-import { HttpResponse } from '@angular/common/http';
 
 @Injectable()
 export class AuthService {
@@ -65,7 +61,7 @@ export class AuthService {
             await Promise.all([stsession.commitTransaction(), identitySession.commitTransaction()]);
             this.logger.log(`Created user`);
 
-            return { status: HttpStatus.CREATED, user };
+            return { status: HttpStatus.CREATED, result: user };
         } catch (error) {
             this.logger.error(error);
             await Promise.all([stsession.abortTransaction(), identitySession.abortTransaction()]);
@@ -95,7 +91,7 @@ export class AuthService {
         this.logger.log(`User validated, generating tokens for user ${username}`);
         delete identity.hash;
         const payload = await this.getTokens(identity);
-        return { status: HttpStatus.OK, payload };
+        return { status: HttpStatus.OK, result: payload };
     }
 
     async refreshToken(username: string): Promise<any> {
@@ -104,7 +100,7 @@ export class AuthService {
         if (!identity) return new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
         this.logger.log(`Generating new tokens for ${username}`);
         const payload = await this.getTokens(identity);
-        return { status: HttpStatus.OK, payload };
+        return { status: HttpStatus.OK, result: payload };
     }
 
     private async getTokens(identity: Identity): Promise<any> {
@@ -132,7 +128,7 @@ export class AuthService {
 
     async getIdentity(username: string) {
         const identity = await this.identityModel.findOne({ username: username }).select('-hash').exec();
-        return { status: HttpStatus.OK, identity };
+        return { status: HttpStatus.OK, result: identity };
     }
 
     async updateIdentity(username: string, updatedCredentials: UserRegistration) {
@@ -185,15 +181,17 @@ export class AuthService {
             if (updatedCredentials.username && username !== updatedCredentials.username) {
                 return {
                     status: HttpStatus.OK,
-                    user: updatedUser,
-                    token: this.jwtService.sign({
-                        sub: updatedUser?.user,
-                        username: updatedUser?.username,
-                        roles: updatedUser?.roles,
-                    }),
+                    result: {
+                        user: updatedUser,
+                        token: this.jwtService.sign({
+                            sub: updatedUser?.user,
+                            username: updatedUser?.username,
+                            roles: updatedUser?.roles,
+                        }),
+                    },
                 };
             }
-            return { status: HttpStatus.OK, user: updatedUser };
+            return { status: HttpStatus.OK, result: updatedUser };
         } catch (error) {
             this.logger.error(error);
             await identitySession.abortTransaction();
@@ -236,7 +234,7 @@ export class AuthService {
             await transaction.commit();
             await Promise.all([stsession.commitTransaction(), identitySession.commitTransaction()]);
             this.logger.log(`Deleted user and identity`);
-            return { status: HttpStatus.OK, user };
+            return { status: HttpStatus.OK, result: user };
         } catch (error) {
             this.logger.error(error);
             await Promise.all([stsession.abortTransaction(), identitySession.abortTransaction()]);

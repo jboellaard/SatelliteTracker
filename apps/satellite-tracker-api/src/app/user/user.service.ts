@@ -12,7 +12,7 @@ export class UserService {
 
     async findAll() {
         const users = await this.userModel.find();
-        return { status: HttpStatus.OK, users };
+        return { status: HttpStatus.OK, result: users };
     }
 
     async findOne(id: Id) {
@@ -23,11 +23,11 @@ export class UserService {
         if (!user) {
             return new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
-        return { status: HttpStatus.OK, user };
+        return { status: HttpStatus.OK, result: user };
     }
 
     async update(id: Id, updateUserDto: UpdateUserDto) {
         const updatedUser = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
-        return { status: HttpStatus.OK, updatedUser };
+        return { status: HttpStatus.OK, result: updatedUser };
     }
 }
