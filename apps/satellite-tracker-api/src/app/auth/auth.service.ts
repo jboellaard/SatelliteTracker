@@ -5,7 +5,7 @@ import { Identity, IdentityDocument } from './schemas/identity.schema';
 import { User, UserDocument } from '../user/schemas/user.schema';
 import { hash, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { UserIdentity, UserRegistration } from 'shared/domain';
+import { IUser, Token, UserIdentity, UserRegistration } from 'shared/domain';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { AuthNeoQueries } from './neo4j/auth.cypher';
 
@@ -14,15 +14,15 @@ export class AuthService {
     private readonly logger = new Logger(AuthService.name);
 
     constructor(
-        @InjectModel(Identity.name, 'identitydb') private identityModel: Model<IdentityDocument>,
-        @InjectModel(User.name, 'satellitetrackerdb') private userModel: Model<UserDocument>,
-        @InjectConnection('satellitetrackerdb') private stconnection: mongoose.Connection,
-        @InjectConnection('identitydb') private identityConnection: mongoose.Connection,
+        @InjectModel(Identity.name, `${process.env.MONGO_IDENTITYDB}`) private identityModel: Model<IdentityDocument>,
+        @InjectModel(User.name, `${process.env.MONGO_DATABASE}`) private userModel: Model<UserDocument>,
+        @InjectConnection(`${process.env.MONGO_DATABASE}`) private stconnection: mongoose.Connection,
+        @InjectConnection(`${process.env.MONGO_IDENTITYDB}`) private identityConnection: mongoose.Connection,
         private readonly neo4jService: Neo4jService,
         private jwtService: JwtService
     ) {}
 
-    async registerUser(credentials: UserRegistration): Promise<any> {
+    async registerUser(credentials: UserRegistration): Promise<{ status: number; result: IUser } | HttpException> {
         const stsession = await this.stconnection.startSession();
         const identitySession = await this.identityConnection.startSession();
         const neo4jSession = this.neo4jService.getWriteSession();
@@ -83,7 +83,10 @@ export class AuthService {
         }
     }
 
-    async generateToken(username: string, password: string): Promise<any> {
+    async generateToken(
+        username: string,
+        password: string
+    ): Promise<{ status: number; result: Token } | HttpException> {
         const identity = await this.identityModel.findOne({ username: username }).exec();
 
         if (!identity || !(await compare(password, identity.hash)))
@@ -94,7 +97,7 @@ export class AuthService {
         return { status: HttpStatus.OK, result: payload };
     }
 
-    async refreshToken(username: string): Promise<any> {
+    async refreshToken(username: string): Promise<{ status: number; result: Token } | HttpException> {
         const identity = await this.identityModel.findOne({ username: username }).select('-hash').exec();
 
         if (!identity) return new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
@@ -103,7 +106,7 @@ export class AuthService {
         return { status: HttpStatus.OK, result: payload };
     }
 
-    private async getTokens(identity: Identity): Promise<any> {
+    private async getTokens(identity: Identity): Promise<Token> {
         const user: UserIdentity = {
             id: identity.user.toString(),
             username: identity.username,
@@ -126,12 +129,15 @@ export class AuthService {
         };
     }
 
-    async getIdentity(username: string) {
+    async getIdentity(username: string): Promise<{ status: number; result: UserIdentity }> {
         const identity = await this.identityModel.findOne({ username: username }).select('-hash').exec();
         return { status: HttpStatus.OK, result: identity };
     }
 
-    async updateIdentity(username: string, updatedCredentials: UserRegistration) {
+    async updateIdentity(
+        username: string,
+        updatedCredentials: UserRegistration
+    ): Promise<{ status: number; result: { user: UserIdentity; token: Token } } | HttpException> {
         const identitySession = await this.identityConnection.startSession();
         identitySession.startTransaction();
         this.logger.log(`Started transaction for updating user with username ${username}`);
@@ -142,16 +148,18 @@ export class AuthService {
                     parseInt(`${process.env.SALT_ROUNDS}`, 10)
                 );
             }
-            const updatedUser = await this.identityModel.findOneAndUpdate({ username: username }, updatedCredentials, {
-                session: identitySession,
-                new: true,
-            });
+            const updatedUser = await this.identityModel
+                .findOneAndUpdate({ username: username }, updatedCredentials, {
+                    session: identitySession,
+                    new: true,
+                })
+                .select('-hash')
+                .exec();
 
             if (!updatedUser) {
                 return new HttpException(`Could not find user with username ${username}`, HttpStatus.NOT_FOUND);
             }
 
-            // if the username is updated, a new token must be generated as well
             if (updatedCredentials.username && username !== updatedCredentials.username) {
                 const stSession = await this.stconnection.startSession();
                 const neo4jSession = this.neo4jService.getWriteSession();
@@ -178,20 +186,13 @@ export class AuthService {
             }
 
             await identitySession.commitTransaction();
-            if (updatedCredentials.username && username !== updatedCredentials.username) {
-                return {
-                    status: HttpStatus.OK,
-                    result: {
-                        user: updatedUser,
-                        token: this.jwtService.sign({
-                            sub: updatedUser?.user,
-                            username: updatedUser?.username,
-                            roles: updatedUser?.roles,
-                        }),
-                    },
-                };
-            }
-            return { status: HttpStatus.OK, result: updatedUser };
+            return {
+                status: HttpStatus.OK,
+                result: {
+                    user: updatedUser,
+                    token: await this.getTokens(updatedUser),
+                },
+            };
         } catch (error) {
             this.logger.error(error);
             await identitySession.abortTransaction();
@@ -206,7 +207,7 @@ export class AuthService {
         }
     }
 
-    async delete(username: string) {
+    async delete(username: string): Promise<{ status: number; result: IUser } | HttpException> {
         this.logger.log(`Removing user with username ${username} (including identity)`);
         const stsession = await this.stconnection.startSession();
         const identitySession = await this.identityConnection.startSession();

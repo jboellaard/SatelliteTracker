@@ -7,3 +7,8 @@ export interface APIResponse<T> {
         count: number;
     };
 }
+
+export interface APIResult<T> {
+    status: number;
+    result: T;
+}

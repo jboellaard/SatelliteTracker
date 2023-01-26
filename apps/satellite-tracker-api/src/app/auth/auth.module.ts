@@ -12,8 +12,8 @@ import { RefreshJwtStrategy } from './guards/refresh-jwt.strategy';
 
 @Module({
     imports: [
-        MongooseModule.forFeature([{ name: Identity.name, schema: IdentitySchema }], 'identitydb'),
-        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }], 'satellitetrackerdb'),
+        MongooseModule.forFeature([{ name: Identity.name, schema: IdentitySchema }], `${process.env.MONGO_IDENTITYDB}`),
+        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }], `${process.env.MONGO_DATABASE}`),
         PassportModule,
         JwtModule.register({}),
     ],

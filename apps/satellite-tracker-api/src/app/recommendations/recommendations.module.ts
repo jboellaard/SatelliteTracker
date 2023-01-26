@@ -12,7 +12,7 @@ import { User, UserSchema } from '../user/schemas/user.schema';
                 { name: User.name, schema: UserSchema },
                 { name: Satellite.name, schema: SatelliteSchema },
             ],
-            'satellitetrackerdb'
+            `${process.env.MONGO_DATABASE}`
         ),
     ],
     controllers: [RecommendationsController],

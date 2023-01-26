@@ -14,10 +14,11 @@ export class SatelliteService {
     private logger = new Logger(SatelliteService.name);
 
     constructor(
-        @InjectModel(User.name, 'satellitetrackerdb') private userModel: Model<UserDocument>,
-        @InjectModel(Satellite.name, 'satellitetrackerdb') private satelliteModel: Model<Satellite>,
-        @InjectModel(SatellitePart.name, 'satellitetrackerdb') private satellitePartModel: Model<SatellitePart>,
-        @InjectConnection('satellitetrackerdb') private connection: mongoose.Connection,
+        @InjectModel(User.name, `${process.env.MONGO_DATABASE}`) private userModel: Model<UserDocument>,
+        @InjectModel(Satellite.name, `${process.env.MONGO_DATABASE}`) private satelliteModel: Model<Satellite>,
+        @InjectModel(SatellitePart.name, `${process.env.MONGO_DATABASE}`)
+        private satellitePartModel: Model<SatellitePart>,
+        @InjectConnection(`${process.env.MONGO_DATABASE}`) private connection: mongoose.Connection,
         private readonly neo4jService: Neo4jService
     ) {}
 
@@ -309,6 +310,46 @@ export class SatelliteService {
             }
         } else {
             return new HttpException('You are not authorized to remove this orbit', HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    async trackSatellite(username: string, id: Id) {
+        const satellite = await this.satelliteModel.findById(id).populate('createdBy');
+        if (satellite) {
+            const createdBy = eval(satellite.createdBy);
+            try {
+                const result = await this.neo4jService.write(SatelliteNeoQueries.trackSatellite, {
+                    username,
+                    createdBy: createdBy.username,
+                    satelliteName: satellite.satelliteName,
+                });
+                return { status: HttpStatus.OK, result: result };
+            } catch (error) {
+                if (error instanceof Error) return new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new HttpException('Could not track satellite', HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return new HttpException('Could not find satellite', HttpStatus.NOT_FOUND);
+        }
+    }
+
+    async untrackSatellite(username: string, id: Id) {
+        const satellite = await this.satelliteModel.findById(id).populate('createdBy');
+        if (satellite) {
+            const createdBy = eval(satellite.createdBy);
+            try {
+                const result = await this.neo4jService.write(SatelliteNeoQueries.untrackSatellite, {
+                    username,
+                    createdBy: createdBy.username,
+                    satelliteName: satellite.satelliteName,
+                });
+                return { status: HttpStatus.OK, result: result };
+            } catch (error) {
+                if (error instanceof Error) return new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+                return new HttpException('Could not track satellite', HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            return new HttpException('Could not find satellite', HttpStatus.NOT_FOUND);
         }
     }
 }

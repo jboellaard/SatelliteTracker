@@ -62,7 +62,7 @@ export interface ISatellite {
     mass: number;
     sizeOfBase: number;
     colorOfBase: string;
-    shapeOfBase: Shape;
+    shapeOfBase?: Shape;
     purpose?: string;
     satelliteParts?: ICustomSatellitePart[];
     orbit?: IOrbit;

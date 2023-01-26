@@ -1,8 +1,10 @@
 export const UserNeoQueries = {
     followUser:
-        'MATCH (a:User {username: $username}), (b:User {username: $username}) MERGE (a)-[follow:FOLLOWS {since: $now])}]->(b)',
-    unfollowUser: 'MATCH (a:User {username: $username})-[follow:FOLLOWS]->(b:User {username: $username}) DELETE follow',
-    trackSatellite:
-        'MATCH (a:User {username: $username}), (b:Satellite {id: $id}) MERGE (a)-[track:TRACKS {since: $now}]->(b)',
-    untrackSatellite: 'MATCH (a:User {username: $username})-[track:TRACKS]->(b:Satellite {id: $id}) DELETE track',
+        'MATCH (a:User {username: $username}), (b:User {username: $toFollow}) MERGE (a)-[follow:FOLLOWS {since: datetime()}]->(b)',
+    unfollowUser:
+        'MATCH (a:User {username: $username})-[follow:FOLLOWS]->(b:User {username: $toUnfollow}) DELETE follow',
+    getFollowers: 'MATCH (a:User {username: $username})<-[follow:FOLLOWS]-(user:User) RETURN user',
+    getFollowing: 'MATCH (a:User {username: $username})-[follow:FOLLOWS]->(user:User) RETURN user',
+    getMostRecentlyFollowed:
+        'MATCH (user:User)-[follow:FOLLOWS]->(followed:User) WHERE user.username in $list RETURN user, followed, follow ORDER BY follow.since DESC SKIP toInteger($skip) LIMIT toInteger($limit)',
 };

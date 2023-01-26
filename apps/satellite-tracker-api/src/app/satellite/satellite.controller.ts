@@ -1,16 +1,4 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Request,
-    Patch,
-    Param,
-    Delete,
-    Logger,
-    UseGuards,
-    HttpStatus,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Request, Patch, Param, Delete, Logger, UseGuards } from '@nestjs/common';
 import { SatelliteService } from './satellite.service';
 import { SatelliteDto, UpdateSatelliteDto } from './dto/satellite.dto';
 import { AccessJwtAuthGuard } from '../auth/guards/access-jwt-auth.guard';
@@ -86,5 +74,12 @@ export class SatelliteController {
     async removeOrbit(@Request() req: any, @Param('id') id: string) {
         this.logger.log('DELETE satellites/:id/orbit called');
         return await this.satelliteService.removeOrbit(req.user.userId, id);
+    }
+
+    @UseGuards(AccessJwtAuthGuard)
+    @Post(':id/track')
+    async trackSatellite(@Request() req: any, @Param('id') id: string) {
+        this.logger.log('POST satellites/:id/track called');
+        return await this.satelliteService.trackSatellite(req.user.userId, id);
     }
 }

@@ -15,13 +15,13 @@ import { FeedModule } from './feed/feed.module';
 @Module({
     imports: [
         MongooseModule.forRootAsync({
-            connectionName: 'satellitetrackerdb',
+            connectionName: `${process.env.MONGO_DATABASE}`,
             useFactory: () => ({
                 uri: `mongodb+srv://${process.env.MONGO_USR}:${process.env.MONGO_PWD}@${process.env.MONGO_HOST}/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority&readPreference=primary&ssl=true`,
             }),
         }),
         MongooseModule.forRootAsync({
-            connectionName: 'identitydb',
+            connectionName: `${process.env.MONGO_IDENTITYDB}`,
             useFactory: () => ({
                 uri: `mongodb+srv://${process.env.MONGO_USR}:${process.env.MONGO_PWD}@${process.env.MONGO_HOST}/${process.env.MONGO_IDENTITYDB}?retryWrites=true&w=majority&readPreference=primary&ssl=true`,
             }),

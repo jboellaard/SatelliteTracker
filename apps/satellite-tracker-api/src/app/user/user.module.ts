@@ -14,7 +14,7 @@ import { Satellite, SatellitePart, SatellitePartSchema, SatelliteSchema } from '
                 { name: Satellite.name, schema: SatelliteSchema },
                 { name: SatellitePart.name, schema: SatellitePartSchema },
             ],
-            'satellitetrackerdb'
+            `${process.env.MONGO_DATABASE}`
         ),
     ],
     controllers: [UserController],

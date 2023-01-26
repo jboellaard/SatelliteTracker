@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { hash } from 'bcrypt';
 import { Model } from 'mongoose';
+import { Shape } from 'shared/domain';
 import { Identity, IdentityDocument } from '../auth/schemas/identity.schema';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import {
@@ -16,10 +17,11 @@ import { User, UserDocument } from '../user/schemas/user.schema';
 export class DbseedService implements OnModuleInit {
     private readonly logger = new Logger(DbseedService.name);
     constructor(
-        @InjectModel(Identity.name, 'identitydb') private identityModel: Model<IdentityDocument>,
-        @InjectModel(User.name, 'satellitetrackerdb') private userModel: Model<UserDocument>,
-        @InjectModel(Satellite.name, 'satellitetrackerdb') private satelliteModel: Model<SatelliteDocument>,
-        @InjectModel(SatellitePart.name, 'satellitetrackerdb') private satellitePartModel: Model<SatellitePartDocument>,
+        @InjectModel(Identity.name, `${process.env.MONGO_IDENTITYDB}`) private identityModel: Model<IdentityDocument>,
+        @InjectModel(User.name, `${process.env.MONGO_DATABASE}`) private userModel: Model<UserDocument>,
+        @InjectModel(Satellite.name, `${process.env.MONGO_DATABASE}`) private satelliteModel: Model<SatelliteDocument>,
+        @InjectModel(SatellitePart.name, `${process.env.MONGO_DATABASE}`)
+        private satellitePartModel: Model<SatellitePartDocument>,
         private readonly neo4jService: Neo4jService
     ) {}
 
@@ -432,6 +434,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 200,
                     colorOfBase: '#ffffff',
+                    shapeOfBase: Shape.Sphere,
                     createdBy: user2.user._id,
                     createdAt: new Date(2023, 0, 20),
                 });
@@ -450,6 +453,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 200,
                     colorOfBase: '#0000cc',
+                    shapeOfBase: Shape.Sphere,
                     createdBy: user4.user._id,
                     createdAt: new Date(2023, 0, 25),
                 });
@@ -459,6 +463,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 200,
                     colorOfBase: '#0000cc',
+                    shapeOfBase: Shape.Sphere,
                     createdBy: user4.user._id,
                     createdAt: new Date(),
                 });
@@ -468,6 +473,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 200,
                     colorOfBase: '#d84390',
+                    shapeOfBase: Shape.Sphere,
                     createdBy: user1.user._id,
                     createdAt: new Date(2023, 0, 1),
                 });
@@ -477,6 +483,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 200,
                     sizeOfBase: 200,
                     colorOfBase: '#130449',
+                    shapeOfBase: Shape.Sphere,
                     createdBy: user1.user._id,
                     createdAt: new Date(2023, 0, 1),
                 });
@@ -565,6 +572,7 @@ export class DbseedService implements OnModuleInit {
                     mass: 5.972 * 10 ** 24,
                     sizeOfBase: 6371 * 2,
                     colorOfBase: '#0020d5',
+                    shapeOfBase: Shape.Sphere,
                     createdBy: user6.user,
                     createdAt: new Date(2023, 0, 11),
                     orbit: {
@@ -637,41 +645,41 @@ export class DbseedService implements OnModuleInit {
                 CREATE (s15:Satellite {satelliteName: $name15, createdBy: $username6 })
                 MERGE (s15)<-[:CREATED {createdAt: datetime($createdAt15)}]-(u6)
                 SET s15.launchDate = datetime($launchDate2)
-                MERGE (u1)-[:TRACKS]->(s)
-                MERGE (u2)-[:TRACKS]->(s2)
-                MERGE (u1)-[:TRACKS]->(s3)
-                MERGE (u4)-[:TRACKS]->(s4)
-                MERGE (u4)-[:TRACKS]->(s5)
-                MERGE (u1)-[:TRACKS]->(s6)
-                MERGE (u1)-[:TRACKS]->(s7)
-                MERGE (u1)-[:TRACKS]->(s8)
-                MERGE (u1)-[:TRACKS]->(s9)
-                MERGE (u2)-[:TRACKS]->(s)
-                MERGE (u2)-[:TRACKS]->(s6)
-                MERGE (u2)-[:TRACKS]->(s7)
-                MERGE (u5)-[:TRACKS]->(s9)
-                MERGE (u5)-[:TRACKS]->(s4)
-                MERGE (u5)-[:TRACKS]->(s5)
-                MERGE (u3)-[:TRACKS]->(s)
-                MERGE (u3)-[:TRACKS]->(s3)
-                MERGE (u3)-[:TRACKS]->(s4)
-                MERGE (u1)-[:TRACKS]->(s4)
-                MERGE (u1)-[:TRACKS]->(s5)
-                MERGE (u1)-[:TRACKS]->(s10)
-                MERGE (u1)-[:TRACKS]->(s11)
-                MERGE (u1)-[:TRACKS]->(s15)
-                MERGE (u2)-[:TRACKS]->(s15)
-                MERGE (u4)-[:TRACKS]->(s15)
-                MERGE (u6)-[:TRACKS]->(s11)
-                MERGE (u6)-[:TRACKS]->(s12)
-                MERGE (u6)-[:TRACKS]->(s13)
-                MERGE (u6)-[:TRACKS]->(s14)
-                MERGE (u6)-[:TRACKS]->(s15)
-                MERGE (u6)-[:TRACKS]->(s)
-                MERGE (u6)-[:TRACKS]->(s5)
-                MERGE (u6)-[:TRACKS]->(s3)
-                MERGE (u6)-[:TRACKS]->(s6)
-                MERGE (u6)-[:TRACKS]->(s7)
+                MERGE (u1)-[:TRACKS {since: datetime($createdAt1)}]->(s)
+                MERGE (u2)-[:TRACKS {since: datetime($createdAt2)}]->(s2)
+                MERGE (u1)-[:TRACKS {since: datetime($createdAt3)}]->(s3)
+                MERGE (u4)-[:TRACKS {since: datetime($createdAt4)}]->(s4)
+                MERGE (u4)-[:TRACKS {since: datetime($createdAt5)}]->(s5)
+                MERGE (u1)-[:TRACKS {since: datetime($createdAt6)}]->(s6)
+                MERGE (u1)-[:TRACKS {since: datetime($createdAt7)}]->(s7)
+                MERGE (u1)-[:TRACKS {since: datetime($createdAt8)}]->(s8)
+                MERGE (u1)-[:TRACKS {since: datetime($createdAt9)}]->(s9)
+                MERGE (u2)-[:TRACKS {since: datetime()}]->(s)
+                MERGE (u2)-[:TRACKS {since: datetime()}]->(s6)
+                MERGE (u2)-[:TRACKS {since: datetime()}]->(s7)
+                MERGE (u5)-[:TRACKS {since: datetime()}]->(s9)
+                MERGE (u5)-[:TRACKS {since: datetime()}]->(s4)
+                MERGE (u5)-[:TRACKS {since: datetime()}]->(s5)
+                MERGE (u3)-[:TRACKS {since: datetime()}]->(s)
+                MERGE (u3)-[:TRACKS {since: datetime()}]->(s3)
+                MERGE (u3)-[:TRACKS {since: datetime()}]->(s4)
+                MERGE (u1)-[:TRACKS {since: datetime()}]->(s4)
+                MERGE (u1)-[:TRACKS {since: datetime()}]->(s5)
+                MERGE (u1)-[:TRACKS {since: datetime($createdAt10)}]->(s10)
+                MERGE (u1)-[:TRACKS {since: datetime()}]->(s11)
+                MERGE (u1)-[:TRACKS {since: datetime()}]->(s15)
+                MERGE (u2)-[:TRACKS {since: datetime()}]->(s15)
+                MERGE (u4)-[:TRACKS {since: datetime()}]->(s15)
+                MERGE (u6)-[:TRACKS {since: datetime($createdAt11)}]->(s11)
+                MERGE (u6)-[:TRACKS {since: datetime($createdAt12)}]->(s12)
+                MERGE (u6)-[:TRACKS {since: datetime($createdAt13)}]->(s13)
+                MERGE (u6)-[:TRACKS {since: datetime($createdAt14)}]->(s14)
+                MERGE (u6)-[:TRACKS {since: datetime($createdAt15)}]->(s15)
+                MERGE (u6)-[:TRACKS {since: datetime()}]->(s)
+                MERGE (u6)-[:TRACKS {since: datetime()}]->(s5)
+                MERGE (u6)-[:TRACKS {since: datetime()}]->(s3)
+                MERGE (u6)-[:TRACKS {since: datetime()}]->(s6)
+                MERGE (u6)-[:TRACKS {since: datetime()}]->(s7)
                 `,
                     {
                         name1: satellite1.satelliteName,

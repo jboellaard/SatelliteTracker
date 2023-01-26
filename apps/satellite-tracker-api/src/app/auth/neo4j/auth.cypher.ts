@@ -1,6 +1,5 @@
 export const AuthNeoQueries = {
-  addUser: 'MERGE (a:User {username: $username}) RETURN a',
-  removeUser: 'MATCH (a:User {username: $username}) DETACH DELETE a',
-  updateUsername:
-    'MATCH (a:User {username: $username}) SET a.username = $newUsername RETURN a',
+    addUser: 'MERGE (user:User {username: $username}) RETURN user',
+    removeUser: 'MATCH (a:User {username: $username}) DETACH DELETE a',
+    updateUsername: 'MATCH (user:User {username: $username}) SET a.username = $newUsername RETURN user',
 };

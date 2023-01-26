@@ -8,19 +8,19 @@ export class APIResponseInterceptor implements NestInterceptor {
     intercept(context: ExecutionContext, next: CallHandler): Observable<APIResponse<unknown>> {
         return next.handle().pipe(
             map((res) => {
-                if (res.results) {
+                if (res.result) {
                     return {
                         ...res,
                         info: {
                             version: '1.0',
-                            type: res.results instanceof Array ? 'list' : 'object',
-                            count: res.results instanceof Array ? res.results.length : 1,
+                            type: res.result instanceof Array ? 'list' : 'object',
+                            count: res.result instanceof Array ? res.result.length : 1,
                         },
                     };
                 } else {
                     return {
                         ...res,
-                        results: undefined,
+                        result: undefined,
                         info: {
                             version: '1.0',
                             type: 'none',

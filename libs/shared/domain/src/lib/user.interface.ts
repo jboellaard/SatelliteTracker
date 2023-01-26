@@ -13,6 +13,9 @@ export interface IUserInfo {
 
 export interface IUser extends IUserInfo {
     satellites?: ISatellite[];
+    followers?: IUserInfo[];
+    following?: IUserInfo[];
+    followerCount?: number;
 }
 
 export interface ILocation {

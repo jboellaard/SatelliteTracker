@@ -134,8 +134,8 @@ export class Satellite {
     @Prop({ required: true })
     colorOfBase!: string;
 
-    @Prop({ required: true, default: Shape.Cube })
-    shapeOfBase?: string;
+    @Prop({ required: true, default: Shape.Cube, enum: Object.values(Shape), type: String })
+    shapeOfBase?: Shape;
 
     @Prop({ required: true, default: 'TBD' })
     purpose?: string;

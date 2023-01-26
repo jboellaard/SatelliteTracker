@@ -13,9 +13,9 @@ import { DbseedService } from './dbseed.service';
                 { name: Satellite.name, schema: SatelliteSchema },
                 { name: SatellitePart.name, schema: SatellitePartSchema },
             ],
-            'satellitetrackerdb'
+            `${process.env.MONGO_DATABASE}`
         ),
-        MongooseModule.forFeature([{ name: Identity.name, schema: IdentitySchema }], 'identitydb'),
+        MongooseModule.forFeature([{ name: Identity.name, schema: IdentitySchema }], `${process.env.MONGO_IDENTITYDB}`),
     ],
     providers: [DbseedService],
 })
