@@ -349,7 +349,7 @@ export class DbseedService implements OnModuleInit {
                 ]);
 
                 const satellite1 = new this.satelliteModel({
-                    satelliteName: 'Internation Space Station',
+                    satelliteName: 'International Space Station',
                     description: 'A space station in low Earth orbit',
                     purpose: 'Research',
                     mass: 419,

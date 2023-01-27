@@ -1,6 +1,6 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { InjectModel, InjectConnection } from '@nestjs/mongoose';
-import mongoose, { Model } from 'mongoose';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 import { APIResult, ISatellite, IUser } from 'shared/domain';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { SatelliteDocument } from '../satellite/schemas/satellite.schema';

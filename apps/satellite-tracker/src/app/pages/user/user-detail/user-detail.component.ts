@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { BehaviorSubject, Observable, Subscription, switchMap, tap } from 'rxjs';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Observable, Subscription } from 'rxjs';
 import { Id, ISatellite, IUser } from 'shared/domain';
 import { SatelliteService } from '../../satellite/satellite.service';
 import { UserService } from '../user.service';
@@ -22,8 +22,6 @@ export class UserDetailComponent implements OnInit {
 
     userSub!: Subscription;
     satelliteSub!: Subscription;
-
-    // user$ = this.userService.exampleData$;
 
     constructor(
         private route: ActivatedRoute,

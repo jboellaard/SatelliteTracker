@@ -26,7 +26,7 @@
                     name="zoom-slider"
                     id="zoom-slider"
                     [(ngModel)]="orbitService.zoom"
-                    (ngModelChange)="orbitService.changeZoom(orbit)"
+                    (ngModelChange)="orbitService.changeZoom(satellite.orbit!)"
                     #eccentricitySlider="ngModel"
                 />
             </mat-slider>
@@ -42,7 +42,7 @@
                 name="semimajoraxis"
                 id="semimajoraxis"
                 class="form-control"
-                [(ngModel)]="orbit.semiMajorAxis"
+                [(ngModel)]="satellite.orbit!.semiMajorAxis"
                 #semiMajorAxis="ngModel"
                 (ngModelChange)="changeSemimajorAxis()"
                 required
@@ -65,7 +65,7 @@
                 type="number"
                 name="period"
                 class="form-control"
-                [(ngModel)]="orbit.period"
+                [(ngModel)]="satellite.orbit!.period"
                 #period="ngModel"
                 disabled
             />
@@ -75,14 +75,14 @@
     <!-- eccentricity -->
     <div class="label-container">
         <label class="label" for="eccentricity-slider">Eccentricity (e)</label>
-        <span class="label-value" id="eccentricity-value">{{ orbit.eccentricity }}</span>
+        <span class="label-value" id="eccentricity-value">{{ satellite.orbit!.eccentricity }}</span>
     </div>
     <mat-slider class="slider" id="mat-eccentricity-slider" step="0.01" min="0" max="1" discrete="true">
         <input
             matSliderThumb
             name="eccentricity-slider"
             id="eccentricity-slider"
-            [(ngModel)]="orbit.eccentricity"
+            [(ngModel)]="satellite.orbit!.eccentricity"
             (ngModelChange)="changeEccentricity()"
             #eccentricitySlider="ngModel"
         />
@@ -92,14 +92,14 @@
     <!-- inclination -->
     <div class="label-container">
         <label class="label" for="inclination-slider">Inclination (i)</label>
-        <span class="label-value" id="inclination-value">{{ orbit.inclination }}°</span>
+        <span class="label-value" id="inclination-value">{{ satellite.orbit!.inclination }}°</span>
     </div>
     <mat-slider class="slider" step="1" min="0" max="180" discrete="true">
         <input
             matSliderThumb
             name="inclination-slider"
             id="inclination-slider"
-            [(ngModel)]="orbit.inclination"
+            [(ngModel)]="satellite.orbit!.inclination"
             (ngModelChange)="changeAngle()"
             #inclinationSlider="ngModel"
         />
@@ -110,7 +110,7 @@
     <!-- longitude (RA) -->
     <div class="label-container">
         <label class="label" for="inclination-slider">Longitude of ascending node (Ω)</label>
-        <span class="label-value" id="inclination-value">{{ orbit.longitudeOfAscendingNode }}°</span>
+        <span class="label-value" id="inclination-value">{{ satellite.orbit!.longitudeOfAscendingNode }}°</span>
     </div>
     <mat-slider
         id="mat-longitude-slider"
@@ -119,13 +119,13 @@
         min="0"
         max="360"
         discrete="true"
-        [disabled]="orbit.inclination == 0"
+        [disabled]="satellite.orbit!.inclination == 0"
     >
         <input
             matSliderThumb
             name="longitude-slider"
             id="longitude-slider"
-            [(ngModel)]="orbit.longitudeOfAscendingNode"
+            [(ngModel)]="satellite.orbit!.longitudeOfAscendingNode"
             (ngModelChange)="changeAngle()"
             #longitudeSlider="ngModel"
         />
@@ -133,21 +133,29 @@
 
     <!-- argumentOfPerigee -->
     <div class="label-container">
-        <label *ngIf="orbit.inclination == 0 && orbit.eccentricity == 0" class="label" for="perigee-slider"
+        <label
+            *ngIf="satellite.orbit!.inclination == 0 && satellite.orbit!.eccentricity == 0"
+            class="label"
+            for="perigee-slider"
             >True longitude (l)</label
         >
-        <label *ngIf="orbit.inclination != 0 && orbit.eccentricity == 0" class="label" for="perigee-slider"
+        <label
+            *ngIf="satellite.orbit!.inclination != 0 && satellite.orbit!.eccentricity == 0"
+            class="label"
+            for="perigee-slider"
             >Argument of latitude (u)</label
         >
-        <label *ngIf="orbit.eccentricity != 0" class="label" for="perigee-slider">Argument of perigee (ω)</label>
-        <span class="label-value" id="perigee-value">{{ orbit.argumentOfPerigee }}°</span>
+        <label *ngIf="satellite.orbit!.eccentricity != 0" class="label" for="perigee-slider"
+            >Argument of perigee (ω)</label
+        >
+        <span class="label-value" id="perigee-value">{{ satellite.orbit!.argumentOfPerigee }}°</span>
     </div>
     <mat-slider class="slider" step="1" min="0" max="360" discrete="true">
         <input
             matSliderThumb
             name="perigee-slider"
             id="perigee-slider"
-            [(ngModel)]="orbit.argumentOfPerigee"
+            [(ngModel)]="satellite.orbit!.argumentOfPerigee"
             (ngModelChange)="changeAngle()"
             #perigeeSlider="ngModel"
         />
@@ -160,8 +168,8 @@
             name="launch-date"
             id="launch-date"
             class="form-control"
-            [ngModel]="orbit.dateTimeOfLaunch | date : 'yyyy-MM-ddTHH:mm:ss'"
-            (ngModelChange)="orbit.dateTimeOfLaunch = dateChanged($event)"
+            [ngModel]="satellite.orbit!.dateTimeOfLaunch | date : 'yyyy-MM-ddTHH:mm:ss'"
+            (ngModelChange)="satellite.orbit!.dateTimeOfLaunch = dateChanged($event)"
             #dateAtPerigee="ngModel"
             required
             [ngClass]="{

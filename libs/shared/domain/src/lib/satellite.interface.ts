@@ -46,13 +46,17 @@ export interface IOrbit {
     updatedAt?: Date;
 }
 
-// export interface ILaunch {
-//     launchDate: Date;
-//     launchSite?: ILocation;
-//     succeeded?: boolean;
-//     createdAt?: Date;
-//     updatedAt?: Date;
-// }
+export function getG() {
+    return 6.6743 * Math.pow(10, -11);
+}
+
+export function getMassEarth() {
+    return 5.9722 * Math.pow(10, 24);
+}
+
+export function getPeriod(a: number) {
+    return 2 * Math.PI * Math.sqrt(Math.pow(a, 3) / (getG() * getMassEarth()));
+}
 
 export interface ISatellite {
     _id?: Id;
@@ -66,8 +70,6 @@ export interface ISatellite {
     purpose?: string;
     satelliteParts?: ICustomSatellitePart[];
     orbit?: IOrbit;
-    // launch?: ILaunch;
-
     createdBy?: Id;
     createdAt?: Date;
     updatedAt?: Date;

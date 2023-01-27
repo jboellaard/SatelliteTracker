@@ -71,7 +71,7 @@ $SatelliteTracker-accent: mat.define-palette(mat.$yellow-palette, 500, 200, 700)
 $SatelliteTracker-grey: mat.define-palette(mat.$grey-palette, 500, 300, 800);
 
 // The warn palette is optional (defaults to red).
-$SatelliteTracker-warn: mat.define-palette(mat.$red-palette);
+$SatelliteTracker-warn: mat.define-palette(mat.$red-palette, 800, 300, 900);
 
 // Create the theme object. A theme consists of configurations for individual
 // theming systems such as "color" or "typography".
@@ -206,18 +206,18 @@ app-root {
     min-height: 100%;
 }
 
-// .mat-mdc-snack-bar-container.snackbar-error .mdc-snackbar__label {
-//     color: white !important;
-// }
+.mat-mdc-snack-bar-container .mdc-snackbar__label {
+    color: white !important;
+}
 
 .mdc-snackbar.snackbar-error div.mdc-snackbar__surface {
-    background-color: #dfb1b1;
+    background-color: #c6282878;
 }
 
 .mdc-snackbar.snackbar-success div.mdc-snackbar__surface {
-    background-color: #a3cba3;
+    background-color: #24662c7a;
 }
 
 .mdc-snackbar.snackbar-info div.mdc-snackbar__surface {
-    background-color: #b4b3d4;
+    background-color: #323f8b8c;
 }

@@ -29,4 +29,13 @@ export class SatelliteService extends EntityService<ISatellite> {
             })
         );
     }
+
+    deleteOrbit(id: Id): Observable<ISatellite> {
+        return this.http.delete<APIResponse<ISatellite>>(`${environment.API_URL}/satellites/${id}/orbit`).pipe(
+            map((response: any) => {
+                response.result.id = response.result._id;
+                return response.result;
+            })
+        );
+    }
 }

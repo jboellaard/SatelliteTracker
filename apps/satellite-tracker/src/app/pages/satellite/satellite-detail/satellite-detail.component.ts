@@ -57,4 +57,9 @@ export class SatelliteDetailComponent implements OnInit {
         this.satelliteService.delete(id).subscribe(() => {});
         this.router.navigate([`/users/${this.username}`]);
     }
+
+    removeOrbit(id: Id) {
+        this.satelliteService.deleteOrbit(id).subscribe(() => {});
+        this.router.navigate([`/users/${this.username}/satellites/${this.id}`]);
+    }
 }

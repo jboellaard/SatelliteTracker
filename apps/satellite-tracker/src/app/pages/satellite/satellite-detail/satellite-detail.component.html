@@ -28,7 +28,21 @@
     </div>
     <br />
     <p>{{ satellite.orbit ? 'This satellite has an orbit' : 'This satellite does not have an orbit yet.' }}</p>
-
+    <div *ngIf="satellite.orbit">
+        <div *ngIf="canEdit" class="buttons">
+            <button mat-flat-button class="muted-button" routerLink="orbit">
+                <mat-icon>edit</mat-icon> Edit orbit
+            </button>
+            <button mat-flat-button color="warn" (click)="removeOrbit(satellite!.id)">
+                <mat-icon>delete</mat-icon> Remove orbit
+            </button>
+        </div>
+    </div>
+    <div *ngIf="!satellite.orbit">
+        <div *ngIf="canEdit" class="buttons">
+            <button mat-flat-button class="muted-button" routerLink="orbit"><mat-icon>add</mat-icon> Add orbit</button>
+        </div>
+    </div>
     <br />
 </div>
 

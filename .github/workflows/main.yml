@@ -1,0 +1,35 @@
+name: Satellite Tracker CI/CD
+
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+      - name: Clone repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: |
+          npm ci
+      # - name: Run unit tests
+      #   run: |
+      #     npm run test
+      # - name: Run e2e tests
+      #   run: |
+      #     npm run test:e2e:workflow
+
+      - name: Install Railway
+        run: npm i -g @railway/cli
+
+      - name: Deploy
+        run: railway up
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
