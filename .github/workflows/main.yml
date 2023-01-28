@@ -2,7 +2,7 @@ name: Satellite Tracker CI/CD
 
 on:
     push:
-        branches: ['main', 'netlify_deploy']
+        branches: ['main']
 
 jobs:
     build:
@@ -27,19 +27,19 @@ jobs:
             #   run: |
             #     npm run test:e2e:workflow
 
-            - name: 'Deploy to Netlify'
-              uses: jsmrcaga/action-netlify-deploy@v2.0.0
-              with:
-                  NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
-                  NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-                  NETLIFY_DEPLOY_TO_PROD: true
-                  build_command: 'npm run build'
-                  build_directory: 'dist/apps/satellite-tracker'
+            # - name: 'Deploy to Angular application to Netlify'
+            #   uses: jsmrcaga/action-netlify-deploy@v2.0.0
+            #   with:
+            #       NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+            #       NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+            #       NETLIFY_DEPLOY_TO_PROD: true
+            #       build_command: 'npm run build'
+            #       build_directory: 'dist/apps/satellite-tracker'
 
             - name: Install Railway
               run: npm i -g @railway/cli
 
-            - name: Deploy
+            - name: Deploy applications to Railway
               run: railway up
               env:
                   RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

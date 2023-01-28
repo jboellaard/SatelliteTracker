@@ -1,4 +1,4 @@
 export const environment = {
-  production: true,
-  API_URL: 'https://satellitetracker.up.railway.app/api/',
+    production: true,
+    API_URL: 'https://satellitetracker-api.up.railway.app/api/',
 };
