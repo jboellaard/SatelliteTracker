@@ -26,6 +26,15 @@ jobs:
       # - name: Run e2e tests
       #   run: |
       #     npm run test:e2e:workflow
+      
+      - name: 'Deploy to Netlify'
+        uses: jsmrcaga/action-netlify-deploy@v1.1.0
+        with:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+          NETLIFY_DEPLOY_TO_PROD: true
+          build_directory: 'dist/apps/satellite-tracker'
+          build_command: 'nx run satellite-tracker:build:prod'
 
       - name: Install Railway
         run: npm i -g @railway/cli
