@@ -6,7 +6,7 @@
         "ng": "nx",
         "postinstall": "node ./decorate-angular-cli.js",
         "start": "nx serve",
-        "build": "nx build --env=prod",
+        "build": "nx build --configuration=production",
         "test": "nx test"
     },
     "private": true,

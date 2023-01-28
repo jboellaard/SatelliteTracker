@@ -1,45 +1,45 @@
 name: Satellite Tracker CI/CD
 
 on:
-  push:
-    branches: ['main', 'netlify_deploy']
+    push:
+        branches: ['main', 'netlify_deploy']
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Clone repository
-        uses: actions/checkout@v3
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Clone repository
+              uses: actions/checkout@v3
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18.x
-          cache: 'npm'
+            - name: Set up Node.js version
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 18.x
+                  cache: 'npm'
 
-      - name: Install npm dependencies
-        run: |
-          npm ci
-      # - name: Run unit tests
-      #   run: |
-      #     npm run test
-      # - name: Run e2e tests
-      #   run: |
-      #     npm run test:e2e:workflow
-      
-      - name: 'Deploy to Netlify'
-        uses: jsmrcaga/action-netlify-deploy@v2.0.0
-        with:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-#           NETLIFY_DEPLOY_TO_PROD: true
-          build_command: 'nx run satellite-tracker:build'
-          build_directory: 'dist/apps/satellite-tracker'
-          
-      - name: Install Railway
-        run: npm i -g @railway/cli
+            - name: Install npm dependencies
+              run: |
+                  npm ci
+            # - name: Run unit tests
+            #   run: |
+            #     npm run test
+            # - name: Run e2e tests
+            #   run: |
+            #     npm run test:e2e:workflow
 
-      - name: Deploy
-        run: railway up
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+            - name: 'Deploy to Netlify'
+              uses: jsmrcaga/action-netlify-deploy@v2.0.0
+              with:
+                  NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+                  NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+                  NETLIFY_DEPLOY_TO_PROD: true
+                  build_command: 'npm run build'
+                  build_directory: 'dist/apps/satellite-tracker'
+
+            - name: Install Railway
+              run: npm i -g @railway/cli
+
+            - name: Deploy
+              run: railway up
+              env:
+                  RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
