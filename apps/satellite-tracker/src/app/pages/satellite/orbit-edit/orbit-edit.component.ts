@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { getPeriod, IOrbit, ISatellite, Shape } from 'shared/domain';
+import { getPeriod, ISatellite, Shape } from 'shared/domain';
 import { SnackBarService } from '../../../utils/snack-bar.service';
 import { OrbitService } from '../orbit-scene.service';
 import { SatelliteService } from '../satellite.service';
