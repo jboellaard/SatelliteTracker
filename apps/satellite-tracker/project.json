@@ -15,7 +15,11 @@
                 "polyfills": ["zone.js"],
                 "tsConfig": "apps/satellite-tracker/tsconfig.app.json",
                 "inlineStyleLanguage": "scss",
-                "assets": ["apps/satellite-tracker/src/favicon.ico", "apps/satellite-tracker/src/assets"],
+                "assets": [
+                    "apps/satellite-tracker/src/favicon.ico",
+                    "apps/satellite-tracker/src/assets",
+                    "apps/satellite-tracker/src/_redirects"
+                ],
                 "styles": [
                     "@angular/material/prebuilt-themes/indigo-pink.css",
                     "apps/satellite-tracker/src/styles.scss"
@@ -36,7 +40,13 @@
                             "maximumError": "4kb"
                         }
                     ],
-                    "outputHashing": "all"
+                    "outputHashing": "all",
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/satellite-tracker-api/src/environments/environment.ts",
+                            "with": "apps/satellite-tracker-api/src/environments/environment.prod.ts"
+                        }
+                    ]
                 },
                 "development": {
                     "buildOptimizer": false,
