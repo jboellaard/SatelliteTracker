@@ -2,7 +2,7 @@ name: Satellite Tracker CI/CD
 
 on:
   push:
-    branches: ['main']
+    branches: ['main', 'netlify_deploy']
 
 jobs:
   build:
@@ -32,10 +32,10 @@ jobs:
         with:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-          NETLIFY_DEPLOY_TO_PROD: true
-          build_directory: 'dist/apps/satellite-tracker'
+#           NETLIFY_DEPLOY_TO_PROD: true
           build_command: 'nx run satellite-tracker:build:prod'
-
+          build_directory: 'dist/apps/satellite-tracker'
+          
       - name: Install Railway
         run: npm i -g @railway/cli
 
