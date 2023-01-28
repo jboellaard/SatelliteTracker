@@ -40,6 +40,8 @@ jobs:
               run: npm i -g @railway/cli
 
             - name: Deploy applications to Railway
-              run: railway up
+              run: |
+                railway up --service satellitetracker
+                railway up --service satellitetracker-api
               env:
                   RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
