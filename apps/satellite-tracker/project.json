@@ -43,8 +43,8 @@
                     "outputHashing": "all",
                     "fileReplacements": [
                         {
-                            "replace": "apps/satellite-tracker-api/src/environments/environment.ts",
-                            "with": "apps/satellite-tracker-api/src/environments/environment.prod.ts"
+                            "replace": "apps/satellite-tracker/src/environments/environment.ts",
+                            "with": "apps/satellite-tracker/src/environments/environment.prod.ts"
                         }
                     ]
                 },
