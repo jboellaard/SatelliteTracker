@@ -154,7 +154,7 @@ export class AuthService {
                         this.user$.next(res.result.user);
                         const expiresAt = this.getExpirationDate(res.result.refreshTokenExpiresIn);
                         localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
-                        return of(res.result);
+                        return of(res);
                     }
                     this.snackBar.error('Something went wrong, please try again later');
                     return of(undefined);

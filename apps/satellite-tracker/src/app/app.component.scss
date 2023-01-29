@@ -11,6 +11,10 @@ app-footer {
     flex: 1 1 auto;
 }
 
+.page-content {
+    display: grid;
+}
+
 app-sidebar {
     position: relative;
     height: 100%;

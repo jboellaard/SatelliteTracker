@@ -42,12 +42,11 @@ export class UserDetailComponent implements OnInit {
                     if (user) {
                         this.user = user;
                         this.username = this.user.username;
-                        this.satelliteSub = this.satelliteService
-                            .getSatellitesOfUserWithUsername(this.username)
-                            .subscribe((satellites) => {
-                                console.log(satellites);
-                                if (satellites) this.satellites = satellites;
-                            });
+                        this.getSatellites();
+
+                        this.satelliteService.getRefreshRequired().subscribe(() => {
+                            this.getSatellites();
+                        });
                     } else {
                         this.snackBarService.error('Could not find this users');
                         this.router.navigate(['/home']);
@@ -71,6 +70,17 @@ export class UserDetailComponent implements OnInit {
                 });
             }
         });
+    }
+
+    private getSatellites() {
+        if (this.user?.username) {
+            this.satelliteSub = this.satelliteService
+                .getSatellitesOfUserWithUsername(this.user.username)
+                .subscribe((satellites) => {
+                    console.log(satellites);
+                    if (satellites) this.satellites = satellites;
+                });
+        }
     }
 
     removeUser(id: Id) {
