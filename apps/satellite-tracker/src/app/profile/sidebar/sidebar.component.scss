@@ -1,10 +1,23 @@
 .side-bar-container {
-    padding: 20px;
+    padding: 0px;
     width: 100%;
 }
 
+.side-bar-header {
+    padding: 20px;
+}
+
 .side-bar-content-item {
-    padding: 10px 0px;
+    padding: 10px 20px;
     width: 100%;
     cursor: pointer;
+}
+
+.active {
+    color: #fff;
+}
+
+div:has(> a.active) {
+    background-color: #303030;
+    color: #fff;
 }

@@ -76,9 +76,9 @@
         <!-- eccentricity -->
         <div class="label-container">
             <label class="label" for="eccentricity-slider">Eccentricity (e)</label>
-            <span class="label-value" id="eccentricity-value">{{ satellite.orbit!.eccentricity }}</span>
+            <span class="label-value" id="eccentricity-value">{{ satellite.orbit!.eccentricity?.toFixed(3) }}</span>
         </div>
-        <mat-slider class="slider" id="mat-eccentricity-slider" step="0.01" min="0" max="1" discrete="true">
+        <mat-slider class="slider" id="mat-eccentricity-slider" step="0.005" min="0" [max]="maxEcc" discrete="true">
             <input
                 matSliderThumb
                 name="eccentricity-slider"

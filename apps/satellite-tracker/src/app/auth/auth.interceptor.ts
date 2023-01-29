@@ -7,7 +7,7 @@ import {
     HttpErrorResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, switchMap, tap, throwError } from 'rxjs';
+import { catchError, Observable, switchMap, throwError } from 'rxjs';
 import { AuthService } from './auth.service';
 
 @Injectable()
@@ -38,12 +38,12 @@ export class AuthInterceptor implements HttpInterceptor {
 
     private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return this.authService.refreshToken().pipe(
-            switchMap((result) => {
-                console.log(result);
-                if (result) {
-                    if (result.accessToken) {
+            switchMap((res) => {
+                console.log(res);
+                if (res) {
+                    if (res.result.accessToken) {
                         return next.handle(
-                            request.clone({ setHeaders: { Authorization: `Bearer ${result.accessToken}` } })
+                            request.clone({ setHeaders: { Authorization: `Bearer ${res.result.accessToken}` } })
                         );
                     } else {
                         return throwError(() => new Error('Could not refresh token'));

@@ -38,6 +38,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 const materialModules = [
     MatToolbarModule,
@@ -60,6 +61,7 @@ const materialModules = [
     MatSnackBarModule,
     MatBadgeModule,
     MatTabsModule,
+    MatProgressBarModule,
 ];
 
 import { LoginComponent } from './auth/login/login.component';
@@ -75,6 +77,7 @@ import { SidebarComponent } from './profile/sidebar/sidebar.component';
 import { SatelliteComponent } from './pages/satellite/satellite.component';
 import { FeedComponent } from './pages/dashboard/feed/feed.component';
 import { DiscoverComponent } from './pages/dashboard/discover/discover.component';
+import { DeleteDialogComponent } from './utils/delete-dialog/delete-dialog.component';
 
 @NgModule({
     declarations: [
@@ -100,6 +103,7 @@ import { DiscoverComponent } from './pages/dashboard/discover/discover.component
         SatelliteComponent,
         FeedComponent,
         DiscoverComponent,
+        DeleteDialogComponent,
     ],
     imports: [
         BrowserModule,

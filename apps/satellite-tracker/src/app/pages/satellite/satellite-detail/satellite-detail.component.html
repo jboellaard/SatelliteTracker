@@ -37,6 +37,7 @@
                 <mat-icon>delete</mat-icon> Remove orbit
             </button>
         </div>
+        <div id="canvas-wrapper" style="width: 100%"><canvas style="width: 100%"></canvas></div>
     </div>
     <div *ngIf="!satellite.orbit">
         <div *ngIf="canEdit" class="buttons">
@@ -44,7 +45,8 @@
         </div>
     </div>
     <br />
-    <div id="canvas-wrapper" style="width: 100%"><canvas style="width: 100%"></canvas></div>
 </div>
-
-<ng-template #loadingMessage><div>Loading Data Service ...</div></ng-template>
+<ng-template #loadingMessage>
+    <mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar>
+    <div>Loading Data Service ...</div></ng-template
+>

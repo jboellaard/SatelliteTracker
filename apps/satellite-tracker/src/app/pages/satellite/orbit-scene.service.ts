@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { IOrbit } from 'shared/domain';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -12,6 +12,7 @@ export class OrbitService {
     scale = 0.0001;
     moonRadius = 1737.4;
 
+    renderer: THREE.WebGLRenderer | undefined;
     ellipseObject = new THREE.Object3D();
     ellipse = new THREE.Line();
     ellipseCurve = new THREE.EllipseCurve(0, 0, 1, 1, 0, 2 * Math.PI, false, 0);
@@ -31,28 +32,19 @@ export class OrbitService {
     createOrbitScene(container: Element, orbit: IOrbit, color: string = '#000000') {
         console.log(orbit);
         const scene = new THREE.Scene();
-        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas: container });
-        // renderer.setSize(container.clientWidth, container.clientHeight);
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas: container });
         const width = container.clientWidth;
         const height = container.clientHeight;
-        renderer.setSize(width, height);
-        // renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(width, height);
 
         this.createCamera();
         this.camera.aspect = width / height;
         let camera = this.camera;
 
-        const controls = this.createControls(camera, renderer);
+        const controls = this.createControls(camera, this.renderer);
 
-        const bgTexture = new THREE.TextureLoader().load('assets/images/background3.jpg');
-        bgTexture.repeat.set(16, 16);
-        bgTexture.wrapS = THREE.RepeatWrapping;
-        bgTexture.wrapT = THREE.RepeatWrapping;
-        const sphereGeometry = new THREE.SphereGeometry(1000, 32, 32);
-        sphereGeometry.scale(-1, 1, 1);
-        const sphereMaterial = new THREE.MeshBasicMaterial({ map: bgTexture });
-        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-        scene.add(sphere);
+        let background = this.createBackground();
+        scene.add(background);
 
         const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
         directionalLight.position.set(50, 0, 0);
@@ -98,8 +90,8 @@ export class OrbitService {
             camera.position.set(-2.2 * cameraPos, 1.2 * cameraPos, 1.2 * cameraPos);
             directionalLight.position.set(50 + cameraPos, 0, 0);
 
-            sphere.geometry = new THREE.SphereGeometry(cameraPos + 700, 32, 32);
-            sphere.geometry.scale(-1, 1, 1);
+            background.geometry = new THREE.SphereGeometry(cameraPos + 700, 32, 32);
+            background.geometry.scale(-1, 1, 1);
             camera.far = cameraPos * 2 + 1100;
 
             satelliteMesh.scale.setScalar(cameraPos * 1.1);
@@ -175,7 +167,7 @@ export class OrbitService {
             earth.rotation.y += earthRotation;
 
             controls.update();
-            renderer.render(scene, camera);
+            this.renderer!.render(scene, camera);
         };
 
         animate();
@@ -194,7 +186,20 @@ export class OrbitService {
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableZoom = false;
         controls.enablePan = true;
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.1;
         return controls;
+    }
+
+    private createBackground() {
+        const bgTexture = new THREE.TextureLoader().load('assets/images/background3.jpg');
+        bgTexture.repeat.set(16, 16);
+        bgTexture.wrapS = THREE.RepeatWrapping;
+        bgTexture.wrapT = THREE.RepeatWrapping;
+        const sphereGeometry = new THREE.SphereGeometry(1000, 32, 32);
+        sphereGeometry.scale(-1, 1, 1);
+        const sphereMaterial = new THREE.MeshBasicMaterial({ map: bgTexture });
+        return new THREE.Mesh(sphereGeometry, sphereMaterial);
     }
 
     private createEarth() {

@@ -11,6 +11,7 @@ import { SatelliteService } from '../satellite.service';
     selector: 'app-satellite-detail',
     templateUrl: './satellite-detail.component.html',
     styleUrls: ['./satellite-detail.component.scss'],
+    providers: [OrbitService],
 })
 export class SatelliteDetailComponent implements OnInit {
     userId: Id | undefined;

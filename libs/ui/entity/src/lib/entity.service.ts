@@ -1,7 +1,7 @@
 import { IEntity } from './entity.interface';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, tap } from 'rxjs/operators';
 import { APIResponse, Id } from 'shared/domain';
 
 const httpOptions = {
@@ -12,6 +12,12 @@ const httpOptions = {
 // Generic service for all entities
 export class EntityService<T extends IEntity> {
     constructor(protected readonly http: HttpClient, public readonly url: string, public readonly endpoint: string) {}
+
+    private _refreshRequired = new Subject<void>();
+
+    getRefreshRequired() {
+        return this._refreshRequired;
+    }
 
     public getAll(options?: any): Observable<T[] | undefined> {
         return this.http
@@ -35,6 +41,9 @@ export class EntityService<T extends IEntity> {
         return this.http
             .post<APIResponse<T | undefined>>(`${this.url}${this.endpoint}`, item, { ...options, ...httpOptions })
             .pipe(
+                tap(() => {
+                    this._refreshRequired.next();
+                }),
                 map((response: any) => response.result),
                 catchError(this.handleError)
             );
@@ -47,6 +56,9 @@ export class EntityService<T extends IEntity> {
                 ...httpOptions,
             })
             .pipe(
+                tap(() => {
+                    this._refreshRequired.next();
+                }),
                 map((response: any) => response.result),
                 catchError(this.handleError)
             );
@@ -56,6 +68,9 @@ export class EntityService<T extends IEntity> {
         return this.http
             .delete<APIResponse<T | undefined>>(`${this.url}${this.endpoint}/${id}`, { ...options, ...httpOptions })
             .pipe(
+                tap(() => {
+                    this._refreshRequired.next();
+                }),
                 map((response: any) => response.result),
                 catchError(this.handleError)
             );

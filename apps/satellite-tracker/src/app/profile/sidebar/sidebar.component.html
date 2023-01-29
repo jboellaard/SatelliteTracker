@@ -4,6 +4,7 @@
             <div class="side-bar-header-title">
                 <h3>Dashboard</h3>
             </div>
+            <mat-icon>portrait</mat-icon>
         </div>
         <div class="side-bar-content">
             <!-- <div class="side-bar-content-item">
@@ -31,7 +32,7 @@
                 </button>
             </div> -->
         </div>
-        <mat-icon>portrait</mat-icon>
+
         <div *ngFor="let satellite of satellites">
             <a routerLink="/users/{{ user?.username }}/satellites/{{ satellite.id }}" routerLinkActive="active">
                 <div class="side-bar-content-item">

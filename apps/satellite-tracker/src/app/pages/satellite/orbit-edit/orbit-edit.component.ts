@@ -10,6 +10,7 @@ import { SatelliteService } from '../satellite.service';
     selector: 'app-orbit-edit',
     templateUrl: './orbit-edit.component.html',
     styleUrls: ['./orbit-edit.component.scss'],
+    providers: [OrbitService],
 })
 export class OrbitEditComponent implements OnInit {
     orbit = {
@@ -39,6 +40,7 @@ export class OrbitEditComponent implements OnInit {
 
     scene = false;
     minAltitude = 0;
+    maxEcc = 1;
     constructor(
         public orbitService: OrbitService,
         private router: Router,
@@ -47,6 +49,9 @@ export class OrbitEditComponent implements OnInit {
         private snackBar: SnackBarService
     ) {
         this.minAltitude = this.orbitService.earthRadius + 30;
+        console.log(1 - this.minAltitude / this.orbitService.maxSMAEarth);
+        this.maxEcc = Math.floor(1000 * (1 - this.minAltitude / this.orbitService.maxSMAEarth)) / 1000;
+        console.log(this.maxEcc);
     }
 
     ngOnInit(): void {
@@ -90,6 +95,7 @@ export class OrbitEditComponent implements OnInit {
             document
                 .querySelector('input#semimajoraxis')!
                 .setAttribute('maxlength', this.orbitService.maxSMAEarth.toFixed(0).length.toString());
+            document.querySelector('input#eccentricity-slider')!.setAttribute('max', this.maxEcc.toFixed(3));
         }, 0);
     }
 
@@ -105,49 +111,31 @@ export class OrbitEditComponent implements OnInit {
         return Math.round(minSemiMajorAxis);
     }
 
-    getMaxEccentricity() {
-        if (this.satellite.orbit) {
-            return Math.max(
-                1 - this.minAltitude / this.satellite.orbit.semiMajorAxis,
-                1 /
-                    Math.sqrt(
-                        (this.satellite.orbit.semiMajorAxis /
-                            (this.satellite.orbit.semiMajorAxis - this.minAltitude)) **
-                            2 +
-                            1
-                    )
-            );
-        }
-        return 1;
-    }
-
     changeEccentricity() {
         if (this.satellite.orbit) {
-            const maxEccentricity = this.getMaxEccentricity();
             if (!this.satellite.orbit.eccentricity) this.satellite.orbit.eccentricity = 0;
             const minSMA = this.getMinSemiMajorAxis();
             let sma = this.satellite.orbit.semiMajorAxis;
             if (minSMA == Infinity || minSMA > this.orbitService.maxSMAEarth) {
                 sma = this.orbitService.maxSMAEarth;
-                this.satellite.orbit.eccentricity = maxEccentricity;
+                this.satellite.orbit.eccentricity = this.maxEcc;
             } else if (sma < minSMA) {
                 sma = minSMA;
             }
 
             this.satellite.orbit.semiMajorAxis = sma;
-            this.changeOrbitSize(maxEccentricity, minSMA);
+            this.changeOrbitSize(minSMA);
         }
     }
 
     changeSemimajorAxis() {
         if (this.satellite.orbit) {
-            const maxEccentricity = this.getMaxEccentricity();
             this.satellite.orbit.semiMajorAxis = Math.round(this.satellite.orbit.semiMajorAxis);
             if (!this.satellite.orbit.eccentricity) this.satellite.orbit.eccentricity = 0;
-            if (this.satellite.orbit.eccentricity > maxEccentricity) {
-                this.satellite.orbit.eccentricity = Number(maxEccentricity.toFixed(2));
+            if (this.satellite.orbit.eccentricity > this.maxEcc) {
+                this.satellite.orbit.eccentricity = Number(this.maxEcc.toFixed(3));
             }
-            this.changeOrbitSize(maxEccentricity);
+            this.changeOrbitSize();
         }
     }
 
@@ -155,11 +143,13 @@ export class OrbitEditComponent implements OnInit {
         return Number((getPeriod(sma * 1000) / (24 * 60 * 60)).toFixed(3));
     }
 
-    changeOrbitSize(maxEccentricity = this.getMaxEccentricity(), minSMA = this.getMinSemiMajorAxis()) {
+    changeOrbitSize(minSMA = this.getMinSemiMajorAxis()) {
         if (this.satellite.orbit) {
-            document
-                .querySelector('mat-slider#mat-eccentricity-slider')!
-                .setAttribute('max', maxEccentricity.toString());
+            if (this.satellite.orbit.semiMajorAxis < minSMA) {
+                this.satellite.orbit.semiMajorAxis = minSMA;
+            } else if (this.satellite.orbit.semiMajorAxis > this.orbitService.maxSMAEarth) {
+                this.satellite.orbit.semiMajorAxis = this.orbitService.maxSMAEarth;
+            }
             document.querySelector('input#semimajoraxis')!.setAttribute('min', minSMA.toFixed(0));
 
             this.satellite.orbit.period = this.getPeriodOrbit(this.satellite.orbit.semiMajorAxis);
