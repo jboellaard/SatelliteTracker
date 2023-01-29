@@ -72,6 +72,9 @@ import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.comp
 import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
 import { ProfileComponent } from './profile/profile.component';
 import { SidebarComponent } from './profile/sidebar/sidebar.component';
+import { SatelliteComponent } from './pages/satellite/satellite.component';
+import { FeedComponent } from './pages/dashboard/feed/feed.component';
+import { DiscoverComponent } from './pages/dashboard/discover/discover.component';
 
 @NgModule({
     declarations: [
@@ -94,6 +97,9 @@ import { SidebarComponent } from './profile/sidebar/sidebar.component';
         PageNotFoundComponent,
         ProfileComponent,
         SidebarComponent,
+        SatelliteComponent,
+        FeedComponent,
+        DiscoverComponent,
     ],
     imports: [
         BrowserModule,

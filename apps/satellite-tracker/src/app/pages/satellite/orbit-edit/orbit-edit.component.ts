@@ -44,7 +44,7 @@ export class OrbitEditComponent implements OnInit {
         private router: Router,
         private route: ActivatedRoute,
         private satelliteService: SatelliteService,
-        private snachBarService: SnackBarService
+        private snackBar: SnackBarService
     ) {
         this.minAltitude = this.orbitService.earthRadius + 30;
     }
@@ -64,12 +64,12 @@ export class OrbitEditComponent implements OnInit {
                         }
                         this.addOrbitScene();
                     } else {
-                        this.snachBarService.error('Could not find a satellite with this id');
+                        this.snackBar.error('Could not find a satellite with this id');
                         this.router.navigate(['../'], { relativeTo: this.route });
                     }
                 });
             } else {
-                this.snachBarService.error('Could not find a satellite with this id');
+                this.snackBar.error('Could not find a satellite with this id');
                 this.router.navigate(['../'], { relativeTo: this.route });
             }
         });
@@ -176,5 +176,41 @@ export class OrbitEditComponent implements OnInit {
 
     dateChanged(date: string): Date {
         return new Date(date);
+    }
+
+    onSubmit() {
+        console.log('Submitting the form');
+        if (this.componentExists) {
+            this.satelliteService.updateOrbit(this.satellite._id!, this.satellite.orbit!).subscribe((satellite) => {
+                if (satellite) {
+                    this.snackBar.success('Orbit updated successfully');
+                    this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                } else {
+                    this.snackBar.error('Orbit could not be updated');
+                }
+            });
+        } else {
+            this.satelliteService.addOrbit(this.satellite._id!, this.satellite.orbit!).subscribe((satellite) => {
+                if (satellite) {
+                    this.snackBar.success('Orbit created successfully');
+                    this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                } else {
+                    this.snackBar.error('Orbit could not be created');
+                }
+            });
+        }
+    }
+
+    backClicked() {
+        if (this.componentExists) {
+            this.router.navigate(['/users/' + this.username + '/satellites/' + this.id]);
+        } else {
+            this.router.navigate(['/users/' + this.username]);
+        }
+    }
+
+    ngOnDestroy() {
+        if (this.paramSub) this.paramSub.unsubscribe();
+        if (this.satelliteSub) this.satelliteSub.unsubscribe();
     }
 }

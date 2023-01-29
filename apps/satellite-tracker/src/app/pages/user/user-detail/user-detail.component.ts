@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { Id, ISatellite, IUser } from 'shared/domain';
+import { SnackBarService } from '../../../utils/snack-bar.service';
 import { SatelliteService } from '../../satellite/satellite.service';
 import { UserService } from '../user.service';
 
@@ -28,11 +29,11 @@ export class UserDetailComponent implements OnInit {
         private router: Router,
         public userService: UserService,
         public satelliteService: SatelliteService,
-        private breakpointObserver: BreakpointObserver
+        private breakpointObserver: BreakpointObserver,
+        private snackBarService: SnackBarService
     ) {}
 
     ngOnInit(): void {
-        console.log('UserDetailComponent.ngOnInit()');
         this.route.paramMap.subscribe((params) => {
             this.username = params.get('username');
             if (this.username) {
@@ -47,10 +48,13 @@ export class UserDetailComponent implements OnInit {
                                 console.log(satellites);
                                 if (satellites) this.satellites = satellites;
                             });
-                    } else this.router.navigate(['/users/new']);
+                    } else {
+                        this.snackBarService.error('Could not find this users');
+                        this.router.navigate(['/home']);
+                    }
                 });
             } else {
-                this.router.navigate(['/users/new']);
+                this.router.navigate(['home']);
             }
         });
 
@@ -71,7 +75,7 @@ export class UserDetailComponent implements OnInit {
 
     removeUser(id: Id) {
         this.userService.delete(id);
-        this.router.navigate(['/users']);
+        this.router.navigate(['/users']); // only for admin
     }
 
     removeSatellite(id: Id) {

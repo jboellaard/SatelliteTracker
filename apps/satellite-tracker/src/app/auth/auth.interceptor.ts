@@ -38,17 +38,18 @@ export class AuthInterceptor implements HttpInterceptor {
 
     private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return this.authService.refreshToken().pipe(
-            switchMap((res) => {
-                if (res) {
-                    if (res.result.accessToken) {
+            switchMap((result) => {
+                console.log(result);
+                if (result) {
+                    if (result.accessToken) {
                         return next.handle(
-                            request.clone({ setHeaders: { Authorization: `Bearer ${res.accessToken}` } })
+                            request.clone({ setHeaders: { Authorization: `Bearer ${result.accessToken}` } })
                         );
                     } else {
-                        return throwError(() => new Error('Could not refresh token, please login again'));
+                        return throwError(() => new Error('Could not refresh token'));
                     }
                 } else {
-                    return throwError(() => new Error('Refresh token is not valid'));
+                    return throwError(() => new Error('Could not refresh token'));
                 }
             })
         );

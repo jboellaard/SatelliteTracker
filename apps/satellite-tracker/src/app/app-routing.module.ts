@@ -18,24 +18,35 @@ import { OwnerAuthGuard } from './auth/owner-auth.guard';
 import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
 import { ProfileComponent } from './profile/profile.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { SatelliteComponent } from './pages/satellite/satellite.component';
 
 const routes: Routes = [
     { path: 'home', pathMatch: 'full', canActivate: [AuthGuard], component: DashboardComponent },
     { path: 'about', pathMatch: 'full', component: AboutComponent },
     { path: 'login', pathMatch: 'full', component: LoginComponent },
     { path: 'register', pathMatch: 'full', component: RegisterComponent },
-    { path: 'profile', pathMatch: 'full', canActivate: [OwnerAuthGuard], component: ProfileComponent },
-    { path: 'users', pathMatch: 'full', canActivate: [AdminAuthGuard], component: UserListComponent },
+    { path: 'user-overview', pathMatch: 'full', canActivate: [AdminAuthGuard], component: UserListComponent },
     {
-        path: 'users/new',
+        path: 'profile',
         pathMatch: 'full',
-        canActivate: [AdminAuthGuard],
-        component: UserEditComponent,
+        canActivate: [OwnerAuthGuard],
+        component: ProfileComponent,
     },
     {
-        path: 'users/:username',
+        path: 'profile/edit',
         pathMatch: 'full',
-        component: UserDetailComponent,
+        canActivate: [OwnerAuthGuard],
+        component: ProfileComponent,
+    },
+    {
+        path: 'users',
+        children: [
+            { path: 'new', canActivate: [AdminAuthGuard], component: UserEditComponent },
+            {
+                path: ':username',
+                component: UserDetailComponent,
+            },
+        ],
     },
     {
         path: 'users/:username/edit',
@@ -45,14 +56,13 @@ const routes: Routes = [
     },
     {
         path: 'users/:username/satellites',
-        pathMatch: 'full',
-        component: SatelliteListComponent,
-    },
-    {
-        path: 'users/:username/satellites/new',
-        pathMatch: 'full',
-        canActivate: [OwnerAuthGuard],
-        component: SatelliteEditComponent,
+        children: [
+            { path: 'new', canActivate: [OwnerAuthGuard], component: SatelliteEditComponent },
+            {
+                path: ':satelliteId',
+                component: SatelliteDetailComponent,
+            },
+        ],
     },
     {
         path: 'users/:username/satellites/:satelliteId/edit',
@@ -66,16 +76,48 @@ const routes: Routes = [
         canActivate: [OwnerAuthGuard],
         component: OrbitEditComponent,
     },
-    { path: 'users/:username/satellites/:satelliteId', pathMatch: 'full', component: SatelliteDetailComponent },
+
     // {
-    //   path: 'columns',
-    //   component: ColumnsComponent,
-    //   children: [
-    //     { path: 'new', pathMatch: 'full', component: EditComponent },
-    //     { path: ':id', pathMatch: 'full', component: DetailComponent },
-    //     { path: ':id/edit', pathMatch: 'full', component: EditComponent },
-    //   ],
+    //     path: 'users/new',
+    //     pathMatch: 'full',
+    //     canActivate: [AdminAuthGuard],
+    //     component: UserEditComponent,
     // },
+    // {
+    //     path: 'users/:username',
+    //     pathMatch: 'full',
+    //     component: UserDetailComponent,
+    // },
+    // {
+    //     path: 'users/:username/edit',
+    //     pathMatch: 'full',
+    //     canActivate: [AdminAuthGuard],
+    //     component: UserEditComponent,
+    // },
+    // {
+    //     path: 'users/:username/satellites',
+    //     pathMatch: 'full',
+    //     component: SatelliteListComponent,
+    // },
+    // {
+    //     path: 'users/:username/satellites/new',
+    //     pathMatch: 'full',
+    //     canActivate: [OwnerAuthGuard],
+    //     component: SatelliteEditComponent,
+    // },
+    // {
+    //     path: 'users/:username/satellites/:satelliteId/edit',
+    //     pathMatch: 'full',
+    //     canActivate: [OwnerAuthGuard],
+    //     component: SatelliteEditComponent,
+    // },
+    // {
+    //     path: 'users/:username/satellites/:satelliteId/orbit',
+    //     pathMatch: 'full',
+    //     canActivate: [OwnerAuthGuard],
+    //     component: OrbitEditComponent,
+    // },
+    // { path: 'users/:username/satellites/:satelliteId', pathMatch: 'full', component: SatelliteDetailComponent },
     { path: '', pathMatch: 'full', redirectTo: 'home' },
     { path: '**', component: PageNotFoundComponent },
 ];

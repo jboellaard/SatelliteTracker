@@ -323,7 +323,8 @@ export class SatelliteService {
                     createdBy: createdBy.username,
                     satelliteName: satellite.satelliteName,
                 });
-                return { status: HttpStatus.OK, result: result };
+                console.log(result);
+                return { status: HttpStatus.OK, result: { message: 'Satellite tracked.' } };
             } catch (error) {
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
                 return new HttpException('Could not track satellite', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -343,7 +344,8 @@ export class SatelliteService {
                     createdBy: createdBy.username,
                     satelliteName: satellite.satelliteName,
                 });
-                return { status: HttpStatus.OK, result: result };
+                console.log(result);
+                return { status: HttpStatus.OK, result: { message: 'No longer tracking this satellite' } };
             } catch (error) {
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
                 return new HttpException('Could not track satellite', HttpStatus.INTERNAL_SERVER_ERROR);

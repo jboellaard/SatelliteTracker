@@ -150,10 +150,11 @@ export class OrbitService {
             pos.applyAxisAngle(xDirection, Math.PI / 2);
             if (orbit.inclination != 0)
                 pos.applyAxisAngle(yDirection, orbit.longitudeOfAscendingNode! * (Math.PI / 180));
+            else pos.applyAxisAngle(yDirection, 0);
             return pos;
         };
 
-        const animate = function () {
+        const animate = () => {
             requestAnimationFrame(animate);
             if (!orbit.eccentricity) orbit.eccentricity = 0;
             if (!orbit.inclination) orbit.inclination = 0;
@@ -275,7 +276,8 @@ export class OrbitService {
         this.ellipse.rotation.z = orbit.argumentOfPerigee * (Math.PI / 180) - Math.PI / 2;
         this.ellipse.rotation.y = Math.PI + orbit.inclination * (Math.PI / 180);
 
-        this.ellipseObject.rotation.z = -orbit.longitudeOfAscendingNode * (Math.PI / 180);
+        if (orbit.inclination != 0) this.ellipseObject.rotation.z = -orbit.longitudeOfAscendingNode * (Math.PI / 180);
+        else this.ellipseObject.rotation.z = 0;
         this.ellipseObject.rotation.x = Math.PI / 2;
     }
 

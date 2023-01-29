@@ -46,7 +46,7 @@ export class UserListComponent implements OnInit, OnDestroy {
     }
 
     removeUser(username: string) {
-        this.userService.delete(username).subscribe(() => this.router.navigate(['/users']));
+        this.userService.delete(username).subscribe(() => this.router.navigate(['/user-overview'])); // only for admin
         this.sub = this.userService.getAll().subscribe((users) => {
             if (users) this.usersArray = users.sort((a, b) => (a.createdAt! < b.createdAt! ? 1 : -1));
         });

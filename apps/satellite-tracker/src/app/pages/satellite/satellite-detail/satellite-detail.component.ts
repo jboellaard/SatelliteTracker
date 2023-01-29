@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { Id, ISatellite } from 'shared/domain';
 import { AuthService } from '../../../auth/auth.service';
 import { UserService } from '../../user/user.service';
+import { OrbitService } from '../orbit-scene.service';
 import { SatelliteService } from '../satellite.service';
 
 @Component({
@@ -25,6 +26,7 @@ export class SatelliteDetailComponent implements OnInit {
         private router: Router,
         public userService: UserService,
         public satelliteService: SatelliteService,
+        private orbitService: OrbitService,
         private authService: AuthService
     ) {}
 
@@ -45,12 +47,28 @@ export class SatelliteDetailComponent implements OnInit {
                         if (this.satellite.createdBy == this.userId) {
                             this.canEdit = true;
                         }
+                        if (this.satellite.orbit) {
+                            this.addOrbitScene();
+                        }
                     } else this.router.navigate([`/users/${this.username}/satellites/`]);
                 });
             } else {
                 this.router.navigate([`/users/${this.username}/satellites/`]);
             }
         });
+    }
+
+    addOrbitScene() {
+        if (this.satellite?.orbit && this.satellite?.colorOfBase) {
+            setTimeout(() => {
+                let canvas = document.querySelector('#canvas-wrapper canvas');
+                this.orbitService.createOrbitScene(
+                    canvas ? canvas : document.body,
+                    this.satellite?.orbit!,
+                    this.satellite?.colorOfBase
+                );
+            }, 0);
+        }
     }
 
     removeSatellite(id: Id) {

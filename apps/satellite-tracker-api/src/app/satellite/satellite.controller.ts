@@ -82,4 +82,11 @@ export class SatelliteController {
         this.logger.log('POST satellites/:id/track called');
         return await this.satelliteService.trackSatellite(req.user.userId, id);
     }
+
+    @UseGuards(AccessJwtAuthGuard)
+    @Delete(':id/track')
+    async untrackSatellite(@Request() req: any, @Param('id') id: string) {
+        this.logger.log('DELETE satellites/:id/track called');
+        return await this.satelliteService.untrackSatellite(req.user.userId, id);
+    }
 }

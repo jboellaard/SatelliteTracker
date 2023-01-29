@@ -107,6 +107,7 @@ export class FeedService {
                     shapeOfBase: { $first: '$shapeOfBase' },
                     purpose: { $first: '$purpose' },
                     createdBy: { $first: '$createdBy' },
+                    createdAt: { $first: '$createdAt' },
                     updatedAt: { $first: '$updatedAt' },
                     orbit: { $first: '$orbit' },
                     // satelliteParts: { $push: '$satelliteParts' },

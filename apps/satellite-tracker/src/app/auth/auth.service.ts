@@ -62,7 +62,6 @@ export class AuthService {
                     localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
                     return of(res.result.user);
                 } else {
-                    // this.snackBar.error(res.message);
                     if (res.status === 401)
                         return of(
                             "Invalid username or password, please try again or register if you don't have an account yet."
@@ -72,7 +71,6 @@ export class AuthService {
             }),
             catchError((err) => {
                 console.log('Error logging in:', err);
-                // this.snackBar.error('Login failed, please try again later');
                 return of('Something went wrong, please try again later.');
             })
         );
@@ -129,7 +127,7 @@ export class AuthService {
     }
 
     isLoggedIn(): boolean {
-        return new Date(JSON.parse(localStorage.getItem('expires_at') || '')).valueOf() > new Date().valueOf();
+        return new Date(JSON.parse(localStorage.getItem('expires_at') || '{}')).valueOf() > new Date().valueOf();
     }
 
     isLoggedOut(): boolean {
@@ -149,19 +147,21 @@ export class AuthService {
             })
             .pipe(
                 tap((res) => {
+                    console.log(res);
                     if (res.result.accessToken) {
                         localStorage.setItem('access_token', res.result.accessToken);
                         localStorage.setItem('refresh_token', res.result.refreshToken);
                         this.user$.next(res.result.user);
                         const expiresAt = this.getExpirationDate(res.result.refreshTokenExpiresIn);
                         localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
+                        return of(res.result);
                     }
-                    console.log(res.result);
-                    return of(res.result);
+                    this.snackBar.error('Something went wrong, please try again later');
+                    return of(undefined);
                 }),
                 catchError((err) => {
                     console.log('refresh error', err);
-                    return of(err);
+                    return of(undefined);
                 })
             );
     }
