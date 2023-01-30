@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { UserIdentity } from 'shared/domain';
 import { AuthService } from './auth/auth.service';
 
@@ -11,11 +12,15 @@ export class AppComponent implements OnInit {
     title = 'satellite-tracker';
     user: UserIdentity | undefined;
 
-    constructor(public authService: AuthService) {}
+    constructor(public authService: AuthService, private router: Router) {}
 
     ngOnInit(): void {
         this.authService.getUser().subscribe((user) => {
             this.user = user;
         });
+    }
+
+    hideSidebar(route: string) {
+        return this.router.url.includes(route);
     }
 }

@@ -13,7 +13,7 @@ const httpOptions = {
 export class EntityService<T extends IEntity> {
     constructor(protected readonly http: HttpClient, public readonly url: string, public readonly endpoint: string) {}
 
-    private _refreshRequired = new Subject<void>();
+    protected _refreshRequired = new Subject<void>();
 
     getRefreshRequired() {
         return this._refreshRequired;

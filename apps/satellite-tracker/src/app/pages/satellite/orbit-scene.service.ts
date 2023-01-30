@@ -186,14 +186,12 @@ export class OrbitService {
         const controls = new OrbitControls(camera, renderer.domElement);
         controls.enableZoom = false;
         controls.enablePan = true;
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.1;
         return controls;
     }
 
     private createBackground() {
         const bgTexture = new THREE.TextureLoader().load('assets/images/background3.jpg');
-        bgTexture.repeat.set(16, 16);
+        bgTexture.repeat.set(12, 12);
         bgTexture.wrapS = THREE.RepeatWrapping;
         bgTexture.wrapT = THREE.RepeatWrapping;
         const sphereGeometry = new THREE.SphereGeometry(1000, 32, 32);

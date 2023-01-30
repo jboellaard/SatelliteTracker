@@ -10,8 +10,12 @@
     max-width: 100%;
 }
 
-.slider,
-.between-sliders {
+.slider {
     width: 96%;
     margin: 0 2%;
+}
+
+.between-sliders {
+    // width: 100%;
+    margin: 0 10px;
 }
