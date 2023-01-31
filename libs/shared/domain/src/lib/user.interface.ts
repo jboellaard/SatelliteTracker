@@ -18,6 +18,11 @@ export interface IUser extends IUserInfo {
     followerCount?: number;
 }
 
+export interface AdminUserInfo extends IUserInfo {
+    emailAddress: string;
+    roles: string[];
+}
+
 export interface ILocation {
     coordinates?: {
         longitude: number;

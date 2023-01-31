@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { IUser } from 'shared/domain';
+import { AdminUserInfo, IUser, UserIdentity } from 'shared/domain';
 import { UserService } from '../user.service';
 import { BreakpointObserver } from '@angular/cdk/layout';
 
@@ -12,32 +12,42 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 })
 export class UserListComponent implements OnInit, OnDestroy {
     // users: Observable<User[]> | undefined;
-    usersArray: IUser[] = [];
-    displayedColumns: string[] = ['name', 'latitude', 'longitude', 'createdAt', 'buttons'];
-    sub!: Subscription;
+    usersArray: AdminUserInfo[] = [];
+    displayedColumns: string[] = ['name', 'email', 'roles', 'createdAt', 'buttons'];
+    userSub!: Subscription;
 
-    constructor(
-        private userService: UserService,
-        private router: Router,
-        private breakpointObserver: BreakpointObserver
-    ) {}
+    constructor(private userService: UserService, private breakpointObserver: BreakpointObserver) {}
 
     ngOnInit(): void {
-        this.sub = this.userService.getAll().subscribe((users) => {
-            if (users) this.usersArray = users.sort((a, b) => (a.createdAt! < b.createdAt! ? 1 : -1));
+        this.getUsers();
+
+        this.userService.getRefreshRequired().subscribe(() => {
+            this.getUsers();
         });
-        this.breakpointObserver.observe(['(max-width: 650px)']).subscribe((result) => {
+        this.breakpointObserver.observe(['(max-width: 790px)']).subscribe((result) => {
             if (result.matches) {
                 this.displayedColumns = ['name', 'buttons'];
             } else {
-                this.breakpointObserver.observe(['(max-width: 800px)']).subscribe((result) => {
+                this.breakpointObserver.observe(['(max-width: 1000px)']).subscribe((result) => {
                     if (result.matches) {
-                        this.displayedColumns = ['name', 'latitude', 'longitude', 'buttons'];
+                        this.displayedColumns = ['name', 'email', 'buttons'];
                     } else {
-                        this.displayedColumns = ['name', 'latitude', 'longitude', 'createdAt', 'buttons'];
+                        this.breakpointObserver.observe(['(max-width: 1100px)']).subscribe((result) => {
+                            if (result.matches) {
+                                this.displayedColumns = ['name', 'email', 'createdAt', 'buttons'];
+                            } else {
+                                this.displayedColumns = ['name', 'email', 'roles', 'createdAt', 'buttons'];
+                            }
+                        });
                     }
                 });
             }
+        });
+    }
+
+    private getUsers() {
+        this.userSub = this.userService.getAllIdentities().subscribe((users) => {
+            if (users) this.usersArray = users.sort((a, b) => (a.createdAt! < b.createdAt! ? 1 : -1));
         });
     }
 
@@ -46,13 +56,13 @@ export class UserListComponent implements OnInit, OnDestroy {
     }
 
     removeUser(username: string) {
-        this.userService.delete(username).subscribe(() => this.router.navigate(['/user-overview'])); // only for admin
-        this.sub = this.userService.getAll().subscribe((users) => {
-            if (users) this.usersArray = users.sort((a, b) => (a.createdAt! < b.createdAt! ? 1 : -1));
-        });
+        // this.userService.delete(username).subscribe(() => this.router.navigate(['/user-overview'])); // TODO: implement reload required
+        // this.sub = this.userService.getAllIdentities().subscribe((users) => {
+        //     if (users) this.usersArray = users.sort((a, b) => (a.createdAt! < b.createdAt! ? 1 : -1));
+        // });
     }
 
     ngOnDestroy() {
-        this.sub.unsubscribe();
+        this.userSub.unsubscribe();
     }
 }

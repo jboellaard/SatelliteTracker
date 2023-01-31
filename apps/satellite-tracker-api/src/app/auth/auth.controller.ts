@@ -11,7 +11,7 @@ import {
     Logger,
     HttpException,
 } from '@nestjs/common';
-import { UserRegistration, Token, UserCredentials, APIResult, IUser, UserIdentity } from 'shared/domain';
+import { UserRegistration, Token, UserCredentials, APIResult, IUser, UserIdentity, AdminUserInfo } from 'shared/domain';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
@@ -91,6 +91,14 @@ export class AuthController {
     async getAll(): Promise<APIResult<IUser[]> | HttpException> {
         this.logger.log('GET users called');
         return await this.userService.findAll();
+    }
+
+    @UseGuards(AccessJwtAuthGuard, RolesGuard)
+    @Roles('admin')
+    @Get('identities')
+    async getAllIdentities(): Promise<APIResult<AdminUserInfo[]> | HttpException> {
+        this.logger.log('GET identities called');
+        return await this.authService.getAllIdentities();
     }
 
     @UseGuards(AccessJwtAuthGuard, RolesGuard)

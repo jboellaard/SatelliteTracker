@@ -11,13 +11,14 @@ app-footer {
     flex: 1 1 auto;
 }
 
-@media only screen and (min-width: 1180px) {
+@media only screen and (min-width: 1000px) {
     .page-content-with-dashboard {
-        grid-template-columns: 312px 1fr;
+        grid-template-columns: 270px 1fr;
     }
 
     .page-content-inner {
-        width: 868px;
+        width: 100%;
+        max-width: 900px;
         margin: auto;
     }
 }
@@ -30,7 +31,7 @@ app-sidebar {
     position: relative;
     height: 100%;
     background-color: #212121;
-    // z-index: 100;
+    z-index: 5;
     display: flex;
 }
 

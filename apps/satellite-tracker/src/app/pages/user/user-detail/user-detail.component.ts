@@ -20,6 +20,7 @@ export class UserDetailComponent implements OnInit {
     satelliteColumns: string[] = ['name', 'mass', 'radius', 'orbit', 'createdAt', 'updatedAt', 'buttons'];
     satellites: ISatellite[] = [];
     admin = false;
+    canEdit = false;
 
     userSub!: Subscription;
     satelliteSub!: Subscription;
@@ -30,7 +31,7 @@ export class UserDetailComponent implements OnInit {
         public userService: UserService,
         public satelliteService: SatelliteService,
         private breakpointObserver: BreakpointObserver,
-        private snackBarService: SnackBarService
+        private snackBar: SnackBarService
     ) {}
 
     ngOnInit(): void {
@@ -38,7 +39,6 @@ export class UserDetailComponent implements OnInit {
             this.username = params.get('username');
             if (this.username) {
                 this.userSub = this.userService.getById(this.username).subscribe((user) => {
-                    console.log(user);
                     if (user) {
                         this.user = user;
                         this.username = this.user.username;
@@ -48,7 +48,7 @@ export class UserDetailComponent implements OnInit {
                             this.getSatellites();
                         });
                     } else {
-                        this.snackBarService.error('Could not find this users');
+                        this.snackBar.error('Could not find this users');
                         this.router.navigate(['/home']);
                     }
                 });

@@ -5,7 +5,7 @@ import { Identity, IdentityDocument } from './schemas/identity.schema';
 import { User, UserDocument } from '../user/schemas/user.schema';
 import { hash, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { IUser, Token, UserIdentity, UserRegistration } from 'shared/domain';
+import { AdminUserInfo, IUser, Token, UserIdentity, UserRegistration } from 'shared/domain';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { AuthNeoQueries } from './neo4j/auth.cypher';
 
@@ -132,6 +132,20 @@ export class AuthService {
     async getIdentity(username: string): Promise<{ status: number; result: UserIdentity }> {
         const identity = await this.identityModel.findOne({ username: username }).select('-hash').exec();
         return { status: HttpStatus.OK, result: identity };
+    }
+
+    async getAllIdentities(): Promise<{ status: number; result: AdminUserInfo[] }> {
+        const identities = await this.identityModel.find().select('-hash').exec();
+        const users = await this.userModel.find().exec();
+        const adminInfoUsers = identities.map((identity) => {
+            const user = users.find((user) => user._id.toString() === identity.user.toString()).toObject() as IUser;
+            return {
+                ...user,
+                emailAddress: identity.emailAddress,
+                roles: identity.roles,
+            };
+        });
+        return { status: HttpStatus.OK, result: adminInfoUsers };
     }
 
     async updateIdentity(

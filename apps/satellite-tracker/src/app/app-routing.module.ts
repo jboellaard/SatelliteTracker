@@ -19,13 +19,23 @@ import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.co
 import { ProfileComponent } from './profile/profile.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { SatelliteComponent } from './pages/satellite/satellite.component';
+import { DiscoverComponent } from './pages/dashboard/discover/discover.component';
+import { FeedComponent } from './pages/dashboard/feed/feed.component';
 
 const routes: Routes = [
-    { path: 'home', pathMatch: 'full', canActivate: [AuthGuard], component: DashboardComponent },
+    { path: 'home', pathMatch: 'full', canActivate: [AuthGuard], component: DiscoverComponent },
+    { path: 'feed', pathMatch: 'full', canActivate: [AuthGuard], component: FeedComponent },
     { path: 'about', pathMatch: 'full', component: AboutComponent },
     { path: 'login', pathMatch: 'full', component: LoginComponent },
     { path: 'register', pathMatch: 'full', component: RegisterComponent },
     { path: 'user-overview', pathMatch: 'full', canActivate: [AdminAuthGuard], component: UserListComponent },
+    { path: 'user-overview/new', pathMatch: 'full', canActivate: [AdminAuthGuard], component: UserEditComponent },
+    {
+        path: 'user-overview/:username/edit',
+        pathMatch: 'full',
+        canActivate: [AdminAuthGuard],
+        component: UserEditComponent,
+    },
     {
         path: 'profile',
         pathMatch: 'full',
@@ -38,17 +48,7 @@ const routes: Routes = [
         canActivate: [OwnerAuthGuard],
         component: ProfileComponent,
     },
-    {
-        path: 'users/new',
-        canActivate: [AdminAuthGuard],
-        component: UserEditComponent,
-    },
-    {
-        path: 'users/:username/edit',
-        pathMatch: 'full',
-        canActivate: [AdminAuthGuard],
-        component: UserEditComponent,
-    },
+
     {
         path: 'users/:username/satellites/new',
         pathMatch: 'full',

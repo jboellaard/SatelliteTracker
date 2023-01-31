@@ -1,6 +1,10 @@
 <div class="component-container">
-    <h2>All current users</h2>
-
+    <div class="header" style="display: flex; justify-content: space-between">
+        <h2>All current users</h2>
+        <button mat-raised-button color="primary" [routerLink]="'new'" class="demo-button">
+            <mat-icon>add</mat-icon>Add user
+        </button>
+    </div>
     <div class="table-wrapper">
         <table mat-table [dataSource]="usersArray" class="mat-elevation-z8 demo-table">
             <caption style="visibility: hidden">
@@ -13,25 +17,19 @@
                 <td mat-cell *matCellDef="let user">{{ user.username }}</td>
             </ng-container>
 
-            <!-- Location latitude Column -->
-            <ng-container matColumnDef="latitude">
-                <th mat-header-cell *matHeaderCellDef>
-                    Location
-                    <div class="smalltext">Latitude</div>
-                </th>
+            <!-- Email Column -->
+            <ng-container matColumnDef="email">
+                <th mat-header-cell *matHeaderCellDef>Email</th>
                 <td mat-cell *matCellDef="let user">
-                    {{ user.location?.coordinates.latitude.toFixed(5) }}
+                    {{ user.emailAddress }}
                 </td>
             </ng-container>
 
-            <!-- Location longitude Column -->
-            <ng-container matColumnDef="longitude">
-                <th mat-header-cell *matHeaderCellDef>
-                    Location
-                    <div class="smalltext">Longitude</div>
-                </th>
+            <!-- Roles Column -->
+            <ng-container matColumnDef="roles">
+                <th mat-header-cell *matHeaderCellDef>Roles</th>
                 <td mat-cell *matCellDef="let user">
-                    {{ user.location?.coordinates.longitude.toFixed(5) }}
+                    {{ user.roles }}
                 </td>
             </ng-container>
 
@@ -47,21 +45,23 @@
             <ng-container matColumnDef="buttons">
                 <th mat-header-cell *matHeaderCellDef></th>
                 <td mat-cell class="icon" layout-align="center center" *matCellDef="let user">
-                    <button mat-flat-button color="accent" [routerLink]="user.username + '/edit'">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-flat-button color="warn" (click)="removeUser(user.username)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
+                    <div *ngIf="!user.roles.includes('admin')">
+                        <button
+                            mat-flat-button
+                            style="background-color: rgb(112, 112, 112)"
+                            [routerLink]="user.username + '/edit'"
+                        >
+                            <mat-icon>edit</mat-icon>
+                        </button>
+                        <button mat-flat-button color="warn" (click)="removeUser(user.username)">
+                            <mat-icon>delete</mat-icon>
+                        </button>
+                    </div>
                 </td>
             </ng-container>
 
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns" [routerLink]="row.username"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns" [routerLink]="['/users', row.username]"></tr>
         </table>
-    </div>
-
-    <div class="button-container">
-        <button mat-raised-button color="primary" [routerLink]="'new'" class="demo-button">Add user</button>
     </div>
 </div>

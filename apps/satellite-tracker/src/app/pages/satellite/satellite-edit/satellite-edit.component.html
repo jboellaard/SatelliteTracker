@@ -160,7 +160,13 @@
                     </mat-form-field>
                 </div>
             </div>
+
             <div id="satellite-parts">
+                <!-- <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title> Manage satellite parts</mat-panel-title>
+                    </mat-expansion-panel-header> -->
+
                 <div
                     cdkDropList
                     [cdkDropListData]="satellitePartNames"
@@ -168,7 +174,9 @@
                     (cdkDropListDropped)="drop($event)"
                 >
                     <div *ngFor="let part of satellite.satelliteParts" cdkDrag class="satellite-part-item">
-                        <div class="satellite-part-name">{{ part.satellitePart.partName }}</div>
+                        <div class="satellite-part-name">
+                            {{ part.satellitePart.partName }} {{ part.color }} {{ part.quantity }} {{ part.size }}
+                        </div>
                         <!-- <div class="satellite-part-function">{{ part.satellitePart.function }}</div>
                         <div class="satellite-part-size">{{ part.size }} m</div>
                         <div class="satellite-part-color">{{ part.color }}</div>
@@ -187,6 +195,7 @@
                         </div> -->
                     </div>
                 </div>
+                <!-- </mat-expansion-panel> -->
             </div>
         </div>
 

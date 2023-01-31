@@ -8,26 +8,28 @@ form {
     // display: flex;
 }
 
-form .cols-2-form {
-    display: flex;
-    justify-content: space-between;
-}
+// form .cols-2-form {
+//     display: flex;
+//     justify-content: space-between;
+// }
 
 #satellite-info {
-    // min-width: 150px;
-    // max-width: 500px;
-    width: 49%;
+    min-width: 150px;
+    max-width: 500px;
+    // width: 49%;
     margin: auto;
-    margin-right: 8px;
+    // margin-right: 8px;
 }
 
 #satellite-parts {
-    width: 49%;
+    width: 100%;
+    min-width: 150px;
+    max-width: 500px;
     max-height: 416px;
     display: inline-block;
     vertical-align: top;
     margin-bottom: 22px;
-    margin-left: 8px;
+    // margin-left: 8px;
 }
 
 .drop-list {
@@ -42,6 +44,7 @@ form .cols-2-form {
 
 .satellite-part-item {
     padding: 18px 10px;
+    width: 100%;
     border-bottom: 1px solid #969696;
     display: flex;
     flex-direction: row;
