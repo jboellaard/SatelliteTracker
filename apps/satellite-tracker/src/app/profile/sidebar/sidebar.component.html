@@ -1,45 +1,82 @@
 <div class="side-bar-container">
     <div class="side-bar">
         <div class="side-bar-header">
-            <div class="side-bar-header-title">
-                <h3>Dashboard</h3>
+            <div>
+                <a routerLink="/home" routerLinkActive="active">
+                    <div class="side-bar-content-item" style="display: flex">
+                        <mat-icon style="font-size: 16px; height: 16px; width: 16px; margin-right: 6px"
+                            >explore</mat-icon
+                        >
+                        <span>Discover</span>
+                    </div>
+                    <mat-divider></mat-divider>
+                </a>
             </div>
-            <mat-icon>portrait</mat-icon>
-        </div>
-        <div class="side-bar-content">
-            <!-- <div class="side-bar-content-item">
-                <button mat-button routerLink="/dashboard" routerLinkActive="active">
-                    <mat-icon>dashboard</mat-icon>
-                    <span>Dashboard</span>
-                </button>
+            <div>
+                <a routerLink="/feed" routerLinkActive="active">
+                    <div class="side-bar-content-item" style="display: flex">
+                        <mat-icon style="font-size: 16px; height: 16px; width: 16px; margin-right: 6px"
+                            >timeline</mat-icon
+                        >
+                        <span>Feed</span>
+                    </div>
+                    <mat-divider></mat-divider>
+                </a>
             </div>
-            <div class="side-bar-content-item">
-                <button mat-button routerLink="/dashboard/satellites" routerLinkActive="active">
-                    <mat-icon>satellite</mat-icon>
-                    <span>Satellites</span>
-                </button>
+            <div>
+                <a
+                    routerLink="/users/{{ user?.username }}"
+                    routerLinkActive="active"
+                    [routerLinkActiveOptions]="{ exact: true }"
+                >
+                    <div class="side-bar-content-item" style="display: flex">
+                        <mat-icon style="font-size: 16px; height: 16px; width: 16px; margin-right: 6px"
+                            >portrait</mat-icon
+                        >
+                        <span>Profile</span>
+                    </div>
+                    <mat-divider></mat-divider>
+                </a>
             </div>
-            <div class="side-bar-content-item">
-                <button mat-button routerLink="/dashboard/locations" routerLinkActive="active">
-                    <mat-icon>location_on</mat-icon>
-                    <span>Locations</span>
-                </button>
-            </div>
-            <div class="side-bar-content-item">
-                <button mat-button routerLink="/dashboard/profile" routerLinkActive="active">
-                    <mat-icon>person</mat-icon>
-                    <span>Profile</span>
-                </button>
-            </div> -->
         </div>
 
-        <div *ngFor="let satellite of satellites">
-            <a routerLink="/users/{{ user?.username }}/satellites/{{ satellite.id }}" routerLinkActive="active">
-                <div class="side-bar-content-item">
-                    <span>{{ satellite.satelliteName }}</span>
+        <div class="side-bar-content">
+            <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #3c3c3c">
+                <h3 style="margin: 30px 0 0 0; padding: 0 20px">My satellites</h3>
+                <button
+                    mat-icon-button
+                    routerLink="/users/{{ user?.username }}/satellites/new"
+                    style="height: 28px; width: 28px; margin: 30px 10px 0 0"
+                >
+                    <mat-icon style="position: absolute; top: 2px; left: 2px">add</mat-icon>
+                </button>
+            </div>
+            <div *ngFor="let satellite of satellites">
+                <a routerLink="/users/{{ user?.username }}/satellites/{{ satellite.id }}" routerLinkActive="active">
+                    <div class="side-bar-content-item">
+                        <span>{{ satellite.satelliteName }}</span>
+                    </div>
+                    <mat-divider></mat-divider>
+                </a>
+            </div>
+
+            <div *ngIf="admin">
+                <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #3c3c3c">
+                    <h3 style="margin: 30px 0 0 0; padding: 0 20px">Admin</h3>
                 </div>
-                <mat-divider></mat-divider>
-            </a>
+                <div>
+                    <a
+                        routerLink="/user-overview"
+                        routerLinkActive="active"
+                        [routerLinkActiveOptions]="{ exact: true }"
+                    >
+                        <div class="side-bar-content-item">
+                            <span>User overview</span>
+                        </div>
+                        <mat-divider></mat-divider>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </div>

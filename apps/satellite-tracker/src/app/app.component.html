@@ -1,6 +1,6 @@
 <app-navbar></app-navbar>
-<div [ngClass]="{ 'page-content-with-dashboard': user, 'page-content': !user }">
-    <div *ngIf="user">
+<div [ngClass]="{ 'page-content-with-dashboard': user && !hideSidebar('about'), 'page-content': !user }">
+    <div *ngIf="user && !hideSidebar('about')">
         <app-sidebar></app-sidebar>
     </div>
     <div class="page-content-inner">

@@ -9,162 +9,194 @@
     <!-- Edit form for satellite model -->
 
     <form #satelliteEditForm="ngForm" name="form" (ngSubmit)="onSubmit()" novalidate>
-        <div id="satellite-info">
-            <!-- name -->
-            <mat-form-field class="form-group" appearance="fill">
-                <mat-label for="name">Name</mat-label>
-                <input
-                    matInput
-                    type="text"
-                    name="name"
-                    id="name"
-                    class="form-control"
-                    [(ngModel)]="satellite!.satelliteName"
-                    #name="ngModel"
-                    minlength="1"
-                    required
-                    [ngClass]="{
-                        'is-invalid': name.invalid && name.touched
-                    }"
-                />
-                <mat-error *ngIf="name.invalid && name.touched" class="invalid-feedback">
-                    <mat-error *ngIf="name.errors!['required']">Name is required</mat-error>
-                    <mat-error *ngIf="name.errors!['minlength']">Username must be at least 1 character long.</mat-error>
-                </mat-error>
-            </mat-form-field>
-
-            <!-- purpose -->
-            <div style="display: flex; justify-content: space-between">
-                <mat-form-field appearance="fill" style="width: 85%">
-                    <mat-label for="purpose">Purpose</mat-label>
-                    <mat-select name="purpose" [(ngModel)]="satellite!.purpose" #purpose="ngModel" required>
-                        <mat-option *ngFor="let purpose of purposes" [value]="purpose">{{ purpose }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-                <button
-                    type="button"
-                    style="width: 13%; height: 100%; padding: 20px 8px"
-                    mat-button
-                    (click)="openDialog()"
-                    #tooltip="matTooltip"
-                    matTooltip="Add new purpose"
-                >
-                    <mat-icon style="margin: auto">add</mat-icon>
-                </button>
-            </div>
-
-            <!-- name -->
-            <mat-form-field class="form-group" appearance="fill">
-                <mat-label for="description">Description</mat-label>
-                <textarea
-                    matInput
-                    type="text"
-                    name="description"
-                    id="description"
-                    class="form-control"
-                    [(ngModel)]="satellite!.description"
-                    #description="ngModel"
-                    [ngClass]="{
-                        'is-invalid': description.invalid && description.touched
-                    }"
-                ></textarea>
-            </mat-form-field>
-
-            <div class="cols-2">
-                <!-- shape of base -->
+        <div class="cols-2-form">
+            <div id="satellite-info">
+                <!-- name -->
                 <mat-form-field class="form-group" appearance="fill">
-                    <mat-label for="shape">Shape of base</mat-label>
-                    <mat-select name="shape" [(ngModel)]="satellite!.shapeOfBase" #shape="ngModel" required>
-                        <mat-option *ngFor="let shape of shapes" [value]="shape">{{ shape }}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-
-                <!-- size of base -->
-                <mat-form-field class="form-group radius" appearance="fill">
-                    <mat-label *ngIf="satellite.shapeOfBase == 'Cube'" for="sizeOfBase">Length of edge</mat-label>
-                    <mat-label *ngIf="satellite.shapeOfBase == 'Sphere'" for="sizeOfBase">Diameter of base</mat-label>
+                    <mat-label for="name">Name</mat-label>
                     <input
                         matInput
-                        type="number"
-                        name="sizeOfBase"
+                        type="text"
+                        name="name"
+                        id="name"
                         class="form-control"
-                        [(ngModel)]="satellite!.sizeOfBase"
-                        #sizeOfBase="ngModel"
+                        [(ngModel)]="satellite!.satelliteName"
+                        #name="ngModel"
+                        minlength="1"
                         required
-                        min="2"
                         [ngClass]="{
-                            'is-invalid': sizeOfBase.invalid && sizeOfBase.touched
+                            'is-invalid': name.invalid && name.touched
                         }"
                     />
-                    <mat-error *ngIf="sizeOfBase.invalid && sizeOfBase.touched && sizeOfBase.errors!['required']"
-                        >Size of base is required</mat-error
-                    >
-                    <mat-error
-                        *ngIf="
-                            sizeOfBase.invalid &&
-                            sizeOfBase.touched &&
-                            !sizeOfBase.errors!['required'] &&
-                            sizeOfBase.errors!['min']
-                        "
-                        >Size of base must be at least 2 m.
+                    <mat-error *ngIf="name.invalid && name.touched" class="invalid-feedback">
+                        <mat-error *ngIf="name.errors!['required']">Name is required</mat-error>
+                        <mat-error *ngIf="name.errors!['minlength']"
+                            >Username must be at least 1 character long.</mat-error
+                        >
                     </mat-error>
                 </mat-form-field>
-            </div>
 
-            <div class="cols-2">
-                <!-- mass -->
-                <mat-form-field class="form-group mass" appearance="fill">
-                    <mat-label for="mass">Mass (kg)</mat-label>
-                    <input
+                <!-- purpose -->
+                <div style="display: flex; justify-content: space-between">
+                    <mat-form-field appearance="fill" style="width: 81%">
+                        <mat-label for="purpose">Purpose</mat-label>
+                        <mat-select name="purpose" [(ngModel)]="satellite!.purpose" #purpose="ngModel" required>
+                            <mat-option *ngFor="let purpose of purposes" [value]="purpose">{{ purpose }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <button
+                        type="button"
+                        style="width: 10%; height: 100%; padding: 20px 8px"
+                        mat-button
+                        (click)="openPurposeDialog()"
+                        #tooltip="matTooltip"
+                        matTooltip="Add new purpose"
+                    >
+                        <mat-icon style="margin: auto">add</mat-icon>
+                    </button>
+                </div>
+
+                <!-- name -->
+                <mat-form-field class="form-group" appearance="fill">
+                    <mat-label for="description">Description</mat-label>
+                    <textarea
                         matInput
-                        type="number"
-                        name="mass"
+                        type="text"
+                        name="description"
+                        id="description"
                         class="form-control"
-                        [(ngModel)]="satellite!.mass"
-                        #mass="ngModel"
-                        required
-                        min="1"
+                        [(ngModel)]="satellite!.description"
+                        #description="ngModel"
                         [ngClass]="{
-                            'is-invalid': mass.invalid && mass.touched
+                            'is-invalid': description.invalid && description.touched
                         }"
-                    />
-                    <mat-error *ngIf="mass.invalid && mass.touched && mass.errors!['required']"
-                        >Mass is required</mat-error
-                    >
-                    <mat-error *ngIf="mass.invalid && mass.touched && !mass.errors!['required'] && mass.errors!['min']"
-                        >Mass must be at least 1 kg.</mat-error
-                    >
+                    ></textarea>
                 </mat-form-field>
 
-                <!-- colorOfBase -->
-                <mat-form-field class="form-group color" appearance="fill">
-                    <mat-label for="colorB">Color of base</mat-label>
-                    <input
-                        matInput
-                        type="color"
-                        name="colorB"
-                        class="form-control"
-                        [(ngModel)]="satellite!.colorOfBase"
-                        #colorB="ngModel"
-                        (ngModelChange)="changeColorSatellite()"
-                        [ngClass]="{
-                            'is-invalid': colorB.invalid && colorB.touched
-                        }"
-                    />
-                </mat-form-field>
+                <div class="cols-2">
+                    <!-- shape of base -->
+                    <mat-form-field class="form-group" appearance="fill">
+                        <mat-label for="shape">Shape of base</mat-label>
+                        <mat-select name="shape" [(ngModel)]="satellite!.shapeOfBase" #shape="ngModel" required>
+                            <mat-option *ngFor="let shape of shapes" [value]="shape">{{ shape }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <!-- size of base -->
+                    <mat-form-field class="form-group radius" appearance="fill">
+                        <mat-label *ngIf="satellite.shapeOfBase == 'Cube'" for="sizeOfBase">Length of edge</mat-label>
+                        <mat-label *ngIf="satellite.shapeOfBase == 'Sphere'" for="sizeOfBase"
+                            >Diameter of base</mat-label
+                        >
+                        <input
+                            matInput
+                            type="number"
+                            name="sizeOfBase"
+                            class="form-control"
+                            [(ngModel)]="satellite!.sizeOfBase"
+                            #sizeOfBase="ngModel"
+                            required
+                            min="2"
+                            [ngClass]="{
+                                'is-invalid': sizeOfBase.invalid && sizeOfBase.touched
+                            }"
+                        />
+                        <mat-error *ngIf="sizeOfBase.invalid && sizeOfBase.touched && sizeOfBase.errors!['required']"
+                            >Size of base is required</mat-error
+                        >
+                        <mat-error
+                            *ngIf="
+                                sizeOfBase.invalid &&
+                                sizeOfBase.touched &&
+                                !sizeOfBase.errors!['required'] &&
+                                sizeOfBase.errors!['min']
+                            "
+                            >Size of base must be at least 2 m.
+                        </mat-error>
+                    </mat-form-field>
+                </div>
+
+                <div class="cols-2">
+                    <!-- mass -->
+                    <mat-form-field class="form-group mass" appearance="fill">
+                        <mat-label for="mass">Mass (kg)</mat-label>
+                        <input
+                            matInput
+                            type="number"
+                            name="mass"
+                            class="form-control"
+                            [(ngModel)]="satellite!.mass"
+                            #mass="ngModel"
+                            required
+                            min="1"
+                            [ngClass]="{
+                                'is-invalid': mass.invalid && mass.touched
+                            }"
+                        />
+                        <mat-error *ngIf="mass.invalid && mass.touched && mass.errors!['required']"
+                            >Mass is required</mat-error
+                        >
+                        <mat-error
+                            *ngIf="mass.invalid && mass.touched && !mass.errors!['required'] && mass.errors!['min']"
+                            >Mass must be at least 1 kg.</mat-error
+                        >
+                    </mat-form-field>
+
+                    <!-- colorOfBase -->
+                    <mat-form-field class="form-group color" appearance="fill">
+                        <mat-label for="colorB">Color of base</mat-label>
+                        <input
+                            matInput
+                            type="color"
+                            name="colorB"
+                            class="form-control"
+                            [(ngModel)]="satellite!.colorOfBase"
+                            #colorB="ngModel"
+                            (ngModelChange)="changeColorSatellite()"
+                            [ngClass]="{
+                                'is-invalid': colorB.invalid && colorB.touched
+                            }"
+                        />
+                    </mat-form-field>
+                </div>
             </div>
 
-            <mat-expansion-panel *ngFor="let part of allSatelliteParts">
-                <mat-expansion-panel-header>
-                    <mat-panel-title>{{ part.partName }}</mat-panel-title> </mat-expansion-panel-header
-                >Function: {{ part.function }}
-                <div *ngIf="part.dependsOn && part.dependsOn.length > 0">
-                    Depends on:
-                    <div *ngFor="let dependency of part.dependsOn">
-                        {{ dependency.partName }}
+            <div id="satellite-parts">
+                <!-- <mat-expansion-panel>
+                    <mat-expansion-panel-header>
+                        <mat-panel-title> Manage satellite parts</mat-panel-title>
+                    </mat-expansion-panel-header> -->
+
+                <div
+                    cdkDropList
+                    [cdkDropListData]="satellitePartNames"
+                    class="drop-list"
+                    (cdkDropListDropped)="drop($event)"
+                >
+                    <div *ngFor="let part of satellite.satelliteParts" cdkDrag class="satellite-part-item">
+                        <div class="satellite-part-name">
+                            {{ part.satellitePart.partName }} {{ part.color }} {{ part.quantity }} {{ part.size }}
+                        </div>
+                        <!-- <div class="satellite-part-function">{{ part.satellitePart.function }}</div>
+                        <div class="satellite-part-size">{{ part.size }} m</div>
+                        <div class="satellite-part-color">{{ part.color }}</div>
+                        <div class="satellite-part-depends-on">
+                            <div *ngIf="part.satellitePart.dependsOn && part.satellitePart.dependsOn.length > 0">
+                                Depends on:
+                                <div *ngFor="let dependency of part.satellitePart.dependsOn">
+                                    {{ dependency.partName }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="satellite-part-remove">
+                            <button mat-icon-button (click)="removePart(part)">
+                                <mat-icon>delete</mat-icon>
+                            </button>
+                        </div> -->
                     </div>
                 </div>
-            </mat-expansion-panel>
+                <!-- </mat-expansion-panel> -->
+            </div>
         </div>
 
         <!-- Submit and Cancel buttons -->

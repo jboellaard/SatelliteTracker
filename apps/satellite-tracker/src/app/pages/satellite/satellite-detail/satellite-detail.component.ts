@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Id, ISatellite } from 'shared/domain';
 import { AuthService } from '../../../auth/auth.service';
+import { DeleteDialogComponent } from '../../../utils/delete-dialog/delete-dialog.component';
+import { SnackBarService } from '../../../utils/snack-bar.service';
 import { UserService } from '../../user/user.service';
 import { OrbitService } from '../orbit-scene.service';
 import { SatelliteService } from '../satellite.service';
@@ -11,7 +14,6 @@ import { SatelliteService } from '../satellite.service';
     selector: 'app-satellite-detail',
     templateUrl: './satellite-detail.component.html',
     styleUrls: ['./satellite-detail.component.scss'],
-    providers: [OrbitService],
 })
 export class SatelliteDetailComponent implements OnInit {
     userId: Id | undefined;
@@ -28,7 +30,9 @@ export class SatelliteDetailComponent implements OnInit {
         public userService: UserService,
         public satelliteService: SatelliteService,
         private orbitService: OrbitService,
-        private authService: AuthService
+        private authService: AuthService,
+        public dialog: MatDialog,
+        public snackBar: SnackBarService
     ) {}
 
     ngOnInit(): void {
@@ -41,21 +45,28 @@ export class SatelliteDetailComponent implements OnInit {
             this.id = params.get('satelliteId');
             this.username = params.get('username')!;
             if (this.id) {
-                this.satelliteSub = this.satelliteService.getById(this.id).subscribe((satellite) => {
-                    if (satellite) {
-                        this.satellite = satellite;
-                        this.satellite.id = satellite._id;
-                        if (this.satellite.createdBy == this.userId) {
-                            this.canEdit = true;
-                        }
-                        if (this.satellite.orbit) {
-                            this.addOrbitScene();
-                        }
-                    } else this.router.navigate([`/users/${this.username}/satellites/`]);
+                this.getSatellite();
+                this.satelliteService.getRefreshRequired().subscribe(() => {
+                    this.getSatellite();
                 });
             } else {
-                this.router.navigate([`/users/${this.username}/satellites/`]);
+                this.router.navigate([`/users/${this.username}/`]);
             }
+        });
+    }
+
+    private getSatellite() {
+        this.satelliteSub = this.satelliteService.getById(this.id).subscribe((satellite) => {
+            if (satellite) {
+                this.satellite = satellite;
+                this.satellite.id = satellite._id;
+                if (this.satellite.createdBy == this.userId) {
+                    this.canEdit = true;
+                }
+                if (this.satellite.orbit) {
+                    this.addOrbitScene();
+                }
+            } else this.router.navigate([`/users/${this.username}/`]);
         });
     }
 
@@ -72,13 +83,42 @@ export class SatelliteDetailComponent implements OnInit {
         }
     }
 
-    removeSatellite(id: Id) {
-        this.satelliteService.delete(id).subscribe(() => {});
-        this.router.navigate([`/users/${this.username}`]);
+    removeSatellite() {
+        const dialogRef = this.dialog.open(DeleteDialogComponent, {
+            data: { message: 'Are you sure you want to delete this satellite?' },
+        });
+        dialogRef.afterClosed().subscribe((ok) => {
+            console.log(ok);
+            if (ok == 'ok') {
+                this.satelliteService.delete(this.id!).subscribe((result) => {
+                    console.log(result);
+                    if (result) {
+                        this.snackBar.success('Satellite successfully deleted');
+                        this.router.navigate([`/users/${this.username}/`]);
+                    } else {
+                        this.snackBar.error('Something went wrong, please try again later');
+                    }
+                });
+            }
+        });
     }
 
-    removeOrbit(id: Id) {
-        this.satelliteService.deleteOrbit(id).subscribe(() => {});
-        this.router.navigate([`/users/${this.username}/satellites/${this.id}`]);
+    removeOrbit() {
+        const dialogRef = this.dialog.open(DeleteDialogComponent, {
+            data: { message: 'Are you sure you want to delete this orbit?' },
+        });
+        dialogRef.afterClosed().subscribe((ok) => {
+            console.log(ok);
+            if (ok == 'ok') {
+                this.satelliteService.deleteOrbit(this.id!).subscribe((result) => {
+                    console.log(result);
+                    if (result) {
+                        this.snackBar.success('Orbit successfully deleted');
+                    } else {
+                        this.snackBar.error('Something went wrong, please try again later');
+                    }
+                });
+            }
+        });
     }
 }

@@ -3,6 +3,10 @@
     height: 100%;
 }
 
+form {
+    padding: 0px 20px 20px 20px;
+}
+
 .label-container {
     display: flex;
     justify-content: space-between;
@@ -10,8 +14,12 @@
     max-width: 100%;
 }
 
-.slider,
-.between-sliders {
+.slider {
     width: 96%;
     margin: 0 2%;
+}
+
+.between-sliders {
+    // width: 100%;
+    margin: 0 10px;
 }

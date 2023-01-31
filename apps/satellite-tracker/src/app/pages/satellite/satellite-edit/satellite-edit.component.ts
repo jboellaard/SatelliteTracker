@@ -1,12 +1,14 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Id, IOrbit, ISatellite, ISatellitePart, Purpose, Shape } from 'shared/domain';
+import { ICustomSatellitePart, Id, IOrbit, ISatellite, ISatellitePart, Purpose, Shape } from 'shared/domain';
 import { SatelliteService } from '../satellite.service';
 import { OrbitService } from '../orbit-scene.service';
 import { AddPurposeDialogComponent } from './add-purpose-dialog/add-purpose-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SnackBarService } from '../../../utils/snack-bar.service';
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { AddEditDialogComponent } from '../../../utils/add-edit-dialog/add-edit-dialog.component';
 
 @Component({
     selector: 'app-satellite-edit',
@@ -18,6 +20,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     componentExists = false;
     id!: Id | null | undefined;
     allSatelliteParts: ISatellitePart[] = [];
+    satellitePartNames: string[] = [];
     purposes = Purpose;
     shapes = Object.values(Shape);
     satellite: ISatellite = {
@@ -43,7 +46,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         private satelliteService: SatelliteService,
         public orbitService: OrbitService,
         public dialog: MatDialog,
-        public snackBarService: SnackBarService
+        public snackBar: SnackBarService
     ) {}
 
     ngOnInit(): void {
@@ -66,6 +69,10 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                             this.satellite.orbit.period = Number(this.satellite.orbit.period?.toFixed(3));
                             this.satellite.orbit.semiMajorAxis = Math.round(this.satellite.orbit.semiMajorAxis);
                         }
+                        this.satellitePartNames =
+                            this.satellite.satelliteParts?.map(
+                                (satellitePart) => satellitePart.satellitePart.partName
+                            ) || [];
                     }
                 });
             }
@@ -78,7 +85,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         }
     }
 
-    openDialog() {
+    openPurposeDialog() {
         const dialogRef = this.dialog.open(AddPurposeDialogComponent);
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
@@ -87,24 +94,55 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         });
     }
 
+    drop(event: CdkDragDrop<string[]>) {
+        moveItemInArray(
+            this.satellite.satelliteParts ? this.satellite.satelliteParts : [],
+            event.previousIndex,
+            event.currentIndex
+        );
+        this.satellitePartNames =
+            this.satellite.satelliteParts?.map((satellitePart) => satellitePart.satellitePart.partName) || [];
+    }
+
+    removePart(part: ICustomSatellitePart) {
+        this.satellite.satelliteParts?.filter(
+            (satellitePart) => satellitePart.satellitePart.partName != part.satellitePart.partName
+        );
+        this.satellitePartNames =
+            this.satellite.satelliteParts?.map((satellitePart) => satellitePart.satellitePart.partName) || [];
+    }
+
     onSubmit() {
-        console.log('Submitting the form');
         if (this.componentExists) {
-            this.satelliteService.update(this.satellite!).subscribe((satellite) => {
-                if (satellite) {
-                    this.snackBarService.success('Satellite updated successfully');
-                    this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
-                } else {
-                    this.snackBarService.error('Satellite could not be updated');
+            const dialogRef = this.dialog.open(AddEditDialogComponent, {
+                data: { message: 'Are you sure you want to update this satellite?' },
+            });
+            dialogRef.afterClosed().subscribe((ok) => {
+                if (ok == 'ok') {
+                    this.satelliteService.update(this.satellite!).subscribe((satellite) => {
+                        if (satellite) {
+                            this.snackBar.success('Satellite updated successfully');
+                            this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                        } else {
+                            this.snackBar.error('Satellite could not be updated');
+                        }
+                    });
                 }
             });
         } else {
-            this.satelliteService.create(this.satellite!).subscribe((satellite) => {
-                if (satellite) {
-                    this.snackBarService.success('Satellite created successfully');
-                    this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
-                } else {
-                    this.snackBarService.error('Satellite could not be created');
+            const dialogRef = this.dialog.open(AddEditDialogComponent, {
+                data: { message: 'Are you sure you want to create this satellite?' },
+            });
+            dialogRef.afterClosed().subscribe((ok) => {
+                if (ok != 'ok') {
+                    this.satelliteService.create(this.satellite!).subscribe((satellite) => {
+                        if (satellite) {
+                            this.snackBar.success('Satellite created successfully');
+                            this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                        } else {
+                            this.snackBar.error('Satellite could not be created');
+                        }
+                    });
                 }
             });
         }

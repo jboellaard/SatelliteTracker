@@ -13,6 +13,7 @@ import { ProfileService } from '../profile.service';
 })
 export class SidebarComponent implements OnInit, OnDestroy {
     user: UserIdentity | undefined;
+    admin = false;
     satellites: ISatellite[] | undefined;
     userSub: Subscription | undefined;
     satellitesSub: Subscription | undefined;
@@ -22,13 +23,13 @@ export class SidebarComponent implements OnInit, OnDestroy {
     constructor(
         private satelliteService: SatelliteService,
         private profileService: ProfileService,
-        private authService: AuthService,
-        private route: ActivatedRoute
+        private authService: AuthService
     ) {}
 
     ngOnInit(): void {
         this.userSub = this.authService.user$.subscribe((user) => {
             this.user = user;
+            this.admin = user?.roles?.includes('admin') || false;
         });
         this.getMySatellites();
         this.satelliteService.getRefreshRequired().subscribe(() => {

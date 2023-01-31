@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { getPeriod, ISatellite, Shape } from 'shared/domain';
+import { AddEditDialogComponent } from '../../../utils/add-edit-dialog/add-edit-dialog.component';
 import { SnackBarService } from '../../../utils/snack-bar.service';
 import { OrbitService } from '../orbit-scene.service';
 import { SatelliteService } from '../satellite.service';
@@ -46,7 +48,8 @@ export class OrbitEditComponent implements OnInit {
         private router: Router,
         private route: ActivatedRoute,
         private satelliteService: SatelliteService,
-        private snackBar: SnackBarService
+        private snackBar: SnackBarService,
+        private dialog: MatDialog
     ) {
         this.minAltitude = this.orbitService.earthRadius + 30;
         console.log(1 - this.minAltitude / this.orbitService.maxSMAEarth);
@@ -171,21 +174,39 @@ export class OrbitEditComponent implements OnInit {
     onSubmit() {
         console.log('Submitting the form');
         if (this.componentExists) {
-            this.satelliteService.updateOrbit(this.satellite._id!, this.satellite.orbit!).subscribe((satellite) => {
-                if (satellite) {
-                    this.snackBar.success('Orbit updated successfully');
-                    this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
-                } else {
-                    this.snackBar.error('Orbit could not be updated');
+            const dialogRef = this.dialog.open(AddEditDialogComponent, {
+                data: { message: 'Are you sure you want to update this orbit?' },
+            });
+            dialogRef.afterClosed().subscribe((ok: string) => {
+                if (ok == 'ok') {
+                    this.satelliteService
+                        .updateOrbit(this.satellite._id!, this.satellite.orbit!)
+                        .subscribe((satellite) => {
+                            if (satellite) {
+                                this.snackBar.success('Orbit updated successfully');
+                                this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                            } else {
+                                this.snackBar.error('Orbit could not be updated');
+                            }
+                        });
                 }
             });
         } else {
-            this.satelliteService.addOrbit(this.satellite._id!, this.satellite.orbit!).subscribe((satellite) => {
-                if (satellite) {
-                    this.snackBar.success('Orbit created successfully');
-                    this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
-                } else {
-                    this.snackBar.error('Orbit could not be created');
+            const dialogRef = this.dialog.open(AddEditDialogComponent, {
+                data: { message: 'Are you sure you want to create this orbit?' },
+            });
+            dialogRef.afterClosed().subscribe((ok: string) => {
+                if (ok == 'ok') {
+                    this.satelliteService
+                        .addOrbit(this.satellite._id!, this.satellite.orbit!)
+                        .subscribe((satellite) => {
+                            if (satellite) {
+                                this.snackBar.success('Orbit created successfully');
+                                this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                            } else {
+                                this.snackBar.error('Orbit could not be created');
+                            }
+                        });
                 }
             });
         }

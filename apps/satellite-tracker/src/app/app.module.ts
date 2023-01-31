@@ -1,6 +1,9 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,10 +16,21 @@ import { UserComponent } from './pages/user/user.component';
 import { UserDetailComponent } from './pages/user/user-detail/user-detail.component';
 import { UserEditComponent } from './pages/user/user-edit/user-edit.component';
 import { UserListComponent } from './pages/user/user-list/user-list.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { AboutComponent } from './pages/about/about.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { LoginComponent } from './auth/login/login.component';
+import { RegisterComponent } from './auth/register/register.component';
+import { AuthService } from './auth/auth.service';
+import { httpInterceptorProviders } from './auth/auth.interceptor';
+import { AddPurposeDialogComponent } from './pages/satellite/satellite-edit/add-purpose-dialog/add-purpose-dialog.component';
+import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.component';
+import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
+import { ProfileComponent } from './profile/profile.component';
+import { SidebarComponent } from './profile/sidebar/sidebar.component';
+import { SatelliteComponent } from './pages/satellite/satellite.component';
+import { FeedComponent } from './pages/dashboard/feed/feed.component';
+import { DiscoverComponent } from './pages/dashboard/discover/discover.component';
+import { DeleteDialogComponent } from './utils/delete-dialog/delete-dialog.component';
 
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
@@ -39,6 +53,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { AddEditDialogComponent } from './utils/add-edit-dialog/add-edit-dialog.component';
 
 const materialModules = [
     MatToolbarModule,
@@ -63,21 +78,6 @@ const materialModules = [
     MatTabsModule,
     MatProgressBarModule,
 ];
-
-import { LoginComponent } from './auth/login/login.component';
-import { RegisterComponent } from './auth/register/register.component';
-
-import { AuthService } from './auth/auth.service';
-import { httpInterceptorProviders } from './auth/auth.interceptor';
-import { AddPurposeDialogComponent } from './pages/satellite/satellite-edit/add-purpose-dialog/add-purpose-dialog.component';
-import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.component';
-import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
-import { ProfileComponent } from './profile/profile.component';
-import { SidebarComponent } from './profile/sidebar/sidebar.component';
-import { SatelliteComponent } from './pages/satellite/satellite.component';
-import { FeedComponent } from './pages/dashboard/feed/feed.component';
-import { DiscoverComponent } from './pages/dashboard/discover/discover.component';
-import { DeleteDialogComponent } from './utils/delete-dialog/delete-dialog.component';
 
 @NgModule({
     declarations: [
@@ -104,6 +104,7 @@ import { DeleteDialogComponent } from './utils/delete-dialog/delete-dialog.compo
         FeedComponent,
         DiscoverComponent,
         DeleteDialogComponent,
+        AddEditDialogComponent,
     ],
     imports: [
         BrowserModule,
@@ -112,6 +113,7 @@ import { DeleteDialogComponent } from './utils/delete-dialog/delete-dialog.compo
         FormsModule,
         ReactiveFormsModule,
         ...materialModules,
+        DragDropModule,
         AppRoutingModule,
     ],
     providers: [AuthService, httpInterceptorProviders],

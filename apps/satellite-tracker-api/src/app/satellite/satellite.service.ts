@@ -290,7 +290,9 @@ export class SatelliteService {
                 const neo4jSession = this.neo4jService.getWriteSession();
                 const transaction = neo4jSession.beginTransaction();
                 try {
-                    transaction.run(SatelliteNeoQueries.removeSatelliteLaunchDate, {});
+                    transaction.run(SatelliteNeoQueries.removeSatelliteLaunchDate, {
+                        satelliteName: satellite?.satelliteName,
+                    });
                 } catch (error) {
                     transaction.rollback();
                     if (error instanceof Error) throw new Error(error.message);

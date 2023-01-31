@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'apps/satellite-tracker/src/environments/environment';
-import { IUser } from 'shared/domain';
+import { AdminUserInfo, APIResponse, IUser, UserIdentity } from 'shared/domain';
 import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { EntityService } from 'ui/entity';
@@ -15,7 +15,13 @@ export class UserService extends EntityService<IUser> {
 
     getByUsername(username: string): Observable<IUser> {
         return this.http
-            .get<IUser>(`${environment.API_URL}${'users'}/${username}`)
+            .get<APIResponse<IUser>>(`${environment.API_URL}${'users'}/${username}`)
+            .pipe(map((response: any) => response.result));
+    }
+
+    getAllIdentities(): Observable<AdminUserInfo[]> {
+        return this.http
+            .get<APIResponse<AdminUserInfo[]>>(`${environment.API_URL}identities`)
             .pipe(map((response: any) => response.result));
     }
 }
