@@ -21,10 +21,20 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { SatelliteComponent } from './pages/satellite/satellite.component';
 import { DiscoverComponent } from './pages/dashboard/discover/discover.component';
 import { FeedComponent } from './pages/dashboard/feed/feed.component';
+import { FollowingComponent } from './pages/dashboard/feed/following/following.component';
+import { TrackingComponent } from './pages/dashboard/feed/tracking/tracking.component';
 
 const routes: Routes = [
     { path: 'home', pathMatch: 'full', canActivate: [AuthGuard], component: DiscoverComponent },
-    { path: 'feed', pathMatch: 'full', canActivate: [AuthGuard], component: FeedComponent },
+    {
+        path: 'feed',
+        canActivate: [AuthGuard],
+        component: FeedComponent,
+        children: [
+            { path: 'following', pathMatch: 'full', component: FollowingComponent },
+            { path: 'tracked-satellites', pathMatch: 'full', component: TrackingComponent },
+        ],
+    },
     { path: 'about', pathMatch: 'full', component: AboutComponent },
     { path: 'login', pathMatch: 'full', component: LoginComponent },
     { path: 'register', pathMatch: 'full', component: RegisterComponent },

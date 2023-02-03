@@ -134,7 +134,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                 data: { message: 'Are you sure you want to create this satellite?' },
             });
             dialogRef.afterClosed().subscribe((ok) => {
-                if (ok != 'ok') {
+                if (ok == 'ok') {
                     this.satelliteService.create(this.satellite!).subscribe((satellite) => {
                         if (satellite) {
                             this.snackBar.success('Satellite created successfully');

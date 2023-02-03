@@ -9,11 +9,14 @@ export enum FeedItemType {
 }
 
 export interface FeedItem {
-    _id?: Id;
-    id?: Id;
     type: FeedItemType;
-    userId: Id;
-    itemDate: Date;
-    title: string;
-    description: string;
+    username: string;
+    followed?: string;
+    satelliteName?: string;
+    satelliteId?: Id;
+    createdBy?: string;
+    changed?: string;
+    date: string;
+    title?: string;
+    description?: string;
 }

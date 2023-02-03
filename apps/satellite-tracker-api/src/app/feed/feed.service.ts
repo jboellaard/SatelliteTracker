@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { FeedItemType } from 'shared/domain';
+import { FeedItem, FeedItemType } from 'shared/domain';
 import { moveMessagePortToContext } from 'worker_threads';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { SatelliteNeoQueries } from '../satellite/neo4j/satellite.cypher';
@@ -21,8 +21,6 @@ export class FeedService {
 
     constructor(
         @InjectModel(Satellite.name, `${process.env.MONGO_DATABASE}`) private satelliteModel: Model<SatelliteDocument>,
-        @InjectModel(SatellitePart.name, `${process.env.MONGO_DATABASE}`)
-        private satellitePartModel: Model<SatellitePartDocument>,
         @InjectModel(User.name, `${process.env.MONGO_DATABASE}`) private userModel: Model<UserDocument>,
         private readonly neo4jService: Neo4jService
     ) {}
@@ -35,12 +33,12 @@ export class FeedService {
                 createdBy: record.get('satellite').properties.createdBy,
             };
         });
-        satellites = satellites.filter((satellite) => satellite.createdBy !== username);
+        // satellites = satellites.filter((satellite) => satellite.createdBy !== username);
         const users = await this.userModel
             .find({ username: { $in: satellites.map((satellite) => satellite.createdBy) } })
             .exec();
         satellites.forEach((satellite) => {
-            const user = users.find((user) => user.username === satellite.createdBy);
+            const user = users.find((user) => user.username == satellite.createdBy);
             satellite.createdBy = user._id;
         });
 
@@ -100,29 +98,33 @@ export class FeedService {
             {
                 $group: {
                     _id: '$_id',
+                    satelliteId: { $first: '$_id' },
                     satelliteName: { $first: '$satelliteName' },
-                    mass: { $first: '$mass' },
-                    sizeOfBase: { $first: '$sizeOfBase' },
-                    colorOfBase: { $first: '$colorOfBase' },
-                    shapeOfBase: { $first: '$shapeOfBase' },
-                    purpose: { $first: '$purpose' },
-                    createdBy: { $first: '$createdBy' },
-                    createdAt: { $first: '$createdAt' },
-                    updatedAt: { $first: '$updatedAt' },
+                    // mass: { $first: '$mass' },
+                    // sizeOfBase: { $first: '$sizeOfBase' },
+                    // colorOfBase: { $first: '$colorOfBase' },
+                    // shapeOfBase: { $first: '$shapeOfBase' },
+                    // purpose: { $first: '$purpose' },
+                    username: { $first: '$createdBy.username' },
+                    // createdAt: { $first: '$createdAt' },
+                    // updatedAt: { $first: '$updatedAt' },
                     orbit: { $first: '$orbit' },
                     // satelliteParts: { $push: '$satelliteParts' },
-                    mostRecentChange: { $first: '$mostRecentChange' },
+                    date: { $first: '$mostRecentChange' },
                     changed: { $first: '$changed' },
                 },
             },
-            { $sort: { mostRecentChange: -1 } },
+            { $sort: { date: -1 } },
         ]);
 
-        mostRecentlyUpdatedSatellites.forEach((satellite) => {
-            if (satellite.createdAt == satellite.mostRecentChange) {
-                satellite.type = 'created';
+        mostRecentlyUpdatedSatellites.forEach((item) => {
+            if (
+                (item.createdAt == item.date && item.changed == 'satellite') ||
+                (item.changed == 'orbit' && item.orbit.createdAt == item.date)
+            ) {
+                item.type = 'created';
             } else {
-                satellite.type = 'updated';
+                item.type = 'updated';
             }
         });
 
@@ -139,10 +141,11 @@ export class FeedService {
         });
         let satellites = mostRecentlyTracked.records.map((record) => {
             return {
-                user: record.get('user').properties.username,
+                username: record.get('user').properties.username,
                 satelliteName: record.get('satellite').properties.satelliteName,
+                satelliteId: undefined,
                 createdBy: record.get('satellite').properties.createdBy,
-                since: record.get('track').properties.since.toString(),
+                date: record.get('track').properties.since.toString(),
                 type: FeedItemType.tracked,
             };
         });
@@ -155,14 +158,24 @@ export class FeedService {
         satellites = satellites.concat(
             mostRecentlyCreated.records.map((record) => {
                 return {
-                    user: record.get('user').properties.username,
+                    username: record.get('user').properties.username,
                     satelliteName: record.get('satellite').properties.satelliteName,
+                    satelliteId: undefined,
                     createdBy: record.get('satellite').properties.createdBy,
-                    since: record.get('create').properties.since.toString(),
+                    date: record.get('create').properties.createdAt.toString(),
                     type: FeedItemType.created,
                 };
             })
         );
+
+        for (let i = 0; i < satellites.length; i++) {
+            const user = await this.userModel.findOne({ username: satellites[i].createdBy });
+            const satellite = await this.satelliteModel.findOne({
+                satelliteName: satellites[i].satelliteName,
+                createdBy: user._id,
+            });
+            satellites[i].satelliteId = satellite._id;
+        }
 
         const mostRecentlyFollowed = await this.neo4jService.read(UserNeoQueries.getMostRecentlyFollowed, {
             list: usersFollowing.records.map((record) => record.get('user').properties.username),
@@ -171,15 +184,15 @@ export class FeedService {
         });
         let users = mostRecentlyFollowed.records.map((record) => {
             return {
-                user: record.get('user').properties.username,
+                username: record.get('user').properties.username,
                 followed: record.get('followed').properties.username,
-                since: record.get('follow').properties.since.toString(),
+                date: record.get('follow').properties.since.toString(),
                 type: FeedItemType.followed,
             };
         });
 
         const feed = [...satellites, ...users]
-            .sort((a, b) => new Date(b.since).getTime() - new Date(a.since).getTime())
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
             .slice(0, 10);
         return { status: HttpStatus.OK, result: feed };
     }

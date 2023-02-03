@@ -53,7 +53,10 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+
 import { AddEditDialogComponent } from './utils/add-edit-dialog/add-edit-dialog.component';
+import { FollowingComponent } from './pages/dashboard/feed/following/following.component';
+import { TrackingComponent } from './pages/dashboard/feed/tracking/tracking.component';
 
 const materialModules = [
     MatToolbarModule,
@@ -105,6 +108,8 @@ const materialModules = [
         DiscoverComponent,
         DeleteDialogComponent,
         AddEditDialogComponent,
+        FollowingComponent,
+        TrackingComponent,
     ],
     imports: [
         BrowserModule,

@@ -1,0 +1,85 @@
+.timeline {
+    list-style-type: none;
+    min-width: 350px;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0;
+    position: relative;
+}
+
+.timeline:before {
+    content: '';
+    position: absolute;
+    top: -20px;
+    bottom: -20px;
+    width: 1px;
+    background: #d2d2d2;
+    left: 35%;
+    margin-left: -2.5px;
+}
+
+.timeline > li {
+    position: relative;
+    min-height: 50px;
+    padding: 0;
+    margin: 0;
+}
+
+.timeline .timeline-time {
+    position: absolute;
+    left: 0;
+    width: 31%;
+    text-align: right;
+    top: 5px;
+    color: #d2d2d2;
+}
+
+.timeline .timeline-time .date {
+    display: block;
+    max-width: 120px;
+    margin-right: 0;
+    margin-left: auto;
+    line-height: 30px;
+    align-self: center;
+    font-style: oblique;
+}
+
+.timeline .timeline-body {
+    margin-left: 37%;
+    min-width: 150px;
+    max-width: 320px;
+    position: relative;
+    padding: 0;
+    border-radius: 6px;
+    margin-bottom: 2.5em;
+}
+
+.timeline .timeline-body:before {
+    content: '';
+    display: block;
+    position: absolute;
+    border: 8px solid transparent;
+    border-right-color: #424242;
+    left: -14px;
+    top: 10px;
+}
+
+.timeline .timeline-icon {
+    left: 35%;
+    margin-left: -12px;
+    position: absolute;
+    text-align: center;
+    top: 10px;
+}
+
+.timeline .timeline-icon p {
+    text-decoration: none;
+    width: 6px;
+    height: 6px;
+    display: inline-block;
+    border-radius: 20px;
+    background: #424242;
+    line-height: 10px;
+    color: #303030;
+    border: 1px solid #d2d2d2;
+}

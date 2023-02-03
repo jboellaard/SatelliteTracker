@@ -20,4 +20,15 @@ export class DashboardService {
             })
         );
     }
+
+    getFollowingFeed() {
+        return this.http.get<APIResponse<any[]>>(`${environment.API_URL}feed/following`).pipe(
+            map((response: any) => {
+                response.result.forEach((satellite: any) => {
+                    satellite.id = satellite._id;
+                });
+                return response.result;
+            })
+        );
+    }
 }

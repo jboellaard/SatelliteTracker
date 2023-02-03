@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
-import { UserIdentity } from 'shared/domain';
+import { Observable, Subscription } from 'rxjs';
+import { UserIdentity, FeedItem } from 'shared/domain';
 import { AuthService } from '../../../auth/auth.service';
+import { DashboardService } from '../dashboard.service';
 
 @Component({
     selector: 'app-feed',
@@ -10,23 +11,27 @@ import { AuthService } from '../../../auth/auth.service';
 })
 export class FeedComponent implements OnInit {
     user: UserIdentity | undefined;
-    tabs: Observable<{ label: string; content: string }[]>;
+    followingFeedSub: Subscription | undefined;
+    satelliteFeedSub: Subscription | undefined;
+    followingFeed$: Observable<FeedItem[] | any[]> | undefined;
+    satelliteFeed$: Observable<FeedItem[] | any[]> | undefined;
 
-    constructor(private authService: AuthService) {
-        this.tabs = new Observable((observer) => {
-            observer.next([
-                { label: 'Tab 1', content: 'Tab 1 content' },
-                { label: 'Tab 2', content: 'Tab 2 content' },
-                { label: 'Tab 3', content: 'Tab 3 content' },
-            ]);
-        });
-    }
+    tabs: { label: string; route: string }[] = [
+        { label: 'Following', route: 'following' },
+        { label: 'Tracked Satellites', route: 'tracked-satellites' },
+    ];
+
+    constructor(private authService: AuthService, private dashboardService: DashboardService) {}
 
     ngOnInit(): void {
         this.authService.user$.subscribe((user) => {
             this.user = user;
         });
-        if (this.user?.username) {
-        }
+
+        this.satelliteFeedSub = this.dashboardService.getSatelliteFeed().subscribe((feed) => {
+            console.log(feed);
+            this.satelliteFeed$ = feed;
+        });
+        console.log(this.followingFeed$);
     }
 }
