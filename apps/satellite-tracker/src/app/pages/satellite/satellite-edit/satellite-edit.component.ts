@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ICustomSatellitePart, Id, IOrbit, ISatellite, ISatellitePart, Purpose, Shape } from 'shared/domain';
@@ -9,6 +9,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { SnackBarService } from '../../../utils/snack-bar.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AddEditDialogComponent } from '../../../utils/add-edit-dialog/add-edit-dialog.component';
+import { MatTable } from '@angular/material/table';
 
 @Component({
     selector: 'app-satellite-edit',
@@ -19,10 +20,12 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     componentId: string | null | undefined;
     componentExists = false;
     id!: Id | null | undefined;
+
     allSatelliteParts: ISatellitePart[] = [];
     satellitePartNames: string[] = [];
     purposes = Purpose;
     shapes = Object.values(Shape);
+
     satellite: ISatellite = {
         satelliteName: '',
         purpose: 'TBD',
@@ -32,13 +35,16 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         shapeOfBase: Shape.Cube,
         orbit: undefined,
     };
-    userId!: Id | null | undefined;
     username: string | undefined;
+
     userSub: Subscription | undefined;
     satelliteSub: Subscription | undefined;
     satellitePartSub: Subscription | undefined;
-
     paramSub: Subscription | undefined;
+
+    @ViewChild('table', { static: true }) table?: MatTable<ICustomSatellitePart>;
+    customPartTableColumns: string[] = ['position', 'name', 'color', 'size', 'quantity', 'actions'];
+    dragDisabled = true;
 
     constructor(
         private route: ActivatedRoute,
@@ -62,6 +68,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                     if (satellite) {
                         this.satellite = { ...satellite };
                         this.satellite.id = this.satellite._id;
+                        if (!this.satellite.satelliteParts) this.satellite.satelliteParts = [];
                         if (this.satellite.purpose && this.purposes.indexOf(this.satellite.purpose) == -1) {
                             this.purposes.push(this.satellite.purpose);
                         }
@@ -94,14 +101,18 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         });
     }
 
-    drop(event: CdkDragDrop<string[]>) {
+    drop(event: CdkDragDrop<ICustomSatellitePart[]>) {
+        console.log(event);
+        this.dragDisabled = true;
+
+        const previousIndex = this.satellite.satelliteParts?.findIndex((part) => part == event.item.data);
+        if (previousIndex == undefined) return;
         moveItemInArray(
             this.satellite.satelliteParts ? this.satellite.satelliteParts : [],
-            event.previousIndex,
+            previousIndex,
             event.currentIndex
         );
-        this.satellitePartNames =
-            this.satellite.satelliteParts?.map((satellitePart) => satellitePart.satellitePart.partName) || [];
+        this.table?.renderRows();
     }
 
     removePart(part: ICustomSatellitePart) {
@@ -110,6 +121,14 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         );
         this.satellitePartNames =
             this.satellite.satelliteParts?.map((satellitePart) => satellitePart.satellitePart.partName) || [];
+    }
+
+    getContrastYIQ(hexcolor: string) {
+        var r = parseInt(hexcolor.substring(1, 3), 16);
+        var g = parseInt(hexcolor.substring(3, 5), 16);
+        var b = parseInt(hexcolor.substring(5, 7), 16);
+        var yiq = (r * 299 + g * 587 + b * 114) / 1000;
+        return yiq >= 128 ? 'black' : 'white';
     }
 
     onSubmit() {

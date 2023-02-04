@@ -1,12 +1,12 @@
-<div class="component-container" *ngIf="user; else loadingMessage">
+<div class="component-container" *ngIf="user; else loading">
     <div class="header">
         <h1>Profile of {{ user.username }}</h1>
-        <div class="buttons" *ngIf="admin">
+        <!-- <div class="buttons" *ngIf="admin">
             <button mat-flat-button routerLink="edit"><mat-icon>edit</mat-icon> Edit</button>
             <button mat-flat-button color="warn" (click)="removeUser(user!.username!)">
                 <mat-icon>delete</mat-icon> Remove
             </button>
-        </div>
+        </div> -->
     </div>
     <div class="text-muted">
         <p>
@@ -16,12 +16,10 @@
     </div>
     <br />
 
-    <p>
+    <!-- <p>
         Location: [ {{ user.location?.coordinates?.latitude?.toFixed(5) }},
         {{ user.location?.coordinates?.longitude?.toFixed(5) }} ]
-    </p>
-
-    <br />
+    </p> -->
 
     <div *ngIf="satellites.length > 0">
         <p>Satellites:</p>
@@ -78,7 +76,7 @@
                 </ng-container>
 
                 <!-- Button Column -->
-                <ng-container matColumnDef="buttons">
+                <!-- <ng-container matColumnDef="buttons">
                     <th mat-header-cell *matHeaderCellDef></th>
                     <td mat-cell class="edit icon" layout-align="center center" *matCellDef="let satellite">
                         <button mat-flat-button color="accent" [routerLink]="'satellites/' + satellite._id + '/edit'">
@@ -88,7 +86,7 @@
                             <mat-icon>delete</mat-icon>
                         </button>
                     </td>
-                </ng-container>
+                </ng-container> -->
 
                 <tr mat-header-row *matHeaderRowDef="satelliteColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: satelliteColumns" [routerLink]="'satellites/' + row._id"></tr>
@@ -103,4 +101,4 @@
     </div>
 </div>
 
-<ng-template #loadingMessage><div>Loading Data Service ...</div></ng-template>
+<ng-template #loading><mat-progress-bar value="indeterminate"></mat-progress-bar></ng-template>

@@ -2,7 +2,8 @@ import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
-import { Id, ISatellite, IUser } from 'shared/domain';
+import { Id, ISatellite, IUser, UserIdentity } from 'shared/domain';
+import { AuthService } from '../../../auth/auth.service';
 import { SnackBarService } from '../../../utils/snack-bar.service';
 import { SatelliteService } from '../../satellite/satellite.service';
 import { UserService } from '../user.service';
@@ -13,11 +14,11 @@ import { UserService } from '../user.service';
     styleUrls: ['./user-detail.component.scss', '../user.component.scss'],
 })
 export class UserDetailComponent implements OnInit {
-    user$!: Observable<IUser | undefined>;
+    user?: IUser;
     username: string | null | undefined;
     id: Id | null | undefined;
-    user?: IUser;
-    satelliteColumns: string[] = ['name', 'mass', 'radius', 'orbit', 'createdAt', 'updatedAt', 'buttons'];
+
+    satelliteColumns = ['name', 'mass', 'radius', 'orbit', 'createdAt', 'updatedAt'];
     satellites: ISatellite[] = [];
     admin = false;
     canEdit = false;
@@ -28,8 +29,8 @@ export class UserDetailComponent implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        public userService: UserService,
-        public satelliteService: SatelliteService,
+        private userService: UserService,
+        private satelliteService: SatelliteService,
         private breakpointObserver: BreakpointObserver,
         private snackBar: SnackBarService
     ) {}
@@ -38,17 +39,16 @@ export class UserDetailComponent implements OnInit {
         this.route.paramMap.subscribe((params) => {
             this.username = params.get('username');
             if (this.username) {
-                this.userSub = this.userService.getById(this.username).subscribe((user) => {
+                this.userSub = this.userService.getByUsername(this.username).subscribe((user) => {
                     if (user) {
                         this.user = user;
-                        this.username = this.user.username;
                         this.getSatellites();
 
                         this.satelliteService.getRefreshRequired().subscribe(() => {
                             this.getSatellites();
                         });
                     } else {
-                        this.snackBar.error('Could not find this users');
+                        this.snackBar.error('Could not find this user');
                         this.router.navigate(['/home']);
                     }
                 });
@@ -78,22 +78,6 @@ export class UserDetailComponent implements OnInit {
                 .getSatellitesOfUserWithUsername(this.user.username)
                 .subscribe((satellites) => {
                     console.log(satellites);
-                    if (satellites) this.satellites = satellites;
-                });
-        }
-    }
-
-    removeUser(id: Id) {
-        this.userService.delete(id);
-        this.router.navigate(['/users']); // only for admin
-    }
-
-    removeSatellite(id: Id) {
-        this.satelliteService.delete(id);
-        if (this.user?.username) {
-            this.satelliteSub = this.satelliteService
-                .getSatellitesOfUserWithUsername(this.user.username)
-                .subscribe((satellites) => {
                     if (satellites) this.satellites = satellites;
                 });
         }

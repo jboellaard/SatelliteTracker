@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from 'apps/satellite-tracker/src/environments/environment';
 import { AdminUserInfo, APIResponse, IUser, UserIdentity } from 'shared/domain';
-import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+import { BehaviorSubject, catchError, map, Observable, tap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { EntityService } from 'ui/entity';
 
@@ -13,15 +13,19 @@ export class UserService extends EntityService<IUser> {
         super(http, environment.API_URL, 'users');
     }
 
-    getByUsername(username: string): Observable<IUser> {
+    public getByUsername(username: string | null, options?: any): Observable<IUser | undefined> {
         return this.http
-            .get<APIResponse<IUser>>(`${environment.API_URL}${'users'}/${username}`)
-            .pipe(map((response: any) => response.result));
+            .get<APIResponse<IUser | undefined>>(`${this.url}${this.endpoint}/${username}`, { ...options })
+            .pipe(
+                map((response: any) => response.result),
+                catchError(this.handleError)
+            );
     }
 
     getAllIdentities(): Observable<AdminUserInfo[]> {
-        return this.http
-            .get<APIResponse<AdminUserInfo[]>>(`${environment.API_URL}identities`)
-            .pipe(map((response: any) => response.result));
+        return this.http.get<APIResponse<AdminUserInfo[]>>(`${environment.API_URL}identities`).pipe(
+            map((response: any) => response.result),
+            catchError(this.handleError)
+        );
     }
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { catchError, of, Subscription, switchMap, tap } from 'rxjs';
-import { APIResponse, IUser, IUserInfo } from 'shared/domain';
+import { IUser } from 'shared/domain';
 import { UserService } from '../user.service';
 
 @Component({
@@ -12,11 +12,13 @@ import { UserService } from '../user.service';
 export class UserEditComponent implements OnInit {
     id: string | null | undefined;
     componentExists = false;
-    // user: User | undefined;
-    // passwordCheck: string | undefined;
 
     title = '';
-    user!: IUser;
+    user: IUser = {
+        username: '',
+        location: { coordinates: { latitude: 0, longitude: 0 } },
+        profileDescription: '',
+    };
     userid!: number | undefined;
     username!: string;
     httpOptions: any;
@@ -45,9 +47,8 @@ export class UserEditComponent implements OnInit {
                     }
                 })
             )
-            .subscribe((user: IUser) => {
-                console.log(user);
-                this.user = user;
+            .subscribe((user: IUser | undefined) => {
+                if (user) this.user = user;
                 this.username = this.user.username;
             });
     }
