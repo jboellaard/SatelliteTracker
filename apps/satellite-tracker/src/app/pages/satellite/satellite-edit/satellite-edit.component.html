@@ -161,88 +161,7 @@
                 </div>
             </div>
 
-            <div class="satellite-parts">
-                <table
-                    mat-table
-                    #table
-                    [dataSource]="satellite.satelliteParts!"
-                    cdkDropList
-                    (cdkDropListDropped)="drop($event)"
-                    class="mat-elevation-z8"
-                    [cdkDropListDisabled]="dragDisabled"
-                >
-                    <!-- Position Column -->
-                    <ng-container matColumnDef="position" sticky>
-                        <th mat-header-cell *matHeaderCellDef class="col-xs">Order</th>
-                        <td mat-cell *matCellDef="let customPart" class="col-xs">
-                            <mat-icon class="dragCursor" (mousedown)="dragDisabled = false">reorder</mat-icon>
-                        </td>
-                    </ng-container>
-
-                    <!-- Name Column -->
-                    <ng-container matColumnDef="name">
-                        <th mat-header-cell *matHeaderCellDef class="col-md">Name</th>
-                        <td mat-cell *matCellDef="let customPart" class="col-md">
-                            {{ customPart.satellitePart.partName }}
-                        </td>
-                    </ng-container>
-
-                    <!-- Color Column -->
-                    <ng-container matColumnDef="color">
-                        <th mat-header-cell *matHeaderCellDef class="col-sm">Color</th>
-                        <td mat-cell *matCellDef="let customPart" class="col-sm">
-                            <div
-                                style="
-                                    width: 100%;
-                                    height: 100%;
-                                    text-align: center;
-                                    border-radius: 5px;
-                                    padding: 5px;
-                                    align-self: center;
-                                "
-                                [style.background]="customPart.color"
-                                [style.color]="getContrastYIQ(customPart.color)"
-                            >
-                                {{ customPart.color }}
-                            </div>
-                        </td>
-                    </ng-container>
-
-                    <!-- Size Column -->
-                    <ng-container matColumnDef="size">
-                        <th mat-header-cell *matHeaderCellDef class="col-sm">Size (m)</th>
-                        <td mat-cell *matCellDef="let customPart" class="col-sm">
-                            {{ customPart.size }}
-                        </td>
-                    </ng-container>
-
-                    <!-- Quantity Column -->
-                    <ng-container matColumnDef="quantity">
-                        <th mat-header-cell *matHeaderCellDef class="col-sm">Quantity</th>
-                        <td mat-cell *matCellDef="let customPart" class="col-sm">
-                            {{ customPart.quantity }}
-                        </td>
-                    </ng-container>
-
-                    <!-- actions column -->
-                    <ng-container matColumnDef="actions">
-                        <th mat-header-cell *matHeaderCellDef class="col-xs"></th>
-                        <td
-                            mat-cell
-                            class="edit icon"
-                            layout-align="center center"
-                            *matCellDef="let customPart"
-                            class="col-xs"
-                        >
-                            <button mat-flat-button (click)="removePart(customPart)">
-                                <mat-icon>remove</mat-icon>
-                            </button>
-                        </td>
-                    </ng-container>
-
-                    <tr mat-header-row *matHeaderRowDef="customPartTableColumns"></tr>
-                    <tr mat-row *matRowDef="let row; columns: customPartTableColumns" cdkDrag></tr>
-                </table>
+            <div id="satellite-parts">
                 <mat-table
                     #table
                     [dataSource]="satellite.satelliteParts!"
@@ -278,6 +197,7 @@
                                         border-radius: 5px;
                                         padding: 5px;
                                         align-self: center;
+                                        margin: 0;
                                     "
                                     [style.background]="customPart.color"
                                     [style.color]="getContrastYIQ(customPart.color)"
@@ -314,7 +234,7 @@
                         </mat-cell>
                     </ng-container>
 
-                    <mat-header-row *matHeaderRowDef="customPartTableColumns"></mat-header-row>
+                    <mat-header-row *matHeaderRowDef="customPartTableColumns; sticky: true"></mat-header-row>
                     <mat-row
                         *matRowDef="let row; columns: customPartTableColumns"
                         cdkDrag
