@@ -16,9 +16,6 @@ import { User, UserDocument } from '../user/schemas/user.schema';
 
 @Injectable()
 export class FeedService {
-    // following: most recently followed and created
-    // tracking: most recently updated
-
     constructor(
         @InjectModel(Satellite.name, `${process.env.MONGO_DATABASE}`) private satelliteModel: Model<SatelliteDocument>,
         @InjectModel(User.name, `${process.env.MONGO_DATABASE}`) private userModel: Model<UserDocument>,
@@ -26,6 +23,146 @@ export class FeedService {
     ) {}
 
     async getSatellitesFeed(username: string) {
+        const trackedSatellites = await this.neo4jService.read(SatelliteNeoQueries.getTrackedSatellites, { username });
+        let satellites = trackedSatellites.records.map((record) => {
+            return {
+                satelliteName: record.get('satellite').properties.satelliteName,
+                createdBy: record.get('satellite').properties.createdBy,
+            };
+        });
+        // satellites = satellites.filter((satellite) => satellite.createdBy !== username);
+        const users = await this.userModel
+            .find({ username: { $in: satellites.map((satellite) => satellite.createdBy) } })
+            .exec();
+        satellites.forEach((satellite) => {
+            const user = users.find((user) => user.username == satellite.createdBy);
+            satellite.createdBy = user._id;
+        });
+
+        let query = { $or: [] };
+        satellites.forEach((currentSatellite) => {
+            query.$or.push({
+                $and: [{ createdBy: currentSatellite.createdBy }, { satelliteName: currentSatellite.satelliteName }],
+            });
+        });
+        const allSatellites = (await this.satelliteModel.find(query).populate('createdBy', 'username').exec()) as any[];
+
+        let mostRecentActivity: FeedItem[] = [];
+        allSatellites.forEach((satellite) => {
+            const satelliteFeedItem = {
+                satelliteName: satellite.satelliteName,
+                satelliteId: satellite._id,
+                username: satellite.createdBy.username,
+                date: satellite.updatedAt,
+                changed: 'satellite',
+            };
+            if (satellite.updatedAt > satellite.createdAt) {
+                mostRecentActivity.push({
+                    ...satelliteFeedItem,
+                    type: FeedItemType.updated,
+                });
+            } else {
+                mostRecentActivity.push({
+                    ...satelliteFeedItem,
+                    type: FeedItemType.created,
+                });
+            }
+            if (satellite.orbit) {
+                let orbitFeedItem = {
+                    satelliteName: satellite.satelliteName,
+                    satelliteId: satellite._id,
+                    username: satellite.createdBy.username,
+                    date: satellite.orbit.updatedAt,
+                    changed: 'orbit',
+                };
+                if (satellite.orbit.updatedAt > satellite.orbit.createdAt) {
+                    mostRecentActivity.push({
+                        ...orbitFeedItem,
+                        type: FeedItemType.updated,
+                    });
+                } else {
+                    mostRecentActivity.push({
+                        ...orbitFeedItem,
+                        type: FeedItemType.created,
+                    });
+                }
+            }
+        });
+
+        mostRecentActivity = mostRecentActivity.sort((a, b) => {
+            return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
+
+        return { status: HttpStatus.OK, result: mostRecentActivity };
+    }
+
+    async getFollowingFeed(username: string) {
+        const usersFollowing = await this.neo4jService.read(UserNeoQueries.getFollowing, { username });
+
+        const mostRecentlyTracked = await this.neo4jService.read(SatelliteNeoQueries.getMostRecentlyTracked, {
+            list: usersFollowing.records.map((record) => record.get('user').properties.username),
+            skip: 0,
+            limit: 10,
+        });
+        let satellites = mostRecentlyTracked.records.map((record) => {
+            return {
+                username: record.get('user').properties.username,
+                satelliteName: record.get('satellite').properties.satelliteName,
+                satelliteId: undefined,
+                createdBy: record.get('satellite').properties.createdBy,
+                date: record.get('track').properties.since.toString(),
+                type: FeedItemType.tracked,
+            };
+        });
+
+        const mostRecentlyCreated = await this.neo4jService.read(SatelliteNeoQueries.getMostRecentlyCreated, {
+            list: usersFollowing.records.map((record) => record.get('user').properties.username),
+            skip: 0,
+            limit: 10,
+        });
+        satellites = satellites.concat(
+            mostRecentlyCreated.records.map((record) => {
+                return {
+                    username: record.get('user').properties.username,
+                    satelliteName: record.get('satellite').properties.satelliteName,
+                    satelliteId: undefined,
+                    createdBy: record.get('satellite').properties.createdBy,
+                    date: record.get('create').properties.createdAt.toString(),
+                    type: FeedItemType.created,
+                };
+            })
+        );
+
+        for (let i = 0; i < satellites.length; i++) {
+            const user = await this.userModel.findOne({ username: satellites[i].createdBy });
+            const satellite = await this.satelliteModel.findOne({
+                satelliteName: satellites[i].satelliteName,
+                createdBy: user._id,
+            });
+            satellites[i].satelliteId = satellite._id;
+        }
+
+        const mostRecentlyFollowed = await this.neo4jService.read(UserNeoQueries.getMostRecentlyFollowed, {
+            list: usersFollowing.records.map((record) => record.get('user').properties.username),
+            skip: 0,
+            limit: 10,
+        });
+        let users = mostRecentlyFollowed.records.map((record) => {
+            return {
+                username: record.get('user').properties.username,
+                followed: record.get('followed').properties.username,
+                date: record.get('follow').properties.since.toString(),
+                type: FeedItemType.followed,
+            };
+        });
+
+        const feed = [...satellites, ...users]
+            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+            .slice(0, 10);
+        return { status: HttpStatus.OK, result: feed };
+    }
+
+    async getMostRecentSatellitesFeed(username: string) {
         const trackedSatellites = await this.neo4jService.read(SatelliteNeoQueries.getTrackedSatellites, { username });
         let satellites = trackedSatellites.records.map((record) => {
             return {
@@ -129,71 +266,5 @@ export class FeedService {
         });
 
         return { status: HttpStatus.OK, result: mostRecentlyUpdatedSatellites };
-    }
-
-    async getFollowingFeed(username: string) {
-        const usersFollowing = await this.neo4jService.read(UserNeoQueries.getFollowing, { username });
-
-        const mostRecentlyTracked = await this.neo4jService.read(SatelliteNeoQueries.getMostRecentlyTracked, {
-            list: usersFollowing.records.map((record) => record.get('user').properties.username),
-            skip: 0,
-            limit: 10,
-        });
-        let satellites = mostRecentlyTracked.records.map((record) => {
-            return {
-                username: record.get('user').properties.username,
-                satelliteName: record.get('satellite').properties.satelliteName,
-                satelliteId: undefined,
-                createdBy: record.get('satellite').properties.createdBy,
-                date: record.get('track').properties.since.toString(),
-                type: FeedItemType.tracked,
-            };
-        });
-
-        const mostRecentlyCreated = await this.neo4jService.read(SatelliteNeoQueries.getMostRecentlyCreated, {
-            list: usersFollowing.records.map((record) => record.get('user').properties.username),
-            skip: 0,
-            limit: 10,
-        });
-        satellites = satellites.concat(
-            mostRecentlyCreated.records.map((record) => {
-                return {
-                    username: record.get('user').properties.username,
-                    satelliteName: record.get('satellite').properties.satelliteName,
-                    satelliteId: undefined,
-                    createdBy: record.get('satellite').properties.createdBy,
-                    date: record.get('create').properties.createdAt.toString(),
-                    type: FeedItemType.created,
-                };
-            })
-        );
-
-        for (let i = 0; i < satellites.length; i++) {
-            const user = await this.userModel.findOne({ username: satellites[i].createdBy });
-            const satellite = await this.satelliteModel.findOne({
-                satelliteName: satellites[i].satelliteName,
-                createdBy: user._id,
-            });
-            satellites[i].satelliteId = satellite._id;
-        }
-
-        const mostRecentlyFollowed = await this.neo4jService.read(UserNeoQueries.getMostRecentlyFollowed, {
-            list: usersFollowing.records.map((record) => record.get('user').properties.username),
-            skip: 0,
-            limit: 10,
-        });
-        let users = mostRecentlyFollowed.records.map((record) => {
-            return {
-                username: record.get('user').properties.username,
-                followed: record.get('followed').properties.username,
-                date: record.get('follow').properties.since.toString(),
-                type: FeedItemType.followed,
-            };
-        });
-
-        const feed = [...satellites, ...users]
-            .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-            .slice(0, 10);
-        return { status: HttpStatus.OK, result: feed };
     }
 }

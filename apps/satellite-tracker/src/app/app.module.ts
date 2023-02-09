@@ -57,6 +57,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { AddEditDialogComponent } from './utils/add-edit-dialog/add-edit-dialog.component';
 import { FollowingComponent } from './pages/dashboard/feed/following/following.component';
 import { TrackingComponent } from './pages/dashboard/feed/tracking/tracking.component';
+import { ForYouComponent } from './pages/dashboard/discover/for-you/for-you.component';
+import { PopularComponent } from './pages/dashboard/discover/popular/popular.component';
 
 const materialModules = [
     MatToolbarModule,
@@ -110,6 +112,8 @@ const materialModules = [
         AddEditDialogComponent,
         FollowingComponent,
         TrackingComponent,
+        ForYouComponent,
+        PopularComponent,
     ],
     imports: [
         BrowserModule,

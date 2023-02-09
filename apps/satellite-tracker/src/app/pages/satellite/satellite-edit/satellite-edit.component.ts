@@ -133,6 +133,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
 
     onSubmit() {
         if (this.componentExists) {
+            this.satellite.orbit = undefined;
             const dialogRef = this.dialog.open(AddEditDialogComponent, {
                 data: { message: 'Are you sure you want to update this satellite?' },
             });

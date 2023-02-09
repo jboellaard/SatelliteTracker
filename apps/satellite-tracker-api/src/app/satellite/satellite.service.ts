@@ -240,9 +240,15 @@ export class SatelliteService {
             const stSession = await this.connection.startSession();
             stSession.startTransaction();
             try {
+                let $valuesToUpdate = {};
+                for (const [key, value] of Object.entries(orbit)) {
+                    $valuesToUpdate['orbit.' + key] = value;
+                }
+                console.log($valuesToUpdate);
+
                 const updatedSatellite = await this.satelliteModel.findByIdAndUpdate(
                     id,
-                    { orbit: orbit },
+                    { $set: $valuesToUpdate },
                     { session: stSession, new: true }
                 );
                 if (orbit.dateTimeOfLaunch) {

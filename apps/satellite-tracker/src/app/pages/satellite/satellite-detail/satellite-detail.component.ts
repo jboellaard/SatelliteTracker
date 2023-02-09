@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { Id, ISatellite } from 'shared/domain';
+import { Id, ISatellite, Shape } from 'shared/domain';
 import { AuthService } from '../../../auth/auth.service';
 import { DeleteDialogComponent } from '../../../utils/delete-dialog/delete-dialog.component';
 import { SnackBarService } from '../../../utils/snack-bar.service';
@@ -42,13 +42,14 @@ export class SatelliteDetailComponent implements OnInit {
             }
         });
         this.route.paramMap.subscribe((params) => {
+            this.satellite = undefined;
             this.id = params.get('satelliteId');
-            this.username = params.get('username')!;
             if (this.id) {
                 this.getSatellite();
                 this.satelliteService.getRefreshRequired().subscribe(() => {
                     this.getSatellite();
                 });
+                this.username = params.get('username')!;
             } else {
                 this.router.navigate([`/users/${this.username}/`]);
             }

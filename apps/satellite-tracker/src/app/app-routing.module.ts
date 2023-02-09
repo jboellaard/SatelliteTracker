@@ -23,14 +23,27 @@ import { DiscoverComponent } from './pages/dashboard/discover/discover.component
 import { FeedComponent } from './pages/dashboard/feed/feed.component';
 import { FollowingComponent } from './pages/dashboard/feed/following/following.component';
 import { TrackingComponent } from './pages/dashboard/feed/tracking/tracking.component';
+import { ForYouComponent } from './pages/dashboard/discover/for-you/for-you.component';
+import { PopularComponent } from './pages/dashboard/discover/popular/popular.component';
 
 const routes: Routes = [
-    { path: 'home', pathMatch: 'full', canActivate: [AuthGuard], component: DiscoverComponent },
+    { path: 'home', pathMatch: 'full', redirectTo: 'feed' },
+    {
+        path: 'discover',
+        canActivate: [AuthGuard],
+        component: DiscoverComponent,
+        children: [
+            { path: '', redirectTo: 'for-you', pathMatch: 'full' },
+            { path: 'for-you', pathMatch: 'full', component: ForYouComponent },
+            { path: 'popular', pathMatch: 'full', component: PopularComponent },
+        ],
+    },
     {
         path: 'feed',
         canActivate: [AuthGuard],
         component: FeedComponent,
         children: [
+            { path: '', redirectTo: 'following', pathMatch: 'full' },
             { path: 'following', pathMatch: 'full', component: FollowingComponent },
             { path: 'tracked-satellites', pathMatch: 'full', component: TrackingComponent },
         ],
@@ -86,7 +99,7 @@ const routes: Routes = [
         path: 'users/:username',
         component: UserDetailComponent,
     },
-    { path: '', pathMatch: 'full', redirectTo: 'home' },
+    { path: '', pathMatch: 'full', redirectTo: 'feed' },
     { path: '**', component: PageNotFoundComponent },
 ];
 
