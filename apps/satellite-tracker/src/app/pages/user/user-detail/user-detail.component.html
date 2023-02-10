@@ -1,12 +1,6 @@
 <div class="component-container" *ngIf="user; else loading">
     <div class="header">
-        <h1>Profile of {{ user.username }}</h1>
-        <!-- <div class="buttons" *ngIf="admin">
-            <button mat-flat-button routerLink="edit"><mat-icon>edit</mat-icon> Edit</button>
-            <button mat-flat-button color="warn" (click)="removeUser(user!.username!)">
-                <mat-icon>delete</mat-icon> Remove
-            </button>
-        </div> -->
+        <h1><mat-icon>portrait</mat-icon> {{ user.username }}</h1>
     </div>
     <div class="text-muted">
         <p>
@@ -89,15 +83,13 @@
                 </ng-container> -->
 
                 <tr mat-header-row *matHeaderRowDef="satelliteColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: satelliteColumns" [routerLink]="'satellites/' + row._id"></tr>
+                <tr
+                    mat-row
+                    *matRowDef="let row; columns: satelliteColumns"
+                    [routerLink]="'/' + user.username + '/satellites/' + row._id"
+                ></tr>
             </table>
         </div>
-    </div>
-
-    <div *ngIf="canEdit" class="button-container">
-        <button mat-raised-button color="primary" [routerLink]="'satellites/new'" class="demo-button">
-            Add satellite
-        </button>
     </div>
 </div>
 

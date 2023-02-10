@@ -9,8 +9,6 @@ export type SatelliteDocument = Satellite & Document;
 
 @Schema()
 export class SatellitePart {
-    _id?: string;
-
     @Prop({ required: true, unique: true, minlength: 1 })
     partName!: string;
 
@@ -127,7 +125,7 @@ SatelliteSchema.pre('validate', async function (next) {
     if (this.satelliteParts && this.satelliteParts.length > 0) {
         for (const part of this.satelliteParts) {
             if (part.satellitePart.dependsOn && part.satellitePart.dependsOn.length > 0) {
-                for (const sp of this.satelliteParts) {
+                for (const sp of this.satelliteParts as any) {
                     if (
                         part.satellitePart.dependsOn
                             .map((p) => p?.toString())

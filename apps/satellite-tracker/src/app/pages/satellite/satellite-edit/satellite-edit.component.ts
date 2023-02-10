@@ -142,7 +142,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                     this.satelliteService.update(this.satellite!).subscribe((satellite) => {
                         if (satellite) {
                             this.snackBar.success('Satellite updated successfully');
-                            this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                            this.router.navigate(['/' + this.username + '/satellites/' + satellite?._id]);
                         } else {
                             this.snackBar.error('Satellite could not be updated');
                         }
@@ -158,7 +158,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                     this.satelliteService.create(this.satellite!).subscribe((satellite) => {
                         if (satellite) {
                             this.snackBar.success('Satellite created successfully');
-                            this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                            this.router.navigate(['/' + this.username + '/satellites/' + satellite?._id]);
                         } else {
                             this.snackBar.error('Satellite could not be created');
                         }
@@ -170,9 +170,9 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
 
     backClicked() {
         if (this.componentExists) {
-            this.router.navigate(['/users/' + this.username + '/satellites/' + this.id]);
+            this.router.navigate(['/' + this.username + '/satellites/' + this.id]);
         } else {
-            this.router.navigate(['/users/' + this.username]);
+            this.router.navigate(['/' + this.username]);
         }
     }
 

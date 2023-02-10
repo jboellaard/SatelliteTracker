@@ -32,6 +32,10 @@ export class OrbitEditComponent implements OnInit {
         shapeOfBase: Shape.Cube,
         orbit: this.orbit,
     };
+    time = {
+        hour: 0,
+        minute: 0,
+    };
 
     id: string | null | undefined;
     username: string | undefined;
@@ -52,9 +56,7 @@ export class OrbitEditComponent implements OnInit {
         private dialog: MatDialog
     ) {
         this.minAltitude = this.orbitService.earthRadius + 30;
-        console.log(1 - this.minAltitude / this.orbitService.maxSMAEarth);
         this.maxEcc = Math.floor(1000 * (1 - this.minAltitude / this.orbitService.maxSMAEarth)) / 1000;
-        console.log(this.maxEcc);
     }
 
     ngOnInit(): void {
@@ -67,6 +69,12 @@ export class OrbitEditComponent implements OnInit {
                         this.satellite = satellite;
                         if (this.satellite.orbit) {
                             this.componentExists = true;
+                            if (this.satellite.orbit.dateTimeOfLaunch) {
+                                this.time = {
+                                    hour: new Date(this.satellite.orbit.dateTimeOfLaunch).getHours(),
+                                    minute: new Date(this.satellite.orbit.dateTimeOfLaunch).getMinutes(),
+                                };
+                            }
                         } else {
                             this.satellite.orbit = this.orbit;
                         }
@@ -89,7 +97,9 @@ export class OrbitEditComponent implements OnInit {
             this.orbitService.createOrbitScene(
                 canvas ? canvas : document.body,
                 this.satellite.orbit!,
-                this.satellite.colorOfBase
+                this.satellite.colorOfBase,
+                this.satellite.shapeOfBase,
+                this.satellite.sizeOfBase
             );
             this.changeOrbitSize();
             document
@@ -173,6 +183,10 @@ export class OrbitEditComponent implements OnInit {
 
     onSubmit() {
         console.log('Submitting the form');
+        if (this.satellite.orbit?.dateTimeOfLaunch) {
+            this.satellite.orbit!.dateTimeOfLaunch = new Date(this.satellite.orbit!.dateTimeOfLaunch!);
+            this.satellite.orbit?.dateTimeOfLaunch.setHours(this.time.hour, this.time.minute);
+        }
         if (this.componentExists) {
             const dialogRef = this.dialog.open(AddEditDialogComponent, {
                 data: { message: 'Are you sure you want to update this orbit?' },
@@ -184,7 +198,7 @@ export class OrbitEditComponent implements OnInit {
                         .subscribe((satellite) => {
                             if (satellite) {
                                 this.snackBar.success('Orbit updated successfully');
-                                this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                                this.router.navigate(['/' + this.username + '/satellites/' + satellite?._id]);
                             } else {
                                 this.snackBar.error('Orbit could not be updated');
                             }
@@ -202,7 +216,7 @@ export class OrbitEditComponent implements OnInit {
                         .subscribe((satellite) => {
                             if (satellite) {
                                 this.snackBar.success('Orbit created successfully');
-                                this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                                this.router.navigate(['/' + this.username + '/satellites/' + satellite?._id]);
                             } else {
                                 this.snackBar.error('Orbit could not be created');
                             }
@@ -214,9 +228,9 @@ export class OrbitEditComponent implements OnInit {
 
     backClicked() {
         if (this.componentExists) {
-            this.router.navigate(['/users/' + this.username + '/satellites/' + this.id]);
+            this.router.navigate(['/' + this.username + '/satellites/' + this.id]);
         } else {
-            this.router.navigate(['/users/' + this.username]);
+            this.router.navigate(['/' + this.username]);
         }
     }
 

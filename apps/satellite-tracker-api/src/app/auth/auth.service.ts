@@ -5,7 +5,7 @@ import { Identity, IdentityDocument } from './schemas/identity.schema';
 import { User, UserDocument } from '../user/schemas/user.schema';
 import { hash, compare } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { AdminUserInfo, IUser, Token, UserIdentity, UserRegistration } from 'shared/domain';
+import { AdminUserInfo, APIResult, IUser, Token, UserIdentity, UserRegistration } from 'shared/domain';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { AuthNeoQueries } from './neo4j/auth.cypher';
 
@@ -22,7 +22,7 @@ export class AuthService {
         private jwtService: JwtService
     ) {}
 
-    async registerUser(credentials: UserRegistration): Promise<{ status: number; result: IUser } | HttpException> {
+    async registerUser(credentials: UserRegistration): Promise<APIResult<IUser> | HttpException> {
         const stsession = await this.stconnection.startSession();
         const identitySession = await this.identityConnection.startSession();
         const neo4jSession = this.neo4jService.getWriteSession();
@@ -83,10 +83,7 @@ export class AuthService {
         }
     }
 
-    async generateToken(
-        username: string,
-        password: string
-    ): Promise<{ status: number; result: Token } | HttpException> {
+    async generateToken(username: string, password: string): Promise<APIResult<Token> | HttpException> {
         const identity = await this.identityModel.findOne({ username: username }).exec();
 
         if (!identity || !(await compare(password, identity.hash)))
@@ -97,7 +94,7 @@ export class AuthService {
         return { status: HttpStatus.OK, result: payload };
     }
 
-    async refreshToken(username: string): Promise<{ status: number; result: Token } | HttpException> {
+    async refreshToken(username: string): Promise<APIResult<Token> | HttpException> {
         const identity = await this.identityModel.findOne({ username: username }).select('-hash').exec();
 
         if (!identity) return new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
@@ -129,12 +126,12 @@ export class AuthService {
         };
     }
 
-    async getIdentity(username: string): Promise<{ status: number; result: UserIdentity }> {
+    async getIdentity(username: string): Promise<APIResult<UserIdentity>> {
         const identity = await this.identityModel.findOne({ username: username }).select('-hash').exec();
         return { status: HttpStatus.OK, result: identity };
     }
 
-    async getAllIdentities(): Promise<{ status: number; result: AdminUserInfo[] }> {
+    async getAllIdentities(): Promise<APIResult<AdminUserInfo[]>> {
         const identities = await this.identityModel.find().select('-hash').exec();
         const users = await this.userModel.find().exec();
         const adminInfoUsers = identities.map((identity) => {
@@ -151,7 +148,7 @@ export class AuthService {
     async updateIdentity(
         username: string,
         updatedCredentials: UserRegistration
-    ): Promise<{ status: number; result: { user: UserIdentity; token: Token } } | HttpException> {
+    ): Promise<APIResult<{ user: UserIdentity; token: Token }> | HttpException> {
         const identitySession = await this.identityConnection.startSession();
         identitySession.startTransaction();
         this.logger.log(`Started transaction for updating user with username ${username}`);
@@ -221,7 +218,7 @@ export class AuthService {
         }
     }
 
-    async delete(username: string): Promise<{ status: number; result: IUser } | HttpException> {
+    async delete(username: string): Promise<APIResult<IUser> | HttpException> {
         this.logger.log(`Removing user with username ${username} (including identity)`);
         const stsession = await this.stconnection.startSession();
         const identitySession = await this.identityConnection.startSession();
@@ -233,7 +230,6 @@ export class AuthService {
         this.logger.log(`Started transaction for deleting user with username ${username}`);
 
         try {
-            //can't rollback neo4j transaction if something goes wrong while committing, so seperate try catch block
             const user = await this.userModel.findOneAndDelete({ username: username }).session(stsession);
             if (!user) {
                 return new HttpException(`Could not find user with username ${username}`, HttpStatus.NOT_FOUND);

@@ -1,5 +1,5 @@
 import { Injectable, OnDestroy } from '@angular/core';
-import { IOrbit } from 'shared/domain';
+import { IOrbit, Shape } from 'shared/domain';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
@@ -17,6 +17,7 @@ export class OrbitService {
     ellipse = new THREE.Line();
     ellipseCurve = new THREE.EllipseCurve(0, 0, 1, 1, 0, 2 * Math.PI, false, 0);
     satelliteMesh = new THREE.Mesh();
+    realSatelliteMesh = new THREE.Mesh();
     xLine = new THREE.Line(new THREE.BufferGeometry());
     yLine = new THREE.Line(new THREE.BufferGeometry());
     zLine = new THREE.Line(new THREE.BufferGeometry());
@@ -25,12 +26,18 @@ export class OrbitService {
     camera = new THREE.PerspectiveCamera();
     fitCameraToOrbit: any;
     guidelines = true;
+    realColorAndSize = true;
     zoom = 1;
 
     constructor() {}
 
-    createOrbitScene(container: Element, orbit: IOrbit, color: string = '#000000') {
-        console.log(orbit);
+    createOrbitScene(
+        container: Element,
+        orbit: IOrbit,
+        color: string = '#ffffff',
+        shape: Shape = Shape.Cube,
+        size = 200
+    ) {
         const scene = new THREE.Scene();
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas: container });
         const width = container.clientWidth;
@@ -63,13 +70,28 @@ export class OrbitService {
         this.createOrbit(orbit, scene);
         this.createGuideLines(scene);
 
-        const satelliteMesh = new THREE.Mesh(
+        this.satelliteMesh = new THREE.Mesh(
             new THREE.BoxGeometry(200 * this.scale, 200 * this.scale, 200 * this.scale),
-            new THREE.MeshPhongMaterial({ color: color, shininess: 100 })
+            new THREE.MeshPhongMaterial({ color: '#ffffff', shininess: 100 })
         );
-        scene.add(satelliteMesh);
-        this.satelliteMesh = satelliteMesh;
-        console.log(satelliteMesh);
+
+        scene.add(this.satelliteMesh);
+        this.satelliteMesh.visible = !this.realColorAndSize;
+
+        if (shape === Shape.Sphere) {
+            this.realSatelliteMesh = new THREE.Mesh(
+                new THREE.BoxGeometry(size * this.scale, size * this.scale, size * this.scale),
+                new THREE.MeshPhongMaterial({ color: color, shininess: 100 })
+            );
+        } else if (shape === Shape.Cube) {
+            this.realSatelliteMesh = new THREE.Mesh(
+                new THREE.SphereGeometry((size * this.scale) / 2, 32, 32),
+                new THREE.MeshPhongMaterial({ color: color, shininess: 100 })
+            );
+        }
+
+        scene.add(this.realSatelliteMesh);
+        this.realSatelliteMesh.visible = this.realColorAndSize;
 
         const perigeeLine = new THREE.Line(
             new THREE.BufferGeometry(),
@@ -94,7 +116,7 @@ export class OrbitService {
             background.geometry.scale(-1, 1, 1);
             camera.far = cameraPos * 2 + 1100;
 
-            satelliteMesh.scale.setScalar(cameraPos * 1.1);
+            this.satelliteMesh.scale.setScalar(cameraPos * 1.1);
             camera.lookAt(0, 0, 0);
             camera.updateProjectionMatrix();
             controls.update();
@@ -159,7 +181,8 @@ export class OrbitService {
                     (1 + 2 * orbit.eccentricity * Math.cos(time) + orbit.eccentricity ** 2)) /
                 (1 - orbit.eccentricity ** 2);
             const pos = getPositionInOrbit(orbit, time);
-            satelliteMesh.position.set(pos.x, pos.y, pos.z);
+            this.satelliteMesh.position.set(pos.x, pos.y, pos.z);
+            this.realSatelliteMesh.position.set(pos.x, pos.y, pos.z);
 
             const perigeePos = getPositionInOrbit(orbit, 0);
             perigeeLine.geometry = new THREE.BufferGeometry().setFromPoints([perigeePos, center]);
@@ -285,7 +308,7 @@ export class OrbitService {
     }
 
     changeColorSatellite(color: string) {
-        this.satelliteMesh.material = new THREE.MeshBasicMaterial({
+        this.realSatelliteMesh.material = new THREE.MeshBasicMaterial({
             color: color,
         });
     }
@@ -295,6 +318,11 @@ export class OrbitService {
         this.yLine.visible = this.guidelines;
         this.zLine.visible = this.guidelines;
         this.equatorialPlane.visible = this.guidelines;
+    }
+
+    toggleColorAndSize() {
+        this.satelliteMesh.visible = !this.realColorAndSize;
+        this.realSatelliteMesh.visible = this.realColorAndSize;
     }
 
     changeZoom(orbit: IOrbit) {

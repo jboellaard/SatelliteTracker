@@ -53,6 +53,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 
 import { AddEditDialogComponent } from './utils/add-edit-dialog/add-edit-dialog.component';
 import { FollowingComponent } from './pages/dashboard/feed/following/following.component';
@@ -82,6 +84,8 @@ const materialModules = [
     MatBadgeModule,
     MatTabsModule,
     MatProgressBarModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
 ];
 
 @NgModule({
@@ -125,7 +129,7 @@ const materialModules = [
         DragDropModule,
         AppRoutingModule,
     ],
-    providers: [AuthService, httpInterceptorProviders],
+    providers: [AuthService, httpInterceptorProviders, MatDatepickerModule],
     bootstrap: [AppComponent],
 })
 export class AppModule {}

@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { SatelliteDto, UpdateSatelliteDto } from './dto/satellite.dto';
-import { Id } from 'shared/domain';
+import { APIResult, Id, ISatellite, ISatellitePart } from 'shared/domain';
 import { Satellite, SatellitePart } from './schemas/satellite.schema';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../user/schemas/user.schema';
@@ -22,7 +22,7 @@ export class SatelliteService {
         private readonly neo4jService: Neo4jService
     ) {}
 
-    async create(username: string, newSatellite: SatelliteDto) {
+    async create(username: string, newSatellite: SatelliteDto): Promise<APIResult<ISatellite> | HttpException> {
         const stSession = await this.connection.startSession();
         const neo4jSession = this.neo4jService.getWriteSession();
 
@@ -30,7 +30,7 @@ export class SatelliteService {
         const transaction = neo4jSession.beginTransaction();
         try {
             const newSatelliteModel = new this.satelliteModel(newSatellite);
-            const satellite = await newSatelliteModel.save({ session: stSession });
+            const satellite = (await newSatelliteModel.save({ session: stSession })).toObject() as ISatellite;
             try {
                 transaction.run(SatelliteNeoQueries.addSatellite, {
                     satelliteName: newSatellite.satelliteName,
@@ -62,16 +62,18 @@ export class SatelliteService {
         }
     }
 
-    async findAll() {
-        const satellites = await this.satelliteModel
+    async findAll(): Promise<APIResult<ISatellite[]>> {
+        const satellites = (await this.satelliteModel
             .find()
             .populate('createdBy', 'username')
-            .populate('satelliteParts.satellitePart');
+            .populate('satelliteParts.satellitePart')) as ISatellite[];
         return { status: HttpStatus.OK, result: satellites };
     }
 
-    async findOne(id: Id) {
-        const satellite = await this.satelliteModel.findById(id).populate('satelliteParts.satellitePart');
+    async findOne(id: Id): Promise<APIResult<ISatellite> | HttpException> {
+        const satellite = (await this.satelliteModel
+            .findById(id)
+            .populate('satelliteParts.satellitePart')) as ISatellite;
         if (satellite) {
             return { status: HttpStatus.OK, result: satellite };
         } else {
@@ -79,20 +81,26 @@ export class SatelliteService {
         }
     }
 
-    async getSatellitesOfUserWithId(id: Id) {
-        const satellites = await this.satelliteModel.find({ createdBy: id }).populate('satelliteParts.satellitePart');
+    async getSatellitesOfUserWithId(id: Id): Promise<APIResult<ISatellite[]>> {
+        const satellites = (await this.satelliteModel
+            .find({ createdBy: id })
+            .populate('satelliteParts.satellitePart')) as ISatellite[];
         return { status: HttpStatus.OK, result: satellites };
     }
 
-    async getSatellitesOfUserWithUsername(username: string) {
+    async getSatellitesOfUserWithUsername(username: string): Promise<APIResult<ISatellite[]>> {
         const user = await this.userModel.findOne({ username });
-        const satellites = await this.satelliteModel
+        const satellites = (await this.satelliteModel
             .find({ createdBy: user._id })
-            .populate('satelliteParts.satellitePart');
+            .populate('satelliteParts.satellitePart')) as ISatellite[];
         return { status: HttpStatus.OK, result: satellites };
     }
 
-    async update(userId: Id, id: Id, updateSatelliteDto: UpdateSatelliteDto) {
+    async update(
+        userId: Id,
+        id: Id,
+        updateSatelliteDto: UpdateSatelliteDto
+    ): Promise<APIResult<ISatellite> | HttpException> {
         const satellite = await this.satelliteModel.findById(id);
         if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
@@ -119,11 +127,13 @@ export class SatelliteService {
                     throw new Error('Could not update satellite');
                 }
 
-                const updatedSatellite = await this.satelliteModel.findByIdAndUpdate(
-                    id,
-                    { ...updateSatelliteDto },
-                    { session: stSession, new: true }
-                );
+                const updatedSatellite = (
+                    await this.satelliteModel.findByIdAndUpdate(
+                        id,
+                        { ...updateSatelliteDto },
+                        { session: stSession, new: true }
+                    )
+                ).toObject() as ISatellite;
 
                 await transaction.commit();
                 await stSession.commitTransaction();
@@ -140,7 +150,7 @@ export class SatelliteService {
         }
     }
 
-    async remove(userId: Id, id: Id) {
+    async remove(userId: Id, id: Id): Promise<APIResult<any> | HttpException> {
         const satellite = await this.satelliteModel.findById(id);
         if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
@@ -179,27 +189,25 @@ export class SatelliteService {
         }
     }
 
-    async getAllSatelliteParts() {
-        const satelliteParts = await this.satellitePartModel.find().populate('dependsOn');
+    async getAllSatelliteParts(): Promise<APIResult<ISatellitePart[]>> {
+        const satelliteParts = (await this.satellitePartModel.find().populate('dependsOn')) as ISatellitePart[];
         return { status: HttpStatus.OK, result: satelliteParts };
     }
 
-    async getSatellitePart(id: Id) {
-        const satellitePart = await this.satellitePartModel.findById(id);
+    async getSatellitePart(id: Id): Promise<APIResult<ISatellitePart>> {
+        const satellitePart = (await this.satellitePartModel.findById(id)).toObject() as ISatellitePart;
         return { status: HttpStatus.OK, result: satellitePart };
     }
 
-    async createOrbit(userId: Id, id: Id, orbit: OrbitDto) {
+    async createOrbit(userId: Id, id: Id, orbit: OrbitDto): Promise<APIResult<ISatellite> | HttpException> {
         const satellite = await this.satelliteModel.findById(id);
         if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
             stSession.startTransaction();
             try {
-                const updatedSatellite = await this.satelliteModel.findByIdAndUpdate(
-                    id,
-                    { orbit: orbit },
-                    { session: stSession, new: true }
-                );
+                const updatedSatellite = (
+                    await this.satelliteModel.findByIdAndUpdate(id, { orbit: orbit }, { session: stSession, new: true })
+                ).toObject() as ISatellite;
                 if (orbit.dateTimeOfLaunch) {
                     const neo4jSession = this.neo4jService.getWriteSession();
                     const transaction = neo4jSession.beginTransaction();
@@ -234,7 +242,7 @@ export class SatelliteService {
         }
     }
 
-    async updateOrbit(userId: Id, id: Id, orbit: UpdateOrbitDto) {
+    async updateOrbit(userId: Id, id: Id, orbit: UpdateOrbitDto): Promise<APIResult<ISatellite> | HttpException> {
         const satellite = await this.satelliteModel.findById(id);
         if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
@@ -244,13 +252,14 @@ export class SatelliteService {
                 for (const [key, value] of Object.entries(orbit)) {
                     $valuesToUpdate['orbit.' + key] = value;
                 }
-                console.log($valuesToUpdate);
 
-                const updatedSatellite = await this.satelliteModel.findByIdAndUpdate(
-                    id,
-                    { $set: $valuesToUpdate },
-                    { session: stSession, new: true }
-                );
+                const updatedSatellite = (
+                    await this.satelliteModel.findByIdAndUpdate(
+                        id,
+                        { $set: $valuesToUpdate },
+                        { session: stSession, new: true }
+                    )
+                ).toObject() as ISatellite;
                 if (orbit.dateTimeOfLaunch) {
                     const neo4jSession = this.neo4jService.getWriteSession();
                     const transaction = neo4jSession.beginTransaction();
@@ -282,17 +291,19 @@ export class SatelliteService {
         }
     }
 
-    async removeOrbit(userId: Id, id: Id) {
+    async removeOrbit(userId: Id, id: Id): Promise<APIResult<ISatellite> | HttpException> {
         const satellite = await this.satelliteModel.findById(id);
         if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
             stSession.startTransaction();
             try {
-                const updatedSatellite = await this.satelliteModel.findByIdAndUpdate(
-                    id,
-                    { $unset: { orbit: 1 } },
-                    { session: stSession, new: true }
-                );
+                const updatedSatellite = (
+                    await this.satelliteModel.findByIdAndUpdate(
+                        id,
+                        { $unset: { orbit: 1 } },
+                        { session: stSession, new: true }
+                    )
+                ).toObject() as ISatellite;
                 const neo4jSession = this.neo4jService.getWriteSession();
                 const transaction = neo4jSession.beginTransaction();
                 try {
@@ -321,7 +332,7 @@ export class SatelliteService {
         }
     }
 
-    async trackSatellite(username: string, id: Id) {
+    async trackSatellite(username: string, id: Id): Promise<APIResult<{ message: string }> | HttpException> {
         const satellite = await this.satelliteModel.findById(id).populate('createdBy');
         if (satellite) {
             const createdBy = eval(satellite.createdBy);
@@ -342,7 +353,7 @@ export class SatelliteService {
         }
     }
 
-    async untrackSatellite(username: string, id: Id) {
+    async untrackSatellite(username: string, id: Id): Promise<APIResult<{ message: string }> | HttpException> {
         const satellite = await this.satelliteModel.findById(id).populate('createdBy');
         if (satellite) {
             const createdBy = eval(satellite.createdBy);

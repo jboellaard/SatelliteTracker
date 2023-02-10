@@ -1,8 +1,9 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Id } from 'shared/domain';
+import { APIResult, Id, ISatellite, IUser, IUserInfo } from 'shared/domain';
 import { Neo4jService } from '../neo4j/neo4j.service';
+import { SatelliteNeoQueries } from '../satellite/neo4j/satellite.cypher';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserNeoQueries } from './neo4j/user.cypher';
 import { User, UserDocument } from './schemas/user.schema';
@@ -15,28 +16,45 @@ export class UserService {
         private readonly neo4jService: Neo4jService
     ) {}
 
-    async findAll() {
+    async findAll(): Promise<APIResult<IUser[]>> {
         const users = await this.userModel.find();
         return { status: HttpStatus.OK, result: users };
     }
 
-    async findOne(id: Id) {
-        const user = await this.userModel
-            .findOne({ username: id })
-            .populate('satellites')
-            .populate('satellites.satelliteParts.satellitePart');
+    async findOne(username: string): Promise<APIResult<IUser> | HttpException> {
+        const user = (await this.userModel.findOne({ username }).populate('satellites')).toObject() as IUser; // .populate('satellites.satelliteParts.satellitePart'))
         if (!user) {
             return new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
-        return { status: HttpStatus.OK, result: user };
+        const neoSession = this.neo4jService.getReadSession();
+        const followers = await neoSession.run(UserNeoQueries.getFollowers, { username }).then((result) => {
+            return result.records.map((record) => record.get('follower').properties as IUserInfo);
+        });
+        const following = await neoSession.run(UserNeoQueries.getFollowing, { username }).then((result) => {
+            return result.records.map((record) => record.get('following').properties as IUserInfo);
+        });
+        const tracking = await neoSession.run(SatelliteNeoQueries.getTrackedSatellites, { username }).then((result) => {
+            return result.records.map((record) => {
+                if (record.get('satellite').properties.launchDate) {
+                    record.get('satellite').properties.launchDate = record
+                        .get('satellite')
+                        .properties.launchDate.toString();
+                }
+                return record.get('satellite').properties as { createdBy: string; satelliteName: string };
+            });
+        });
+
+        const userWithRelations = { ...user, followers, following, tracking };
+        await neoSession.close();
+        return { status: HttpStatus.OK, result: userWithRelations };
     }
 
-    async update(id: Id, updateUserDto: UpdateUserDto) {
+    async update(id: Id, updateUserDto: UpdateUserDto): Promise<APIResult<IUser>> {
         const updatedUser = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
         return { status: HttpStatus.OK, result: updatedUser };
     }
 
-    async followUser(username: string, toFollow: string) {
+    async followUser(username: string, toFollow: string): Promise<APIResult<{ message: string }> | HttpException> {
         try {
             const result = await this.neo4jService.write(UserNeoQueries.followUser, { username, toFollow });
             console.log(result);
@@ -47,7 +65,7 @@ export class UserService {
         }
     }
 
-    async unfollowUser(username: string, toUnfollow: string) {
+    async unfollowUser(username: string, toUnfollow: string): Promise<APIResult<{ message: string }> | HttpException> {
         try {
             const result = await this.neo4jService.write(UserNeoQueries.unfollowUser, { username, toUnfollow });
             console.log(result);

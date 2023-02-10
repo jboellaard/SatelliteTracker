@@ -122,7 +122,7 @@ export class RecommendationsService {
         return { status: HttpStatus.OK, result: usersWithCount };
     }
 
-    async getRecentlyCreatedSatellites() {
+    async getRecentlyCreatedSatellites(): Promise<APIResult<ISatellite[]>> {
         const recentlyCreatedSatellites = await this.neo4jService.read(
             RecommendationsNeoQueries.getMostRecentlyCreatedSatellites,
             {

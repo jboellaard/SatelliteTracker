@@ -25,7 +25,7 @@
             </div>
             <div>
                 <a
-                    routerLink="/users/{{ user?.username }}"
+                    routerLink="/{{ user?.username }}"
                     routerLinkActive="active"
                     [routerLinkActiveOptions]="{ exact: true }"
                 >
@@ -45,14 +45,14 @@
                 <h3 style="margin: 30px 0 0 0; padding: 0 20px">My satellites</h3>
                 <button
                     mat-icon-button
-                    routerLink="/users/{{ user?.username }}/satellites/new"
+                    routerLink="/{{ user?.username }}/satellites/new"
                     style="height: 28px; width: 28px; margin: 30px 10px 0 0"
                 >
                     <mat-icon style="position: absolute; top: 2px; left: 2px">add</mat-icon>
                 </button>
             </div>
             <div *ngFor="let satellite of satellites">
-                <a routerLink="/users/{{ user?.username }}/satellites/{{ satellite.id }}" routerLinkActive="active">
+                <a routerLink="/{{ user?.username }}/satellites/{{ satellite.id }}" routerLinkActive="active">
                     <div class="side-bar-content-item">
                         <span>{{ satellite.satelliteName }}</span>
                     </div>

@@ -1,27 +1,27 @@
-<div id="canvas-wrapper"><canvas></canvas></div>
-<form #orbitEditForm="ngForm" name="form" (ngSubmit)="onSubmit()">
-    <div>
+<div class="col-2">
+    <div id="visual">
+        <div id="canvas-wrapper"><canvas></canvas></div>
         <section style="margin-bottom: 10px">
-            <div style="float: left; width: 260px; margin-top: 4px">
+            <div id="checkbox-wrapper">
                 <mat-checkbox
                     [(ngModel)]="orbitService.guidelines"
                     name="guidelines"
                     (ngModelChange)="orbitService.toggleGuideLines()"
                     color="'accent'"
+                    style="margin-right: 10px"
                     >Add guidelines</mat-checkbox
                 >
-            </div>
-            <div style="margin-left: 270px; display: flex; justify-content: end; gap: 10px">
-                <mat-label for="mat-zoom-slider" style="align-self: center">Zoom</mat-label>
-                <mat-slider
-                    class="slider"
-                    id="mat-zoom-slider"
-                    step="0.02"
-                    min="0.4"
-                    max="2"
-                    discrete="true"
-                    style="max-width: 60%"
+                <mat-checkbox
+                    [(ngModel)]="orbitService.realColorAndSize"
+                    name="realColorAndSize"
+                    (ngModelChange)="orbitService.toggleColorAndSize()"
+                    color="'accent'"
+                    >Real color and size</mat-checkbox
                 >
+            </div>
+            <div id="zoom-slider-wrapper">
+                <mat-label for="mat-zoom-slider" style="align-self: center">Zoom</mat-label>
+                <mat-slider class="slider" id="mat-zoom-slider" step="0.02" min="0.4" max="2" discrete="true">
                     <input
                         matSliderThumb
                         name="zoom-slider"
@@ -33,166 +33,207 @@
                 </mat-slider>
             </div>
         </section>
-        <!-- semi major axis -->
-        <div class="cols-2 between-sliders">
-            <mat-form-field class="form-group orbit" appearance="fill" style="width: 60%">
-                <mat-label for="semimajoraxis">Semimajor axis (a) in km</mat-label>
+    </div>
+    <form #orbitEditForm="ngForm" name="form" (ngSubmit)="onSubmit()">
+        <div>
+            <!-- semi major axis -->
+            <div class="cols-2 between-sliders">
+                <mat-form-field class="form-group orbit" appearance="fill" style="width: 60%">
+                    <mat-label for="semimajoraxis">Semimajor axis (a) in km</mat-label>
+                    <input
+                        matInput
+                        type="number"
+                        name="semimajoraxis"
+                        id="semimajoraxis"
+                        class="form-control"
+                        [(ngModel)]="satellite.orbit!.semiMajorAxis"
+                        #semiMajorAxis="ngModel"
+                        (ngModelChange)="changeSemimajorAxis()"
+                        required
+                        step="1"
+                        [ngClass]="{
+                            'is-invalid': semiMajorAxis.invalid && semiMajorAxis.touched
+                        }"
+                    />
+                    <mat-error
+                        class="invalid-feedback"
+                        *ngIf="semiMajorAxis.invalid && semiMajorAxis.touched && semiMajorAxis.errors!['required']"
+                        >Semimajor axis is required</mat-error
+                    >
+                </mat-form-field>
+                <!-- period -->
+                <mat-form-field class="form-group orbit" appearance="fill" style="width: 38%">
+                    <mat-label for="period">Period (P) in days</mat-label>
+                    <input
+                        matInput
+                        type="number"
+                        name="period"
+                        class="form-control"
+                        [(ngModel)]="satellite.orbit!.period"
+                        #period="ngModel"
+                        disabled
+                    />
+                </mat-form-field>
+            </div>
+
+            <!-- eccentricity -->
+            <div class="label-container">
+                <label class="label" for="eccentricity-slider">Eccentricity (e)</label>
+                <span class="label-value" id="eccentricity-value">{{ satellite.orbit!.eccentricity?.toFixed(3) }}</span>
+            </div>
+            <mat-slider class="slider" id="mat-eccentricity-slider" step="0.005" min="0" [max]="maxEcc" discrete="true">
                 <input
-                    matInput
-                    type="number"
-                    name="semimajoraxis"
-                    id="semimajoraxis"
-                    class="form-control"
-                    [(ngModel)]="satellite.orbit!.semiMajorAxis"
-                    #semiMajorAxis="ngModel"
-                    (ngModelChange)="changeSemimajorAxis()"
-                    required
-                    step="1"
-                    [ngClass]="{
-                        'is-invalid': semiMajorAxis.invalid && semiMajorAxis.touched
-                    }"
+                    matSliderThumb
+                    name="eccentricity-slider"
+                    id="eccentricity-slider"
+                    [(ngModel)]="satellite.orbit!.eccentricity"
+                    (ngModelChange)="changeEccentricity()"
+                    #eccentricitySlider="ngModel"
                 />
-                <mat-error
-                    class="invalid-feedback"
-                    *ngIf="semiMajorAxis.invalid && semiMajorAxis.touched && semiMajorAxis.errors!['required']"
-                    >Semimajor axis is required</mat-error
+            </mat-slider>
+
+            <!-- <div class="cols-2"> -->
+            <!-- inclination -->
+            <div class="label-container">
+                <label class="label" for="inclination-slider">Inclination (i)</label>
+                <span class="label-value" id="inclination-value">{{ satellite.orbit!.inclination }}°</span>
+            </div>
+            <mat-slider class="slider" step="1" min="0" max="180" discrete="true">
+                <input
+                    matSliderThumb
+                    name="inclination-slider"
+                    id="inclination-slider"
+                    [(ngModel)]="satellite.orbit!.inclination"
+                    (ngModelChange)="changeAngle()"
+                    #inclinationSlider="ngModel"
+                />
+            </mat-slider>
+
+            <!-- </div> -->
+            <!-- <div class="cols-2"> -->
+            <!-- longitude (RA) -->
+            <div class="label-container">
+                <label class="label" for="inclination-slider">Longitude of ascending node (Ω)</label>
+                <span class="label-value" id="inclination-value">{{ satellite.orbit!.longitudeOfAscendingNode }}°</span>
+            </div>
+            <mat-slider
+                id="mat-longitude-slider"
+                class="slider"
+                step="1"
+                min="0"
+                max="360"
+                discrete="true"
+                [disabled]="satellite.orbit!.inclination == 0"
+            >
+                <input
+                    matSliderThumb
+                    name="longitude-slider"
+                    id="longitude-slider"
+                    [(ngModel)]="satellite.orbit!.longitudeOfAscendingNode"
+                    (ngModelChange)="changeAngle()"
+                    #longitudeSlider="ngModel"
+                />
+            </mat-slider>
+
+            <!-- argumentOfPerigee -->
+            <div class="label-container">
+                <label
+                    *ngIf="satellite.orbit!.inclination == 0 && satellite.orbit!.eccentricity == 0"
+                    class="label"
+                    for="perigee-slider"
+                    >True longitude (l)</label
                 >
-            </mat-form-field>
-            <!-- period -->
-            <mat-form-field class="form-group orbit" appearance="fill" style="width: 38%">
-                <mat-label for="period">Period (P) in days</mat-label>
+                <label
+                    *ngIf="satellite.orbit!.inclination != 0 && satellite.orbit!.eccentricity == 0"
+                    class="label"
+                    for="perigee-slider"
+                    >Argument of latitude (u)</label
+                >
+                <label *ngIf="satellite.orbit!.eccentricity != 0" class="label" for="perigee-slider"
+                    >Argument of perigee (ω)</label
+                >
+                <span class="label-value" id="perigee-value">{{ satellite.orbit!.argumentOfPerigee }}°</span>
+            </div>
+            <mat-slider class="slider" step="1" min="0" max="360" discrete="true">
                 <input
-                    matInput
-                    type="number"
-                    name="period"
-                    class="form-control"
-                    [(ngModel)]="satellite.orbit!.period"
-                    #period="ngModel"
-                    disabled
+                    matSliderThumb
+                    name="perigee-slider"
+                    id="perigee-slider"
+                    [(ngModel)]="satellite.orbit!.argumentOfPerigee"
+                    (ngModelChange)="changeAngle()"
+                    #perigeeSlider="ngModel"
                 />
-            </mat-form-field>
+            </mat-slider>
+            <div class="date-time">
+                <div class="date-picker">
+                    <mat-form-field appearance="fill">
+                        <mat-label for="launch-date">Date and time at perigee</mat-label>
+                        <input
+                            matInput
+                            [matDatepicker]="picker"
+                            id="launch-date"
+                            name="launch-date"
+                            class="form-control"
+                            required
+                            [(ngModel)]="satellite.orbit!.dateTimeOfLaunch"
+                            #date="ngModel"
+                            [ngClass]="{ 'is-invalid': date.invalid && (date.dirty || date.touched) }"
+                        />
+                        <mat-hint style="color: #979797">MM/DD/YYYY</mat-hint>
+                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-datepicker #picker></mat-datepicker>
+                    </mat-form-field>
+                </div>
+                <div class="time-picker">
+                    <mat-form-field appearance="fill">
+                        <input
+                            matInput
+                            id="hour"
+                            name="hour"
+                            type="number"
+                            [(ngModel)]="time.hour"
+                            #hour="ngModel"
+                            required
+                            [ngClass]="{ 'is-invalid': hour.invalid && hour.touched }"
+                            placeholder="H"
+                            min="0"
+                            max="23"
+                        />
+                    </mat-form-field>
+                    :
+                    <mat-form-field appearance="fill">
+                        <input
+                            matInput
+                            id="minute"
+                            name="minute"
+                            type="number"
+                            [(ngModel)]="time.minute"
+                            #minute="ngModel"
+                            required
+                            [ngClass]="{ 'is-invalid': minute.invalid && minute.touched }"
+                            placeholder="M"
+                            min="0"
+                            max="59"
+                        />
+                    </mat-form-field>
+                </div>
+            </div>
         </div>
 
-        <!-- eccentricity -->
-        <div class="label-container">
-            <label class="label" for="eccentricity-slider">Eccentricity (e)</label>
-            <span class="label-value" id="eccentricity-value">{{ satellite.orbit!.eccentricity?.toFixed(3) }}</span>
+        <!-- Submit and Cancel buttons -->
+        <div class="buttons">
+            <div class="">
+                <button
+                    mat-flat-button
+                    color="primary"
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="!orbitEditForm.valid"
+                >
+                    Submit
+                </button>
+                <button mat-flat-button class="btn btn-warning" (click)="backClicked()">Cancel</button>
+            </div>
         </div>
-        <mat-slider class="slider" id="mat-eccentricity-slider" step="0.005" min="0" [max]="maxEcc" discrete="true">
-            <input
-                matSliderThumb
-                name="eccentricity-slider"
-                id="eccentricity-slider"
-                [(ngModel)]="satellite.orbit!.eccentricity"
-                (ngModelChange)="changeEccentricity()"
-                #eccentricitySlider="ngModel"
-            />
-        </mat-slider>
-
-        <!-- <div class="cols-2"> -->
-        <!-- inclination -->
-        <div class="label-container">
-            <label class="label" for="inclination-slider">Inclination (i)</label>
-            <span class="label-value" id="inclination-value">{{ satellite.orbit!.inclination }}°</span>
-        </div>
-        <mat-slider class="slider" step="1" min="0" max="180" discrete="true">
-            <input
-                matSliderThumb
-                name="inclination-slider"
-                id="inclination-slider"
-                [(ngModel)]="satellite.orbit!.inclination"
-                (ngModelChange)="changeAngle()"
-                #inclinationSlider="ngModel"
-            />
-        </mat-slider>
-
-        <!-- </div> -->
-        <!-- <div class="cols-2"> -->
-        <!-- longitude (RA) -->
-        <div class="label-container">
-            <label class="label" for="inclination-slider">Longitude of ascending node (Ω)</label>
-            <span class="label-value" id="inclination-value">{{ satellite.orbit!.longitudeOfAscendingNode }}°</span>
-        </div>
-        <mat-slider
-            id="mat-longitude-slider"
-            class="slider"
-            step="1"
-            min="0"
-            max="360"
-            discrete="true"
-            [disabled]="satellite.orbit!.inclination == 0"
-        >
-            <input
-                matSliderThumb
-                name="longitude-slider"
-                id="longitude-slider"
-                [(ngModel)]="satellite.orbit!.longitudeOfAscendingNode"
-                (ngModelChange)="changeAngle()"
-                #longitudeSlider="ngModel"
-            />
-        </mat-slider>
-
-        <!-- argumentOfPerigee -->
-        <div class="label-container">
-            <label
-                *ngIf="satellite.orbit!.inclination == 0 && satellite.orbit!.eccentricity == 0"
-                class="label"
-                for="perigee-slider"
-                >True longitude (l)</label
-            >
-            <label
-                *ngIf="satellite.orbit!.inclination != 0 && satellite.orbit!.eccentricity == 0"
-                class="label"
-                for="perigee-slider"
-                >Argument of latitude (u)</label
-            >
-            <label *ngIf="satellite.orbit!.eccentricity != 0" class="label" for="perigee-slider"
-                >Argument of perigee (ω)</label
-            >
-            <span class="label-value" id="perigee-value">{{ satellite.orbit!.argumentOfPerigee }}°</span>
-        </div>
-        <mat-slider class="slider" step="1" min="0" max="360" discrete="true">
-            <input
-                matSliderThumb
-                name="perigee-slider"
-                id="perigee-slider"
-                [(ngModel)]="satellite.orbit!.argumentOfPerigee"
-                (ngModelChange)="changeAngle()"
-                #perigeeSlider="ngModel"
-            />
-        </mat-slider>
-        <mat-form-field appearance="fill" class="between-sliders" style="width: 97%">
-            <mat-label for="launch-date">Date time at zero</mat-label>
-            <input
-                matInput
-                type="datetime-local"
-                name="launch-date"
-                id="launch-date"
-                class="form-control"
-                [ngModel]="satellite.orbit!.dateTimeOfLaunch | date : 'yyyy-MM-ddTHH:mm:ss'"
-                (ngModelChange)="satellite.orbit!.dateTimeOfLaunch = dateChanged($event)"
-                #dateAtPerigee="ngModel"
-                required
-                [ngClass]="{
-                    'is-invalid': dateAtPerigee.invalid && dateAtPerigee.touched
-                }"
-            />
-        </mat-form-field>
-    </div>
-
-    <!-- Submit and Cancel buttons -->
-    <div class="buttons">
-        <div class="">
-            <button
-                mat-flat-button
-                color="primary"
-                type="submit"
-                class="btn btn-primary"
-                [disabled]="!orbitEditForm.valid"
-            >
-                Submit
-            </button>
-            <button mat-flat-button class="btn btn-warning" (click)="backClicked()">Cancel</button>
-        </div>
-    </div>
-</form>
+    </form>
+</div>

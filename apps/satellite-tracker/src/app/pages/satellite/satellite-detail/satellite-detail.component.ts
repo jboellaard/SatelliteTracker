@@ -51,7 +51,7 @@ export class SatelliteDetailComponent implements OnInit {
                 });
                 this.username = params.get('username')!;
             } else {
-                this.router.navigate([`/users/${this.username}/`]);
+                this.router.navigate([`/${this.username}/`]);
             }
         });
     }
@@ -67,7 +67,7 @@ export class SatelliteDetailComponent implements OnInit {
                 if (this.satellite.orbit) {
                     this.addOrbitScene();
                 }
-            } else this.router.navigate([`/users/${this.username}/`]);
+            } else this.router.navigate([`/${this.username}/`]);
         });
     }
 
@@ -78,7 +78,9 @@ export class SatelliteDetailComponent implements OnInit {
                 this.orbitService.createOrbitScene(
                     canvas ? canvas : document.body,
                     this.satellite?.orbit!,
-                    this.satellite?.colorOfBase
+                    this.satellite?.colorOfBase,
+                    this.satellite?.shapeOfBase,
+                    this.satellite?.sizeOfBase
                 );
             }, 0);
         }
@@ -95,7 +97,7 @@ export class SatelliteDetailComponent implements OnInit {
                     console.log(result);
                     if (result) {
                         this.snackBar.success('Satellite successfully deleted');
-                        this.router.navigate([`/users/${this.username}/`]);
+                        this.router.navigate([`/${this.username}/`]);
                     } else {
                         this.snackBar.error('Something went wrong, please try again later');
                     }

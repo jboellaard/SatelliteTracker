@@ -3,8 +3,63 @@
     height: 100%;
 }
 
+section {
+    padding: 0px 20px 0px 20px;
+}
+
+#checkbox-wrapper {
+    float: left;
+    margin-top: 4px;
+}
+
+#zoom-slider-wrapper {
+    margin-left: 270px;
+    display: flex;
+    justify-content: end;
+    gap: 10px;
+}
+
+#zoom-slider-wrapper mat-slider.slider {
+    max-width: 60%;
+}
+
 form {
     padding: 0px 20px 20px 20px;
+}
+
+@media only screen and (min-width: 1180px) {
+    #checkbox-wrapper {
+        float: none;
+        display: flex;
+        justify-content: space-between;
+        margin-left: -10px;
+    }
+
+    #zoom-slider-wrapper {
+        justify-content: center;
+        margin: auto;
+        width: 100%;
+    }
+
+    #zoom-slider-wrapper mat-slider.slider {
+        max-width: 100%;
+    }
+
+    .col-2 {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px;
+        max-width: 100%;
+    }
+
+    .col-2 canvas {
+        min-height: 350px;
+    }
+
+    .col-2 #visual,
+    .col-2 form {
+        width: 49%;
+    }
 }
 
 .label-container {
@@ -20,6 +75,30 @@ form {
 }
 
 .between-sliders {
-    // width: 100%;
     margin: 0 10px;
+}
+
+.date-time {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    margin: 0 10px;
+    max-width: 100%;
+    margin-bottom: 20px;
+}
+
+.date-picker {
+    flex: 1 1 100%;
+}
+
+.date-picker mat-form-field {
+    width: 100%;
+}
+
+.time-picker {
+    flex: 0 0 155px;
+}
+
+.time-picker mat-form-field {
+    width: 70px;
 }

@@ -14,16 +14,22 @@ export class UserService extends EntityService<IUser> {
     }
 
     public getByUsername(username: string | null, options?: any): Observable<IUser | undefined> {
-        return this.http
-            .get<APIResponse<IUser | undefined>>(`${this.url}${this.endpoint}/${username}`, { ...options })
-            .pipe(
-                map((response: any) => response.result),
-                catchError(this.handleError)
-            );
+        return this.http.get<APIResponse<IUser | undefined>>(`${this.url}${this.endpoint}/${username}`).pipe(
+            tap((response) => console.log(response)),
+            map((response: any) => response.result),
+            catchError(this.handleError)
+        );
     }
 
     getAllIdentities(): Observable<AdminUserInfo[]> {
         return this.http.get<APIResponse<AdminUserInfo[]>>(`${environment.API_URL}identities`).pipe(
+            map((response: any) => response.result),
+            catchError(this.handleError)
+        );
+    }
+
+    followUser(username: string): Observable<UserIdentity> {
+        return this.http.post<APIResponse<UserIdentity>>(`${environment.API_URL}${username}/follows`, {}).pipe(
             map((response: any) => response.result),
             catchError(this.handleError)
         );

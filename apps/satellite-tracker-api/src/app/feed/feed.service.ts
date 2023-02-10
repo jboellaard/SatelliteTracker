@@ -1,7 +1,7 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { FeedItem, FeedItemType } from 'shared/domain';
+import { APIResult, FeedItem, FeedItemType } from 'shared/domain';
 import { moveMessagePortToContext } from 'worker_threads';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { SatelliteNeoQueries } from '../satellite/neo4j/satellite.cypher';
@@ -22,7 +22,7 @@ export class FeedService {
         private readonly neo4jService: Neo4jService
     ) {}
 
-    async getSatellitesFeed(username: string) {
+    async getSatellitesFeed(username: string): Promise<APIResult<FeedItem[]>> {
         const trackedSatellites = await this.neo4jService.read(SatelliteNeoQueries.getTrackedSatellites, { username });
         let satellites = trackedSatellites.records.map((record) => {
             return {
@@ -49,39 +49,47 @@ export class FeedService {
 
         let mostRecentActivity: FeedItem[] = [];
         allSatellites.forEach((satellite) => {
-            const satelliteFeedItem = {
+            const feedItem = {
                 satelliteName: satellite.satelliteName,
                 satelliteId: satellite._id,
                 username: satellite.createdBy.username,
-                date: satellite.updatedAt,
-                changed: 'satellite',
             };
-            if (satellite.updatedAt > satellite.createdAt) {
-                mostRecentActivity.push({
-                    ...satelliteFeedItem,
-                    type: FeedItemType.updated,
-                });
-            } else {
-                mostRecentActivity.push({
-                    ...satelliteFeedItem,
-                    type: FeedItemType.created,
-                });
+            if (
+                (satellite.orbit && satellite.orbit.updatedAt.toString() != satellite.updatedAt.toString()) ||
+                !satellite.orbit
+            ) {
+                const satelliteFeedItem = {
+                    date: satellite.updatedAt,
+                    changed: 'satellite',
+                };
+                if (satellite.updatedAt > satellite.createdAt) {
+                    mostRecentActivity.push({
+                        ...feedItem,
+                        ...satelliteFeedItem,
+                        type: FeedItemType.updated,
+                    });
+                } else {
+                    mostRecentActivity.push({
+                        ...feedItem,
+                        ...satelliteFeedItem,
+                        type: FeedItemType.created,
+                    });
+                }
             }
             if (satellite.orbit) {
-                let orbitFeedItem = {
-                    satelliteName: satellite.satelliteName,
-                    satelliteId: satellite._id,
-                    username: satellite.createdBy.username,
+                const orbitFeedItem = {
                     date: satellite.orbit.updatedAt,
                     changed: 'orbit',
                 };
                 if (satellite.orbit.updatedAt > satellite.orbit.createdAt) {
                     mostRecentActivity.push({
+                        ...feedItem,
                         ...orbitFeedItem,
                         type: FeedItemType.updated,
                     });
                 } else {
                     mostRecentActivity.push({
+                        ...feedItem,
                         ...orbitFeedItem,
                         type: FeedItemType.created,
                     });
@@ -96,11 +104,11 @@ export class FeedService {
         return { status: HttpStatus.OK, result: mostRecentActivity };
     }
 
-    async getFollowingFeed(username: string) {
+    async getFollowingFeed(username: string): Promise<APIResult<FeedItem[]>> {
         const usersFollowing = await this.neo4jService.read(UserNeoQueries.getFollowing, { username });
 
         const mostRecentlyTracked = await this.neo4jService.read(SatelliteNeoQueries.getMostRecentlyTracked, {
-            list: usersFollowing.records.map((record) => record.get('user').properties.username),
+            list: usersFollowing.records.map((record) => record.get('following').properties.username),
             skip: 0,
             limit: 10,
         });
@@ -116,7 +124,7 @@ export class FeedService {
         });
 
         const mostRecentlyCreated = await this.neo4jService.read(SatelliteNeoQueries.getMostRecentlyCreated, {
-            list: usersFollowing.records.map((record) => record.get('user').properties.username),
+            list: usersFollowing.records.map((record) => record.get('following').properties.username),
             skip: 0,
             limit: 10,
         });
@@ -143,7 +151,7 @@ export class FeedService {
         }
 
         const mostRecentlyFollowed = await this.neo4jService.read(UserNeoQueries.getMostRecentlyFollowed, {
-            list: usersFollowing.records.map((record) => record.get('user').properties.username),
+            list: usersFollowing.records.map((record) => record.get('following').properties.username),
             skip: 0,
             limit: 10,
         });
@@ -162,7 +170,7 @@ export class FeedService {
         return { status: HttpStatus.OK, result: feed };
     }
 
-    async getMostRecentSatellitesFeed(username: string) {
+    async getMostRecentSatellitesFeed(username: string): Promise<APIResult<FeedItem[]>> {
         const trackedSatellites = await this.neo4jService.read(SatelliteNeoQueries.getTrackedSatellites, { username });
         let satellites = trackedSatellites.records.map((record) => {
             return {

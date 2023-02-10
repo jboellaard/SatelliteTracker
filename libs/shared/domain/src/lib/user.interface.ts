@@ -15,6 +15,7 @@ export interface IUser extends IUserInfo {
     satellites?: ISatellite[];
     followers?: IUserInfo[];
     following?: IUserInfo[];
+    tracking?: { createdBy: string; satelliteName: string; launchDate?: string }[];
     followerCount?: number;
 }
 

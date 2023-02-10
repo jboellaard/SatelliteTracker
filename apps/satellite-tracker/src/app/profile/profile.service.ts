@@ -15,4 +15,6 @@ export class ProfileService {
             .get<APIResponse<ISatellite[] | undefined>>(environment.API_URL + `users/${username}/satellites`)
             .pipe(map((response) => response.result));
     }
+
+    // get following, followers and tracking and add refresh required
 }
