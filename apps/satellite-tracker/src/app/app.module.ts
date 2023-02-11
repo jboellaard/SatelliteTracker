@@ -61,6 +61,10 @@ import { FollowingComponent } from './pages/dashboard/feed/following/following.c
 import { TrackingComponent } from './pages/dashboard/feed/tracking/tracking.component';
 import { ForYouComponent } from './pages/dashboard/discover/for-you/for-you.component';
 import { PopularComponent } from './pages/dashboard/discover/popular/popular.component';
+import { TabCreatedComponent } from './profile/tab-created/tab-created.component';
+import { TabFollowingComponent } from './profile/tab-following/tab-following.component';
+import { TabFollowersComponent } from './profile/tab-followers/tab-followers.component';
+import { TabTrackingComponent } from './profile/tab-tracking/tab-tracking.component';
 
 const materialModules = [
     MatToolbarModule,
@@ -118,6 +122,10 @@ const materialModules = [
         TrackingComponent,
         ForYouComponent,
         PopularComponent,
+        TabCreatedComponent,
+        TabFollowingComponent,
+        TabFollowersComponent,
+        TabTrackingComponent,
     ],
     imports: [
         BrowserModule,

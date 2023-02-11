@@ -86,7 +86,7 @@
                 <tr
                     mat-row
                     *matRowDef="let row; columns: satelliteColumns"
-                    [routerLink]="'/' + user.username + '/satellites/' + row._id"
+                    [routerLink]="'/users/' + user.username + '/satellites/' + row._id"
                 ></tr>
             </table>
         </div>

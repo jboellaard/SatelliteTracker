@@ -65,7 +65,7 @@ export class AuthController {
     @Get('self/info')
     async getProfileInfo(@Request() req: any): Promise<APIResult<IUser> | HttpException> {
         this.logger.log('GET self/info called');
-        return await this.userService.findOne(req.user.userId);
+        return await this.userService.getSelf(req.user.username);
     }
 
     @UseGuards(AccessJwtAuthGuard)

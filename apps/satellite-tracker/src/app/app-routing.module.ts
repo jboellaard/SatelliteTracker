@@ -25,6 +25,10 @@ import { FollowingComponent } from './pages/dashboard/feed/following/following.c
 import { TrackingComponent } from './pages/dashboard/feed/tracking/tracking.component';
 import { ForYouComponent } from './pages/dashboard/discover/for-you/for-you.component';
 import { PopularComponent } from './pages/dashboard/discover/popular/popular.component';
+import { TabCreatedComponent } from './profile/tab-created/tab-created.component';
+import { TabFollowingComponent } from './profile/tab-following/tab-following.component';
+import { TabFollowersComponent } from './profile/tab-followers/tab-followers.component';
+import { TabTrackingComponent } from './profile/tab-tracking/tab-tracking.component';
 
 const routes: Routes = [
     { path: 'home', pathMatch: 'full', redirectTo: 'feed' },
@@ -66,42 +70,49 @@ const routes: Routes = [
         component: UserEditComponent,
     },
     // {
-    //     path: ':username/profile',
+    //     path: 'users/:username/profile',
     //     pathMatch: 'full',
     //     component: ProfileComponent,
     // },
     {
-        path: ':username/profile/edit',
+        path: 'users/:username/profile/edit',
         pathMatch: 'full',
         canActivate: [OwnerAuthGuard],
         component: ProfileComponent,
     },
     {
-        path: ':username/satellites/new',
+        path: 'users/:username/satellites/new',
         pathMatch: 'full',
         canActivate: [OwnerAuthGuard],
         component: SatelliteEditComponent,
     },
     {
-        path: ':username/satellites/:satelliteId',
+        path: 'users/:username/satellites/:satelliteId',
         pathMatch: 'full',
         component: SatelliteDetailComponent,
     },
     {
-        path: ':username/satellites/:satelliteId/edit',
+        path: 'users/:username/satellites/:satelliteId/edit',
         pathMatch: 'full',
         canActivate: [OwnerAuthGuard],
         component: SatelliteEditComponent,
     },
     {
-        path: ':username/satellites/:satelliteId/orbit',
+        path: 'users/:username/satellites/:satelliteId/orbit',
         pathMatch: 'full',
         canActivate: [OwnerAuthGuard],
         component: OrbitEditComponent,
     },
     {
-        path: ':username',
+        path: 'users/:username',
         component: ProfileComponent,
+        children: [
+            { path: '', pathMatch: 'full', redirectTo: 'created' },
+            { path: 'created', pathMatch: 'full', component: TabCreatedComponent },
+            { path: 'tracking', pathMatch: 'full', component: TabTrackingComponent },
+            { path: 'following', pathMatch: 'full', component: TabFollowingComponent },
+            { path: 'followers', pathMatch: 'full', component: TabFollowersComponent },
+        ],
     },
     { path: '', pathMatch: 'full', redirectTo: 'feed' },
     { path: '**', component: PageNotFoundComponent },

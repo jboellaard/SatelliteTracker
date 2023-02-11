@@ -78,12 +78,12 @@ export class OrbitService {
         scene.add(this.satelliteMesh);
         this.satelliteMesh.visible = !this.realColorAndSize;
 
-        if (shape === Shape.Sphere) {
+        if (shape === Shape.Cube) {
             this.realSatelliteMesh = new THREE.Mesh(
                 new THREE.BoxGeometry(size * this.scale, size * this.scale, size * this.scale),
                 new THREE.MeshPhongMaterial({ color: color, shininess: 100 })
             );
-        } else if (shape === Shape.Cube) {
+        } else if (shape === Shape.Sphere) {
             this.realSatelliteMesh = new THREE.Mesh(
                 new THREE.SphereGeometry((size * this.scale) / 2, 32, 32),
                 new THREE.MeshPhongMaterial({ color: color, shininess: 100 })

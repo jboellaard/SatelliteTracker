@@ -15,7 +15,46 @@ table {
     width: 100%;
 }
 
-// .component-container {
-//   max-width: 800px;
-//   margin: auto;
-// }
+.component-container {
+    display: flex;
+    flex-direction: row;
+    //   margin: auto;
+}
+
+#profile {
+    display: flex;
+    flex-direction: column;
+    width: 270px;
+    margin: 0px 20px 20px 0px;
+    padding-right: 20px;
+    border-right: 1px solid #424242;
+}
+
+#tabs {
+    width: 100%;
+}
+
+.profile-button {
+    padding: 10px 0px 20px 0px;
+    border-bottom: 1px solid #424242;
+}
+
+.profile-button button {
+    width: 100%;
+}
+
+.mat-mdc-row .mat-mdc-cell {
+    border-bottom: 1px solid transparent;
+    border-top: 1px solid transparent;
+    cursor: pointer;
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
+    border-color: currentColor;
+    background-color: transparent;
+}
+
+.text-muted p {
+    font-size: 13px;
+    margin-bottom: 6px;
+}

@@ -67,7 +67,7 @@
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
 $SatelliteTracker-primary: mat.define-palette(mat.$indigo-palette, 500, 300, 800);
-$SatelliteTracker-accent: mat.define-palette(mat.$yellow-palette, 500, 200, 700);
+$SatelliteTracker-accent: mat.define-palette(mat.$deep-orange-palette, 400, 200, 700);
 $SatelliteTracker-grey: mat.define-palette(mat.$grey-palette, 500, 300, 800);
 
 // The warn palette is optional (defaults to red).
@@ -225,4 +225,11 @@ app-root {
 
 .mat-mdc-tab-link.mdc-tab {
     height: 40px !important;
+}
+
+.darkMode
+    .mat-mdc-tab-nav-bar.mat-accent
+    .mat-mdc-tab-link:not(.mat-mdc-tab-disabled).mdc-tab--active
+    .mdc-tab__text-label {
+    color: #acacac;
 }

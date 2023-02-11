@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Logger, Post, UseGuards, Request, Delete, HttpException } from '@nestjs/common';
 import { UserService } from './user.service';
 import { SatelliteService } from '../satellite/satellite.service';
-import { APIResult, Id, ISatellite, IUser } from 'shared/domain';
+import { APIResult, Id, ISatellite, IUser, IUserInfo } from 'shared/domain';
 import { AccessJwtAuthGuard } from '../auth/guards/access-jwt-auth.guard';
 
 @Controller('users')
@@ -21,8 +21,14 @@ export class UserController {
         return await this.satelliteService.getSatellitesOfUserWithUsername(username);
     }
 
+    @Get(':username/following')
+    async getFollows(@Param('username') username: string): Promise<APIResult<IUserInfo[]> | HttpException> {
+        this.logger.log('GET users/:username/follows called');
+        return await this.userService.getUserFollowing(username);
+    }
+
     @UseGuards(AccessJwtAuthGuard)
-    @Post(':username/follows')
+    @Post(':username/follow')
     async followUser(
         @Request() req: any,
         @Param('username') username: string
@@ -32,12 +38,24 @@ export class UserController {
     }
 
     @UseGuards(AccessJwtAuthGuard)
-    @Delete(':username/follows')
+    @Delete(':username/follow')
     async unfollowUser(
         @Request() req: any,
         @Param('username') username: string
     ): Promise<APIResult<{ message: string }> | HttpException> {
         this.logger.log('DELETE users/:username/follows called');
         return await this.userService.unfollowUser(req.user.username, username);
+    }
+
+    @Get(':username/followers')
+    async getFollowers(@Param('username') username: string): Promise<APIResult<IUserInfo[]> | HttpException> {
+        this.logger.log('GET users/:username/followers called');
+        return await this.userService.getUserFollowers(username);
+    }
+
+    @Get(':username/tracking')
+    async getTracking(@Param('username') username: string): Promise<APIResult<ISatellite[]> | HttpException> {
+        this.logger.log('GET users/:username/tracking called');
+        return await this.userService.getUserTracking(username);
     }
 }

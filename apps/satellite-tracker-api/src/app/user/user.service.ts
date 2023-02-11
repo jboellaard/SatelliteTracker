@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { APIResult, Id, ISatellite, IUser, IUserInfo } from 'shared/domain';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { SatelliteNeoQueries } from '../satellite/neo4j/satellite.cypher';
+import { Satellite, SatelliteDocument } from '../satellite/schemas/satellite.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserNeoQueries } from './neo4j/user.cypher';
 import { User, UserDocument } from './schemas/user.schema';
@@ -13,6 +14,7 @@ export class UserService {
     private logger = new Logger(UserService.name);
     constructor(
         @InjectModel(User.name, `${process.env.MONGO_DATABASE}`) private userModel: Model<UserDocument>,
+        @InjectModel(Satellite.name, `${process.env.MONGO_DATABASE}`) private satelliteModel: Model<SatelliteDocument>,
         private readonly neo4jService: Neo4jService
     ) {}
 
@@ -21,11 +23,8 @@ export class UserService {
         return { status: HttpStatus.OK, result: users };
     }
 
-    async findOne(username: string): Promise<APIResult<IUser> | HttpException> {
-        const user = (await this.userModel.findOne({ username }).populate('satellites')).toObject() as IUser; // .populate('satellites.satelliteParts.satellitePart'))
-        if (!user) {
-            return new HttpException('User not found', HttpStatus.NOT_FOUND);
-        }
+    private async getRelations(user: IUser): Promise<IUser> {
+        const username = user.username;
         const neoSession = this.neo4jService.getReadSession();
         const followers = await neoSession.run(UserNeoQueries.getFollowers, { username }).then((result) => {
             return result.records.map((record) => record.get('follower').properties as IUserInfo);
@@ -43,10 +42,83 @@ export class UserService {
                 return record.get('satellite').properties as { createdBy: string; satelliteName: string };
             });
         });
+        tracking.forEach(async (satellite) => {
+            const satelliteInfo = await this.satelliteModel
+                .find({ satelliteName: satellite.satelliteName })
+                .populate('createdBy', 'username');
+            satelliteInfo.forEach((satellite) => {
+                if ((satellite.createdBy as any).username == username) {
+                    satellite.id = satellite._id.toString();
+                }
+            });
+        });
 
         const userWithRelations = { ...user, followers, following, tracking };
         await neoSession.close();
+        return userWithRelations;
+    }
+
+    async findOne(username: string): Promise<APIResult<IUser> | HttpException> {
+        const user = (
+            await this.userModel.findOne({ username }).select('-location').populate('satellites')
+        ).toObject() as IUser; // .populate('satellites.satelliteParts.satellitePart'))
+        if (!user) {
+            return new HttpException('User not found', HttpStatus.NOT_FOUND);
+        }
+
+        const userWithRelations = await this.getRelations(user);
         return { status: HttpStatus.OK, result: userWithRelations };
+    }
+
+    async getSelf(username: string): Promise<APIResult<IUser> | HttpException> {
+        const user = (await this.userModel.findOne({ username }).populate('satellites')).toObject() as IUser;
+        if (!user) {
+            return new HttpException('User not found', HttpStatus.NOT_FOUND);
+        }
+
+        const userWithRelations = await this.getRelations(user);
+        return { status: HttpStatus.OK, result: userWithRelations };
+    }
+
+    async getUserFollowing(username: string): Promise<APIResult<IUserInfo[]>> {
+        const following = await this.neo4jService.read(UserNeoQueries.getFollowing, { username }).then((result) => {
+            return result.records.map((record) => record.get('following').properties as IUserInfo);
+        });
+        return { status: HttpStatus.OK, result: following };
+    }
+
+    async getUserFollowers(username: string): Promise<APIResult<IUserInfo[]>> {
+        const followers = await this.neo4jService.read(UserNeoQueries.getFollowers, { username }).then((result) => {
+            return result.records.map((record) => record.get('follower').properties as IUserInfo);
+        });
+        return { status: HttpStatus.OK, result: followers };
+    }
+
+    async getUserTracking(username: string): Promise<APIResult<ISatellite[]>> {
+        const tracking = await this.neo4jService
+            .read(SatelliteNeoQueries.getTrackedSatellites, { username })
+            .then((result) => {
+                return result.records.map((record) => {
+                    if (record.get('satellite').properties.launchDate) {
+                        record.get('satellite').properties.launchDate = record
+                            .get('satellite')
+                            .properties.launchDate.toString();
+                    }
+                    return record.get('satellite').properties as ISatellite;
+                });
+            });
+
+        tracking.forEach(async (satellite) => {
+            const satelliteInfo = await this.satelliteModel
+                .find({ satelliteName: satellite.satelliteName })
+                .populate('createdBy', 'username');
+            satelliteInfo.forEach((satellite) => {
+                if ((satellite.createdBy as any).username == username) {
+                    satellite.id = satellite._id.toString();
+                }
+            });
+        });
+        return { status: HttpStatus.OK, result: tracking };
     }
 
     async update(id: Id, updateUserDto: UpdateUserDto): Promise<APIResult<IUser>> {

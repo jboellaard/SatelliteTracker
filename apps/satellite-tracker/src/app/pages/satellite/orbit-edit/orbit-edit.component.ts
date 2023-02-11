@@ -198,7 +198,7 @@ export class OrbitEditComponent implements OnInit {
                         .subscribe((satellite) => {
                             if (satellite) {
                                 this.snackBar.success('Orbit updated successfully');
-                                this.router.navigate(['/' + this.username + '/satellites/' + satellite?._id]);
+                                this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
                             } else {
                                 this.snackBar.error('Orbit could not be updated');
                             }
@@ -216,7 +216,7 @@ export class OrbitEditComponent implements OnInit {
                         .subscribe((satellite) => {
                             if (satellite) {
                                 this.snackBar.success('Orbit created successfully');
-                                this.router.navigate(['/' + this.username + '/satellites/' + satellite?._id]);
+                                this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
                             } else {
                                 this.snackBar.error('Orbit could not be created');
                             }
@@ -228,9 +228,9 @@ export class OrbitEditComponent implements OnInit {
 
     backClicked() {
         if (this.componentExists) {
-            this.router.navigate(['/' + this.username + '/satellites/' + this.id]);
+            this.router.navigate(['/users/' + this.username + '/satellites/' + this.id]);
         } else {
-            this.router.navigate(['/' + this.username]);
+            this.router.navigate(['/users/' + this.username]);
         }
     }
 

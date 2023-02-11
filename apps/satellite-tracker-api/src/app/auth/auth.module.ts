@@ -9,11 +9,18 @@ import { JwtModule } from '@nestjs/jwt';
 import { AccessJwtStrategy } from './guards/access-jwt.strategy';
 import { UserService } from '../user/user.service';
 import { RefreshJwtStrategy } from './guards/refresh-jwt.strategy';
+import { Satellite, SatelliteSchema } from '../satellite/schemas/satellite.schema';
 
 @Module({
     imports: [
         MongooseModule.forFeature([{ name: Identity.name, schema: IdentitySchema }], `${process.env.MONGO_IDENTITYDB}`),
-        MongooseModule.forFeature([{ name: User.name, schema: UserSchema }], `${process.env.MONGO_DATABASE}`),
+        MongooseModule.forFeature(
+            [
+                { name: User.name, schema: UserSchema },
+                { name: Satellite.name, schema: SatelliteSchema },
+            ],
+            `${process.env.MONGO_DATABASE}`
+        ),
         PassportModule,
         JwtModule.register({}),
     ],

@@ -12,20 +12,21 @@
                 <mat-card-content>
                     <p>
                         <ng-template [ngIf]="feedItem.type == 'created'">
-                            <a routerLink="/{{ feedItem.username }}">{{ feedItem.username }}</a> created
-                            <a routerLink="/{{ feedItem.username }}/satellites/{{ feedItem.satelliteId }}">{{
+                            <a routerLink="/users/{{ feedItem.username }}">{{ feedItem.username }}</a> created
+                            <a routerLink="/users/{{ feedItem.username }}/satellites/{{ feedItem.satelliteId }}">{{
                                 feedItem.satelliteName
                             }}</a></ng-template
                         >
 
                         <ng-template [ngIf]="feedItem.type == 'followed'"
-                            ><a routerLink="/{{ feedItem.username }}">{{ feedItem.username }}</a> started following
-                            <a routerLink="/{{ feedItem.followed }}">{{ feedItem.followed }}</a></ng-template
+                            ><a routerLink="/users/{{ feedItem.username }}">{{ feedItem.username }}</a> started
+                            following
+                            <a routerLink="/users/{{ feedItem.followed }}">{{ feedItem.followed }}</a></ng-template
                         >
                         <ng-template [ngIf]="feedItem.type == 'tracked'"
-                            ><a routerLink="/{{ feedItem.username }}">{{ feedItem.username }}</a> started tracking the
-                            satellite
-                            <a routerLink="/{{ feedItem.createdBy }}/satellites/{{ feedItem.satelliteId }}">{{
+                            ><a routerLink="/users/{{ feedItem.username }}">{{ feedItem.username }}</a> started tracking
+                            the satellite
+                            <a routerLink="/users/{{ feedItem.createdBy }}/satellites/{{ feedItem.satelliteId }}">{{
                                 feedItem.satelliteName
                             }}</a></ng-template
                         >

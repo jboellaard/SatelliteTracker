@@ -2,17 +2,6 @@
     <div class="side-bar">
         <div class="side-bar-header">
             <div>
-                <a routerLink="/discover" routerLinkActive="active">
-                    <div class="side-bar-content-item" style="display: flex">
-                        <mat-icon style="font-size: 16px; height: 16px; width: 16px; margin-right: 6px"
-                            >explore</mat-icon
-                        >
-                        <span>Discover</span>
-                    </div>
-                    <mat-divider></mat-divider>
-                </a>
-            </div>
-            <div>
                 <a routerLink="/feed" routerLinkActive="active">
                     <div class="side-bar-content-item" style="display: flex">
                         <mat-icon style="font-size: 16px; height: 16px; width: 16px; margin-right: 6px"
@@ -24,8 +13,19 @@
                 </a>
             </div>
             <div>
+                <a routerLink="/discover" routerLinkActive="active">
+                    <div class="side-bar-content-item" style="display: flex">
+                        <mat-icon style="font-size: 16px; height: 16px; width: 16px; margin-right: 6px"
+                            >explore</mat-icon
+                        >
+                        <span>Discover</span>
+                    </div>
+                    <mat-divider></mat-divider>
+                </a>
+            </div>
+            <div>
                 <a
-                    routerLink="/{{ user?.username }}"
+                    routerLink="/users/{{ user?.username }}"
                     routerLinkActive="active"
                     [routerLinkActiveOptions]="{ exact: true }"
                 >
@@ -45,14 +45,14 @@
                 <h3 style="margin: 30px 0 0 0; padding: 0 20px">My satellites</h3>
                 <button
                     mat-icon-button
-                    routerLink="/{{ user?.username }}/satellites/new"
+                    routerLink="/users/{{ user?.username }}/satellites/new"
                     style="height: 28px; width: 28px; margin: 30px 10px 0 0"
                 >
                     <mat-icon style="position: absolute; top: 2px; left: 2px">add</mat-icon>
                 </button>
             </div>
             <div *ngFor="let satellite of satellites">
-                <a routerLink="/{{ user?.username }}/satellites/{{ satellite.id }}" routerLinkActive="active">
+                <a routerLink="/users/{{ user?.username }}/satellites/{{ satellite.id }}" routerLinkActive="active">
                     <div class="side-bar-content-item">
                         <span>{{ satellite.satelliteName }}</span>
                     </div>
