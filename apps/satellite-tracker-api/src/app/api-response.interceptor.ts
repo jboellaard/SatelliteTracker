@@ -20,7 +20,7 @@ export class APIResponseInterceptor implements NestInterceptor {
                 } else {
                     return {
                         ...res,
-                        result: undefined,
+                        result: res.response,
                         info: {
                             version: '1.0',
                             type: 'none',

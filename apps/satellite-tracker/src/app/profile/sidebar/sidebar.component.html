@@ -25,9 +25,9 @@
             </div>
             <div>
                 <a
-                    routerLink="/users/{{ user?.username }}"
+                    routerLink="/profile/{{ user?.username }}"
                     routerLinkActive="active"
-                    [routerLinkActiveOptions]="{ exact: true }"
+                    [routerLinkActiveOptions]="{ exact: isProfileRoute }"
                 >
                     <div class="side-bar-content-item" style="display: flex">
                         <mat-icon style="font-size: 16px; height: 16px; width: 16px; margin-right: 6px"

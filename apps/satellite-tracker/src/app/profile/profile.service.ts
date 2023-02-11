@@ -1,27 +1,24 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { Observable, map, Subject, tap, catchError, BehaviorSubject } from 'rxjs';
-import { ISatellite, APIResponse, IUserInfo } from 'shared/domain';
+import { ISatellite, APIResponse, IUserInfo, Id } from 'shared/domain';
 import { environment } from '../../environments/environment';
+import { SnackBarService } from '../utils/snack-bar.service';
+import { RelationsService } from './relations.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class ProfileService {
     url: string = environment.API_URL;
+    currentUser$ = new BehaviorSubject<IUserInfo | undefined>(undefined);
+    canEdit$ = new BehaviorSubject<boolean>(false);
 
-    constructor(private http: HttpClient) {}
-
-    protected _followingRefreshRequired = new Subject<void>();
-    protected _trackingRefreshRequired = new Subject<void>();
-
-    getFollowingRefreshRequired() {
-        return this._followingRefreshRequired;
-    }
-
-    getTrackingRefreshRequired() {
-        return this._trackingRefreshRequired;
-    }
+    constructor(
+        private http: HttpClient,
+        private relationsService: RelationsService,
+        private snackbar: SnackBarService
+    ) {}
 
     getSelf(): Observable<IUserInfo | undefined> {
         return this.http.get<APIResponse<IUserInfo | undefined>>(this.url + 'self/info').pipe(
@@ -60,37 +57,69 @@ export class ProfileService {
 
     followUser(username: string): Observable<string | undefined> {
         return this.http.post<APIResponse<string | undefined>>(this.url + `users/${username}/follow`, {}).pipe(
-            tap(() => this._followingRefreshRequired.next()),
-            map((response) => response.result),
+            tap((res) => {
+                if (res.status == 200) {
+                    this.snackbar.success('User followed successfully');
+                    this.relationsService
+                        .getFollowing()
+                        .subscribe((following) => this.relationsService.following$.next(following));
+                } else {
+                    this.snackbar.error('Something went wrong, please try again later.');
+                }
+            }),
             catchError(this.handleError)
         );
     }
 
     unfollowUser(username: string): Observable<string | undefined> {
         return this.http.delete<APIResponse<string | undefined>>(this.url + `users/${username}/follow`).pipe(
-            tap(() => this._followingRefreshRequired.next()),
-            map((response) => response.result),
+            tap((res) => {
+                if (res.status == 200) {
+                    this.snackbar.success('You are no longer following this user');
+                    this.relationsService
+                        .getFollowing()
+                        .subscribe((following) => this.relationsService.following$.next(following));
+                } else {
+                    this.snackbar.error('Something went wrong, please try again later.');
+                }
+            }),
             catchError(this.handleError)
         );
     }
 
-    trackSatellite(username: string, satelliteId: string): Observable<string | undefined> {
+    trackSatellite(satelliteId: Id): Observable<string | undefined> {
         return this.http.post<APIResponse<string | undefined>>(this.url + `satellites/${satelliteId}/track`, {}).pipe(
-            tap(() => this._trackingRefreshRequired.next()),
-            map((response) => response.result),
+            tap((res) => {
+                if (res.status == 200) {
+                    this.snackbar.success('Satellite tracked successfully');
+                    this.relationsService
+                        .getTracking()
+                        .subscribe((tracking) => this.relationsService.tracking$.next(tracking));
+                } else {
+                    this.snackbar.error('Something went wrong, please try again later.');
+                }
+            }),
             catchError(this.handleError)
         );
     }
 
-    untrackSatellite(username: string, satelliteId: string): Observable<string | undefined> {
+    untrackSatellite(satelliteId: Id): Observable<string | undefined> {
         return this.http.delete<APIResponse<string | undefined>>(this.url + `satellites/${satelliteId}/track`).pipe(
-            tap(() => this._trackingRefreshRequired.next()),
-            map((response) => response.result),
+            tap((res) => {
+                if (res.status == 200) {
+                    this.snackbar.success('You are no longer tracking this satellite');
+                    this.relationsService
+                        .getTracking()
+                        .subscribe((tracking) => this.relationsService.tracking$.next(tracking));
+                } else {
+                    this.snackbar.error('Something went wrong, please try again later.');
+                }
+            }),
             catchError(this.handleError)
         );
     }
 
-    public handleError(error: HttpErrorResponse): Observable<any> {
+    handleError(error: HttpErrorResponse): Observable<any> {
         console.log(error);
 
         const errorResponse = {

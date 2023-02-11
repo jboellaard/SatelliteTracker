@@ -69,17 +69,6 @@ const routes: Routes = [
         canActivate: [AdminAuthGuard],
         component: UserEditComponent,
     },
-    // {
-    //     path: 'users/:username/profile',
-    //     pathMatch: 'full',
-    //     component: ProfileComponent,
-    // },
-    {
-        path: 'users/:username/profile/edit',
-        pathMatch: 'full',
-        canActivate: [OwnerAuthGuard],
-        component: ProfileComponent,
-    },
     {
         path: 'users/:username/satellites/new',
         pathMatch: 'full',
@@ -104,7 +93,13 @@ const routes: Routes = [
         component: OrbitEditComponent,
     },
     {
-        path: 'users/:username',
+        path: 'profile/:username/edit',
+        pathMatch: 'full',
+        canActivate: [OwnerAuthGuard],
+        component: ProfileComponent,
+    },
+    {
+        path: 'profile/:username',
         component: ProfileComponent,
         children: [
             { path: '', pathMatch: 'full', redirectTo: 'created' },

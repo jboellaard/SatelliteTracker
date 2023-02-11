@@ -172,7 +172,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         if (this.componentExists) {
             this.router.navigate(['/users/' + this.username + '/satellites/' + this.id]);
         } else {
-            this.router.navigate(['/users/' + this.username]);
+            this.router.navigate(['/profile/' + this.username]);
         }
     }
 

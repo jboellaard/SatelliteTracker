@@ -339,10 +339,11 @@ export class SatelliteService {
             try {
                 const result = await this.neo4jService.write(SatelliteNeoQueries.trackSatellite, {
                     username,
-                    createdBy: createdBy.username,
+                    creator: createdBy.username,
                     satelliteName: satellite.satelliteName,
                 });
-                console.log(result);
+                if (result.summary.counters.updates().relationshipsCreated == 0)
+                    return new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
                 return { status: HttpStatus.OK, result: { message: 'Satellite tracked.' } };
             } catch (error) {
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
@@ -360,11 +361,12 @@ export class SatelliteService {
             try {
                 const result = await this.neo4jService.write(SatelliteNeoQueries.untrackSatellite, {
                     username,
-                    createdBy: createdBy.username,
+                    creator: createdBy.username,
                     satelliteName: satellite.satelliteName,
                 });
-                console.log(result);
-                return { status: HttpStatus.OK, result: { message: 'No longer tracking this satellite' } };
+                if (result.summary.counters.updates().relationshipsDeleted == 0)
+                    return new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
+                return { status: HttpStatus.OK, result: { message: 'No longer tracking satellite' } };
             } catch (error) {
                 if (error instanceof Error) return new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
                 return new HttpException('Could not track satellite', HttpStatus.INTERNAL_SERVER_ERROR);

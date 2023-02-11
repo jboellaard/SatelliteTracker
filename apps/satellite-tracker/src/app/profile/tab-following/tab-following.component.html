@@ -1,1 +1,48 @@
-<p>tab-following works!</p>
+<div *ngIf="users; else loading">
+    <div class="title"></div>
+    <div *ngIf="users.length > 0; else none">
+        <div class="wrapper" *ngFor="let user of users">
+            <div class="header">
+                <a [routerLink]="'/profile/' + user.username"
+                    ><h3>
+                        <mat-icon>person</mat-icon><span>{{ user.username }}</span>
+                    </h3></a
+                >
+                <div class="button-container">
+                    <button
+                        *ngIf="following && user.username != loggedInUser?.username && !isFollowing(user.username)"
+                        mat-stroked-button
+                        (click)="isFollowing(user.username)"
+                    >
+                        Follow
+                    </button>
+                    <button
+                        *ngIf="user.username != loggedInUser?.username && isFollowing(user.username)"
+                        mat-stroked-button
+                        (click)="unfollow(user.username)"
+                    >
+                        Unfollow
+                    </button>
+                </div>
+            </div>
+            <div class="text-muted">
+                <p></p>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #none>
+        <div *ngIf="canEdit">
+            <p>You aren't following any users yet.</p>
+        </div>
+        <div *ngIf="!canEdit">
+            <p>This user isn't following any users yet.</p>
+        </div>
+    </ng-template>
+</div>
+
+<ng-template #loading><mat-progress-bar mode="indeterminate"></mat-progress-bar></ng-template>
+
+<div *ngIf="waiting">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>

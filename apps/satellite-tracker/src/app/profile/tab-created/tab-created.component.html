@@ -1,75 +1,85 @@
-<div *ngIf="satellites.length > 0">
-    <div class="table-wrapper">
-        <table mat-table [dataSource]="satellites" class="mat-elevation-z8 demo-table">
-            <!-- Position Column -->
-            <ng-container matColumnDef="id">
-                <th mat-header-cell *matHeaderCellDef>Id</th>
-                <td mat-cell *matCellDef="let satellite">{{ satellite.id }}</td>
-            </ng-container>
-
-            <!-- Name Column -->
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef>Name</th>
-                <td mat-cell *matCellDef="let satellite">{{ satellite.satelliteName }}</td>
-            </ng-container>
-
-            <!-- Mass Column -->
-            <ng-container matColumnDef="mass">
-                <th mat-header-cell *matHeaderCellDef>Mass (kg)</th>
-                <td mat-cell *matCellDef="let satellite">{{ satellite.mass }}</td>
-            </ng-container>
-
-            <!-- Radius Column -->
-            <ng-container matColumnDef="radius">
-                <th mat-header-cell *matHeaderCellDef>Size (m)</th>
-                <td mat-cell *matCellDef="let satellite">
-                    {{ satellite.sizeOfBase }}
-                </td>
-            </ng-container>
-
-            <!-- Orbit Column -->
-            <ng-container matColumnDef="orbit">
-                <th mat-header-cell *matHeaderCellDef>Has orbit</th>
-                <td mat-cell *matCellDef="let satellite">
-                    {{ satellite.orbit ? 'Yes' : 'No' }}
-                </td>
-            </ng-container>
-
-            <!-- CreatedAt Column -->
-            <ng-container matColumnDef="createdAt">
-                <th mat-header-cell *matHeaderCellDef>Created at</th>
-                <td mat-cell *matCellDef="let satellite">
-                    {{ satellite.createdAt | date : 'dd/MM/yyyy' }}
-                </td>
-            </ng-container>
-
-            <!-- UpdatedAt Column -->
-            <ng-container matColumnDef="updatedAt">
-                <th mat-header-cell *matHeaderCellDef>Last updated</th>
-                <td mat-cell *matCellDef="let satellite">
-                    {{ satellite.updatedAt | date : 'dd/MM/yyyy' }}
-                </td>
-            </ng-container>
-
-            <!-- Button Column -->
-            <!-- <ng-container matColumnDef="buttons">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell class="edit icon" layout-align="center center" *matCellDef="let satellite">
-                <button mat-flat-button color="accent" [routerLink]="'satellites/' + satellite._id + '/edit'">
-                    <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-flat-button color="warn" (click)="removeSatellite(satellite._id)">
-                    <mat-icon>delete</mat-icon>
-                </button>
-            </td>
-        </ng-container> -->
-
-            <tr mat-header-row *matHeaderRowDef="satelliteColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: satelliteColumns" [routerLink]="'satellites/' + row._id"></tr>
-        </table>
+<div *ngIf="satellites; else loading">
+    <div class="title">
+        <h2 *ngIf="canEdit">Satellites</h2>
+        <div *ngIf="canEdit" class="new-button">
+            <button
+                mat-stroked-button
+                color="accent"
+                [routerLink]="'/users/' + user?.username + '/satellites/new'"
+                style="display: flex"
+            >
+                <mat-icon>add</mat-icon><span> New Satellite</span>
+            </button>
+        </div>
     </div>
+    <div *ngIf="satellites.length > 0; else none">
+        <div class="wrapper" *ngFor="let satellite of satellites">
+            <div class="header">
+                <a [routerLink]="'/users/' + user?.username + '/satellites/' + satellite.id"
+                    ><h3>
+                        <mat-icon>satellite_alt</mat-icon><span>{{ satellite.satelliteName }}</span>
+                    </h3></a
+                >
+                <div class="button-container">
+                    <button
+                        *ngIf="!canEdit && tracking && !isTracking(satellite.id)"
+                        mat-stroked-button
+                        (click)="track(satellite.id)"
+                    >
+                        Track
+                    </button>
+                    <button
+                        *ngIf="!canEdit && isTracking(satellite.id)"
+                        mat-stroked-button
+                        (click)="untrack(satellite.id)"
+                    >
+                        Untrack
+                    </button>
+                    <button
+                        *ngIf="canEdit"
+                        mat-stroked-button
+                        color="primary"
+                        [routerLink]="'/users/' + user?.username + '/satellites/' + satellite.id + '/edit'"
+                        class="icon-button"
+                    >
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                        *ngIf="canEdit"
+                        mat-stroked-button
+                        color="warn"
+                        (click)="deleteSatellite(satellite.id)"
+                        class="icon-button"
+                    >
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+            </div>
+            <div class="text-muted">
+                <p>
+                    <i>
+                        Created on
+                        {{ satellite.createdAt | date : 'dd/MM/yyyy' }}
+                    </i>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #none>
+        <div class="none">
+            <div *ngIf="canEdit">
+                <p>You haven't created any satellites yet.</p>
+            </div>
+            <div *ngIf="!canEdit">
+                <p>This user hasn't created any satellites yet.</p>
+            </div>
+        </div>
+    </ng-template>
 </div>
 
-<div *ngIf="canEdit" class="button-container">
-    <button mat-raised-button color="primary" [routerLink]="'satellites/new'" class="demo-button">Add satellite</button>
+<ng-template #loading><mat-progress-bar mode="indeterminate"></mat-progress-bar></ng-template>
+
+<div *ngIf="waiting">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </div>

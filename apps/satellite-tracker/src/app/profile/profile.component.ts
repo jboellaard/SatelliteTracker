@@ -1,13 +1,13 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
+import { BehaviorSubject, Subscription } from 'rxjs';
 import { IUser, Id, ISatellite, UserIdentity } from 'shared/domain';
 import { AuthService } from '../auth/auth.service';
-import { SatelliteService } from '../pages/satellite/satellite.service';
 import { UserService } from '../pages/user/user.service';
 import { SnackBarService } from '../utils/snack-bar.service';
 import { ProfileService } from './profile.service';
+import { RelationsService } from './relations.service';
 
 @Component({
     selector: 'app-profile',
@@ -22,7 +22,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
         { label: 'Followers', route: 'followers' },
     ];
 
-    user$: UserIdentity | undefined;
+    loggedInUser: UserIdentity | undefined;
+    loggedInUserFollowing: IUser[] | undefined;
+
     user?: IUser;
     username: string | null | undefined;
     id: Id | null | undefined;
@@ -30,12 +32,16 @@ export class ProfileComponent implements OnInit, OnDestroy {
     admin = false;
     canEdit = false;
 
-    userSub!: Subscription;
+    waiting = false;
+
+    userSub: Subscription | undefined;
+    followingSub: Subscription | undefined;
 
     constructor(
         private route: ActivatedRoute,
         private router: Router,
         private authService: AuthService,
+        private relationsService: RelationsService,
         private profileService: ProfileService,
         private userService: UserService,
         private snackBar: SnackBarService
@@ -44,30 +50,35 @@ export class ProfileComponent implements OnInit, OnDestroy {
     ngOnInit(): void {
         this.userSub = this.authService.user$.subscribe((user) => {
             if (user) {
-                this.user$ = user;
+                this.loggedInUser = user;
             }
+        });
+        this.followingSub = this.relationsService.following$.subscribe((following) => {
+            this.loggedInUserFollowing = following;
         });
         this.route.paramMap.subscribe((params) => {
             this.username = params.get('username');
+
             if (this.username) {
-                if (this.username === this.user$?.username) {
-                    this.canEdit = true;
+                if (this.username === this.loggedInUser?.username) {
                     this.userSub = this.profileService.getSelf().subscribe((user) => {
                         if (user) {
                             this.user = user;
-                            console.log(this.user);
+                            this.canEdit = true;
+                            this.profileService.canEdit$.next(true);
+                            this.profileService.currentUser$.next(user);
+                        } else {
+                            this.snackBar.error('Could not find this user');
+                            this.router.navigate(['/home']);
                         }
                     });
                 } else {
                     this.userSub = this.userService.getByUsername(this.username).subscribe((user) => {
                         if (user) {
                             this.user = user;
-                            console.log(this.user);
-                            // this.getSatellites();
-
-                            // this.satelliteService.getRefreshRequired().subscribe(() => {
-                            //     this.getSatellites();
-                            // });
+                            this.canEdit = false;
+                            this.profileService.canEdit$.next(false);
+                            this.profileService.currentUser$.next(user);
                         } else {
                             this.snackBar.error('Could not find this user');
                             this.router.navigate(['/home']);
@@ -80,11 +91,19 @@ export class ProfileComponent implements OnInit, OnDestroy {
         });
     }
 
+    isFollowing() {
+        if (this.loggedInUserFollowing && this.user) {
+            return this.loggedInUserFollowing.some((user) => user.username === this.user?.username);
+        }
+        return false;
+    }
+
     followUser() {
-        if (this.user$ && this.user) {
+        if (this.user) {
+            this.waiting = true;
             this.profileService.followUser(this.user.username).subscribe((user) => {
+                this.waiting = false;
                 if (user) {
-                    // this.user = user;
                     this.snackBar.success('You are now following this user');
                 } else {
                     this.snackBar.error('Could not follow this user');
@@ -93,12 +112,22 @@ export class ProfileComponent implements OnInit, OnDestroy {
         }
     }
 
-    onOutletLoaded(component: any) {
-        component.user = this.user;
-        component.canEdit = this.canEdit;
+    unfollowUser() {
+        if (this.user) {
+            this.waiting = true;
+            this.profileService.unfollowUser(this.user.username).subscribe((user) => {
+                this.waiting = false;
+                if (user) {
+                    this.snackBar.success('You are no longer following this user');
+                } else {
+                    this.snackBar.error('Could not unfollow this user');
+                }
+            });
+        }
     }
 
     ngOnDestroy(): void {
         if (this.userSub) this.userSub.unsubscribe();
+        if (this.followingSub) this.followingSub.unsubscribe();
     }
 }

@@ -1,8 +1,8 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, Observable, of, switchMap, tap } from 'rxjs';
-import { UserCredentials, UserIdentity, UserRegistration } from 'shared/domain';
+import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
+import { APIResponse, ISatellite, IUserInfo, UserCredentials, UserIdentity, UserRegistration } from 'shared/domain';
 import { environment } from 'apps/satellite-tracker/src/environments/environment';
 import { SnackBarService } from '../utils/snack-bar.service';
 
@@ -62,7 +62,7 @@ export class AuthService {
                     localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
                     return of(res.result.user);
                 } else {
-                    if (res.status === 401)
+                    if (res.status == 401)
                         return of(
                             "Invalid username or password, please try again or register if you don't have an account yet."
                         );
@@ -104,10 +104,6 @@ export class AuthService {
         localStorage.removeItem(this.CURRENT_USER);
         this.user$.next(undefined);
         this.router.navigate(['/login']);
-    }
-
-    getUser(): Observable<UserIdentity | undefined> {
-        return this.user$.asObservable();
     }
 
     getUserFromLocalStorage(): Observable<UserIdentity | undefined> {

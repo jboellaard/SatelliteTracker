@@ -111,7 +111,7 @@ export class SatelliteController {
         @Param('id') id: string
     ): Promise<APIResult<{ message: string }> | HttpException> {
         this.logger.log('POST satellites/:id/track called');
-        return await this.satelliteService.trackSatellite(req.user.userId, id);
+        return await this.satelliteService.trackSatellite(req.user.username, id);
     }
 
     @UseGuards(AccessJwtAuthGuard)
@@ -121,6 +121,6 @@ export class SatelliteController {
         @Param('id') id: string
     ): Promise<APIResult<{ message: string }> | HttpException> {
         this.logger.log('DELETE satellites/:id/track called');
-        return await this.satelliteService.untrackSatellite(req.user.userId, id);
+        return await this.satelliteService.untrackSatellite(req.user.username, id);
     }
 }

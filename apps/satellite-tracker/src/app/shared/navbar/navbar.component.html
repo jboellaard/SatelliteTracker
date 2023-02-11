@@ -22,7 +22,7 @@
                 Logged in as <b style="font-weight: 500">{{ user.username }}</b>
             </p>
             <mat-divider></mat-divider>
-            <button mat-menu-item routerLink="/users/{{ user.username }}">Profile</button>
+            <button mat-menu-item routerLink="/profile/{{ user.username }}">Profile</button>
             <button mat-menu-item (click)="logout()" ariaCurrentWhenActive="page">Logout</button>
         </mat-menu>
     </div>

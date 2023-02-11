@@ -1,0 +1,77 @@
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    margin: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #424242;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+div.header a {
+    text-decoration: none;
+    color: #fff;
+}
+
+div.header a:hover,
+.text-muted a:hover {
+    text-decoration: underline;
+}
+
+mat-icon {
+    margin-right: 10px;
+    align-self: center;
+}
+
+h3 {
+    display: flex;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.text-muted {
+    font-size: 13px;
+}
+
+h2 {
+    align-self: center;
+    margin: 0px;
+}
+
+.title {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px 20px 20px 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #424242;
+}
+
+.button-container {
+    display: flex;
+    gap: 6px;
+}
+
+.button-container button mat-icon {
+    margin: 0px auto;
+    text-align: center;
+}
+
+.icon-button {
+    min-width: 40px;
+    padding: 0px 6px;
+}
+
+.none {
+    margin: 0px 20px;
+}
+
+// button.track-button {
+//     color: #8b99e4;
+// }

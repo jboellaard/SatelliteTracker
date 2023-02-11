@@ -11,7 +11,7 @@
                 <mat-card-content>
                     <p>
                         <ng-template [ngIf]="feedItem.type == 'created'">
-                            <a routerLink="/users/{{ feedItem.username }}">{{ feedItem.username }}</a> created
+                            <a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> created
                             <ng-template [ngIf]="feedItem.changed == 'orbit'">an orbit for </ng-template>
                             <a routerLink="/users/{{ feedItem.username }}/satellites/{{ feedItem.satelliteId }}">{{
                                 feedItem.satelliteName
@@ -19,7 +19,7 @@
                         >
 
                         <ng-template [ngIf]="feedItem.type == 'updated'"
-                            ><a routerLink="/users/{{ feedItem.username }}">{{ feedItem.username }}</a> updated
+                            ><a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> updated
                             <ng-template [ngIf]="feedItem.changed == 'orbit'">the orbit for </ng-template>
                             <a routerLink="/users/{{ feedItem.username }}/satellites/{{ feedItem.satelliteId }}">{{
                                 feedItem.satelliteName

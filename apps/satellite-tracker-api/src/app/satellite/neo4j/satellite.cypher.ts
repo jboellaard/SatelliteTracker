@@ -21,7 +21,7 @@ export const SatelliteNeoQueries = {
     // params: username, creator, satelliteName
     untrackSatellite:
         'MATCH (a:User {username: $username})-[track:TRACKS]->(b:Satellite {createdBy: $creator, satelliteName: $satelliteName}) DELETE track',
-    getTrackedSatellites: 'MATCH (a:User {username: $username})-[track:TRACKS]->(satellite:Satellite) RETURN satellite',
+    getTrackedSatellites: 'MATCH (a:User {username: $username})-[track:TRACKS]->(satellite:Satellite) RETURN satellite', //add createdAt
     getMostRecentlyCreated:
         'MATCH (user:User)-[create:CREATED]->(satellite:Satellite) WHERE user.username IN $list RETURN user, satellite, create ORDER BY create.createdAt DESC SKIP toInteger($skip) LIMIT toInteger($limit)',
     // params: list, skip, limit

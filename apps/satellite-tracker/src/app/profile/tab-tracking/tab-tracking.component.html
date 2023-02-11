@@ -1,1 +1,49 @@
-<p>tab-tracking works!</p>
+<div *ngIf="satellites; else loading">
+    <div class="title"></div>
+    <div *ngIf="satellites.length > 0; else none">
+        <div class="wrapper" *ngFor="let satellite of satellites">
+            <div class="header">
+                <a [routerLink]="'/users/' + satellite.createdBy + '/satellites/' + satellite.id"
+                    ><h3>
+                        <mat-icon>satellite_alt</mat-icon><span>{{ satellite.satelliteName }}</span>
+                    </h3></a
+                >
+                <div class="button-container">
+                    <button
+                        *ngIf="tracking && !isTracking(satellite.id)"
+                        mat-stroked-button
+                        (click)="track(satellite.id)"
+                    >
+                        Track
+                    </button>
+                    <button *ngIf="isTracking(satellite.id)" mat-stroked-button (click)="untrack(satellite.id)">
+                        Untrack
+                    </button>
+                </div>
+            </div>
+            <div class="text-muted">
+                <p>
+                    <i>
+                        Created by
+                        <a [routerLink]="'/profile/' + satellite.createdBy">{{ satellite.createdBy }}</a>
+                    </i>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <ng-template #none>
+        <div *ngIf="canEdit">
+            <p>You aren't tracking any satellites yet.</p>
+        </div>
+        <div *ngIf="!canEdit">
+            <p>This user isn't tracking any satellites yet.</p>
+        </div>
+    </ng-template>
+</div>
+
+<ng-template #loading><mat-progress-bar mode="indeterminate"></mat-progress-bar></ng-template>
+
+<div *ngIf="waiting">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>

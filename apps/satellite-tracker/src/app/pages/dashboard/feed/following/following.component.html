@@ -12,20 +12,20 @@
                 <mat-card-content>
                     <p>
                         <ng-template [ngIf]="feedItem.type == 'created'">
-                            <a routerLink="/users/{{ feedItem.username }}">{{ feedItem.username }}</a> created
+                            <a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> created
                             <a routerLink="/users/{{ feedItem.username }}/satellites/{{ feedItem.satelliteId }}">{{
                                 feedItem.satelliteName
                             }}</a></ng-template
                         >
 
                         <ng-template [ngIf]="feedItem.type == 'followed'"
-                            ><a routerLink="/users/{{ feedItem.username }}">{{ feedItem.username }}</a> started
+                            ><a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> started
                             following
-                            <a routerLink="/users/{{ feedItem.followed }}">{{ feedItem.followed }}</a></ng-template
+                            <a routerLink="/profile/{{ feedItem.followed }}">{{ feedItem.followed }}</a></ng-template
                         >
                         <ng-template [ngIf]="feedItem.type == 'tracked'"
-                            ><a routerLink="/users/{{ feedItem.username }}">{{ feedItem.username }}</a> started tracking
-                            the satellite
+                            ><a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> started
+                            tracking the satellite
                             <a routerLink="/users/{{ feedItem.createdBy }}/satellites/{{ feedItem.satelliteId }}">{{
                                 feedItem.satelliteName
                             }}</a></ng-template

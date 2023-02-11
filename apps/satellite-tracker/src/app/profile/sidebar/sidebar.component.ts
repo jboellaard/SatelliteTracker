@@ -19,6 +19,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     satellitesSub: Subscription | undefined;
     paramSub: Subscription | undefined;
     currentSatellite: string | undefined;
+    isProfileRoute = false;
 
     constructor(
         private satelliteService: SatelliteService,

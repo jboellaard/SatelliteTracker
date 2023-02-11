@@ -51,7 +51,7 @@ export class SatelliteDetailComponent implements OnInit {
                 });
                 this.username = params.get('username')!;
             } else {
-                this.router.navigate([`/users/${this.username}/`]);
+                this.router.navigate([`/profile/${this.username}/`]);
             }
         });
     }
@@ -67,7 +67,9 @@ export class SatelliteDetailComponent implements OnInit {
                 if (this.satellite.orbit) {
                     this.addOrbitScene();
                 }
-            } else this.router.navigate([`/users/${this.username}/`]);
+            } else {
+                this.router.navigate([`/profile/${this.username}/`]);
+            }
         });
     }
 
@@ -97,7 +99,7 @@ export class SatelliteDetailComponent implements OnInit {
                     console.log(result);
                     if (result) {
                         this.snackBar.success('Satellite successfully deleted');
-                        this.router.navigate([`/users/${this.username}/`]);
+                        this.router.navigate([`/profile/${this.username}/`]);
                     } else {
                         this.snackBar.error('Something went wrong, please try again later');
                     }

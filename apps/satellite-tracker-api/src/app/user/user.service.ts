@@ -95,7 +95,7 @@ export class UserService {
     }
 
     async getUserTracking(username: string): Promise<APIResult<ISatellite[]>> {
-        const tracking = await this.neo4jService
+        let tracking = await this.neo4jService
             .read(SatelliteNeoQueries.getTrackedSatellites, { username })
             .then((result) => {
                 return result.records.map((record) => {
@@ -104,20 +104,21 @@ export class UserService {
                             .get('satellite')
                             .properties.launchDate.toString();
                     }
-                    return record.get('satellite').properties as ISatellite;
+                    return { ...record.get('satellite').properties, id: undefined } as ISatellite;
                 });
             });
 
-        tracking.forEach(async (satellite) => {
+        for (let i = 0; i < tracking.length; i++) {
             const satelliteInfo = await this.satelliteModel
-                .find({ satelliteName: satellite.satelliteName })
+                .find({ satelliteName: tracking[i].satelliteName })
                 .populate('createdBy', 'username');
-            satelliteInfo.forEach((satellite) => {
-                if ((satellite.createdBy as any).username == username) {
-                    satellite.id = satellite._id.toString();
+            for (let j = 0; j < satelliteInfo.length; j++) {
+                if ((satelliteInfo[j].createdBy as any).username == tracking[i].createdBy) {
+                    tracking[i].id = satelliteInfo[j]._id;
                 }
-            });
-        });
+            }
+        }
+
         return { status: HttpStatus.OK, result: tracking };
     }
 
@@ -129,7 +130,8 @@ export class UserService {
     async followUser(username: string, toFollow: string): Promise<APIResult<{ message: string }> | HttpException> {
         try {
             const result = await this.neo4jService.write(UserNeoQueries.followUser, { username, toFollow });
-            console.log(result);
+            if (result.summary.counters.updates().relationshipsCreated == 0)
+                return new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
             return { status: HttpStatus.OK, result: { message: 'User followed' } };
         } catch (error) {
             this.logger.error(error);
@@ -140,7 +142,8 @@ export class UserService {
     async unfollowUser(username: string, toUnfollow: string): Promise<APIResult<{ message: string }> | HttpException> {
         try {
             const result = await this.neo4jService.write(UserNeoQueries.unfollowUser, { username, toUnfollow });
-            console.log(result);
+            if (result.summary.counters.updates().relationshipsDeleted == 0)
+                return new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
             return { status: HttpStatus.OK, result: { message: 'User unfollowed' } };
         } catch (error) {
             this.logger.error(error);
