@@ -163,6 +163,19 @@
             </div>
 
             <div id="satellite-parts">
+                <h2>
+                    Satellite parts
+                    <button
+                        type="button"
+                        mat-raised-button
+                        (click)="openAddPartDialog()"
+                        [disabled]="!allSatelliteParts || allSatelliteParts.length == 0"
+                        style="margin-left: 10px"
+                    >
+                        <mat-icon>add</mat-icon> Add part
+                    </button>
+                </h2>
+
                 <mat-table
                     #table
                     [dataSource]="satellite.satelliteParts!"

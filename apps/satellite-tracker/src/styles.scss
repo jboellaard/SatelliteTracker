@@ -233,3 +233,11 @@ app-root {
     .mdc-tab__text-label {
     color: #acacac;
 }
+
+.mdc-list-item--with-leading-icon.mdc-list-item--with-two-lines .mdc-list-item__primary-text::before {
+    height: 26px !important;
+}
+
+// div.mat-mdc-dialog-surface.mdc-dialog__surface {
+//     background: #313131;
+// }

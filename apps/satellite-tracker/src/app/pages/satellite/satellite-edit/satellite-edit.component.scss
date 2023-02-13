@@ -5,13 +5,7 @@
 
 form {
     width: 100%;
-    // display: flex;
 }
-
-// form .cols-2-form {
-//     display: flex;
-//     justify-content: space-between;
-// }
 
 #satellite-info {
     min-width: 150px;
@@ -25,7 +19,7 @@ form {
     width: 100%;
     max-width: 700px;
     margin: auto;
-    height: 416px;
+    max-height: 416px;
     overflow: auto;
     margin-bottom: 22px;
 }
@@ -47,8 +41,13 @@ mat-form-field {
     width: 49%;
 }
 
+.buttons {
+    max-width: 700px;
+    margin: auto;
+}
+
 .buttons button {
-    margin-inline: 5px;
+    margin-inline: 1%;
 }
 
 .dragCursor {

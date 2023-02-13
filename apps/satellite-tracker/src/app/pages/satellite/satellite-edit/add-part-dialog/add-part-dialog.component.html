@@ -1,0 +1,111 @@
+<h1 mat-dialog-title>Add new part</h1>
+<div mat-dialog-content class="dialog-wrapper">
+    <div class="parts">
+        <mat-accordion>
+            <mat-expansion-panel
+                *ngFor="let part of data.allSatelliteParts; let i = index"
+                [expanded]="i == 0"
+                (opened)="selectedPart.satellitePart = part"
+                [disabled]="selectedPart.satellitePart.partName == part.partName"
+            >
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        {{ part.partName }}
+                    </mat-panel-title>
+                    <mat-panel-description>
+                        {{ part.function }}
+                    </mat-panel-description>
+                </mat-expansion-panel-header>
+
+                <div *ngIf="part.description">
+                    {{ part.description ? part.description : 'This part does not have a description' }}
+                </div>
+                <mat-divider></mat-divider>
+                <div *ngIf="part.dependsOn && part.dependsOn.length > 0">
+                    <mat-list>
+                        <div mat-subheader style="font-size: 14px; margin: 0">
+                            This part depends on any of the following satellite parts:
+                        </div>
+                        <mat-list-item *ngFor="let dependency of part.dependsOn" style="height: 60px">
+                            <mat-icon matListItemIcon style="margin-right: 16px">build</mat-icon>
+                            <div matListItemTitle style="font-size: 14px">{{ dependency.partName }}</div>
+                            <div matListItemLine style="font-size: 12px">{{ dependency.description }}</div>
+                        </mat-list-item>
+                    </mat-list>
+                </div>
+
+                <!-- <mat-checkbox [(ngModel)]="part.checked">{{part.partName}}</mat-checkbox> -->
+            </mat-expansion-panel>
+        </mat-accordion>
+    </div>
+    <div class="custom">
+        <form #partForm="ngForm" name="form">
+            <h3>{{ selectedPart.satellitePart.partName }}</h3>
+            <p>{{ selectedPart.satellitePart.description }}</p>
+
+            <mat-form-field class="form-group">
+                <mat-label>Color</mat-label>
+                <input
+                    matInput
+                    type="color"
+                    class="form-control"
+                    value="#000000"
+                    [(ngModel)]="selectedPart.color"
+                    name="color"
+                    #color="ngModel"
+                    required
+                    [ngClass]="{
+                        'is-invalid': color.invalid && color.touched
+                    }"
+                />
+            </mat-form-field>
+            <mat-form-field class="form-group">
+                <mat-label for="size">Size (m)</mat-label>
+                <input
+                    matInput
+                    type="number"
+                    class="form-control"
+                    [(ngModel)]="selectedPart.size"
+                    name="size"
+                    id="size"
+                    min="1"
+                    #size="ngModel"
+                    required
+                    [ngClass]="{
+                        'is-invalid': size.invalid && size.touched
+                    }"
+                />
+                <mat-error *ngIf="size.invalid && size.touched" class="invalid-feedback">
+                    <ng-container *ngIf="size.errors!['required']">Name is required</ng-container>
+                    <ng-container *ngIf="size.errors!['min']">The size must be at least 1 meter</ng-container>
+                </mat-error>
+            </mat-form-field>
+            <mat-form-field class="form-group">
+                <mat-label>Quantity</mat-label>
+                <input
+                    matInput
+                    type="number"
+                    class="form-control"
+                    [(ngModel)]="selectedPart.quantity"
+                    name="quantity"
+                    min="1"
+                    max="50"
+                    #quantity="ngModel"
+                    required
+                    [ngClass]="{
+                        'is-invalid': quantity.invalid && quantity.touched
+                    }"
+                />
+                <mat-error *ngIf="quantity.invalid && quantity.touched" class="invalid-feedback">
+                    <ng-container *ngIf="quantity.errors!['required']">Quantity is required</ng-container>
+                    <ng-container *ngIf="quantity.errors!['min']">You must add at least one of this part</ng-container>
+                    <ng-container *ngIf="quantity.errors!['max']">You can't add more than 50 of this part</ng-container>
+                </mat-error>
+            </mat-form-field>
+        </form>
+    </div>
+</div>
+<div mat-dialog-actions style="justify-content: space-between; margin: 10px">
+    <button mat-flat-button (click)="onNoClick()">Cancel</button>
+    <button mat-flat-button color="primary" [mat-dialog-close]="selectedPart" [disabled]="!partForm.valid">Add</button>
+</div>

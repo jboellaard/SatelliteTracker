@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { DialogPosition, MatDialogRef, MAT_DIALOG_DATA, MAT_DIALOG_DEFAULT_OPTIONS } from '@angular/material/dialog';
 
 @Component({
     selector: 'app-add-edit-dialog',
@@ -8,9 +8,9 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
         <div mat-dialog-content>
             <p>{{ data.message }}</p>
         </div>
-        <div mat-dialog-actions>
+        <div mat-dialog-actions style="justify-content: space-between; margin: 10px;">
             <button mat-flat-button (click)="onNoClick()">Cancel</button>
-            <button mat-flat-button color="primary" [mat-dialog-close]="'ok'" cdkFocusInitial>Submit</button>
+            <button mat-flat-button color="primary" [mat-dialog-close]="'ok'" cdkFocusInitial>Yes</button>
         </div>
     `,
 })

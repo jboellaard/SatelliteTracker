@@ -36,8 +36,9 @@ export class OrbitService {
         orbit: IOrbit,
         color: string = '#ffffff',
         shape: Shape = Shape.Cube,
-        size = 200
+        size = 200000
     ) {
+        size = size / 1000; // convert to km
         const scene = new THREE.Scene();
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas: container });
         const width = container.clientWidth;

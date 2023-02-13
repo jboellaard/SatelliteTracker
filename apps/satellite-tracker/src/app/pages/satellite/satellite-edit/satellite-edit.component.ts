@@ -10,6 +10,7 @@ import { SnackBarService } from '../../../utils/snack-bar.service';
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AddEditDialogComponent } from '../../../utils/add-edit-dialog/add-edit-dialog.component';
 import { MatTable } from '@angular/material/table';
+import { AddPartDialogComponent } from './add-part-dialog/add-part-dialog.component';
 
 @Component({
     selector: 'app-satellite-edit',
@@ -22,7 +23,6 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     id!: Id | null | undefined;
 
     allSatelliteParts: ISatellitePart[] = [];
-    satellitePartNames: string[] = [];
     purposes = Purpose;
     shapes = Object.values(Shape);
 
@@ -76,10 +76,6 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                             this.satellite.orbit.period = Number(this.satellite.orbit.period?.toFixed(3));
                             this.satellite.orbit.semiMajorAxis = Math.round(this.satellite.orbit.semiMajorAxis);
                         }
-                        this.satellitePartNames =
-                            this.satellite.satelliteParts?.map(
-                                (satellitePart) => satellitePart.satellitePart.partName
-                            ) || [];
                     }
                 });
             }
@@ -119,8 +115,6 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         this.satellite.satelliteParts?.filter(
             (satellitePart) => satellitePart.satellitePart.partName != part.satellitePart.partName
         );
-        this.satellitePartNames =
-            this.satellite.satelliteParts?.map((satellitePart) => satellitePart.satellitePart.partName) || [];
     }
 
     getContrastYIQ(hexcolor: string) {
@@ -131,11 +125,25 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         return yiq >= 128 ? 'black' : 'white';
     }
 
+    openAddPartDialog() {
+        const dialogRef = this.dialog.open(AddPartDialogComponent, {
+            data: { allSatelliteParts: this.allSatelliteParts },
+        });
+        dialogRef.afterClosed().subscribe((result) => {
+            console.log(result);
+            if (result) {
+                if (!this.satellite.satelliteParts) this.satellite.satelliteParts = [];
+                this.satellite.satelliteParts = [...this.satellite.satelliteParts, result];
+            }
+        });
+    }
+
     onSubmit() {
         if (this.componentExists) {
             this.satellite.orbit = undefined;
             const dialogRef = this.dialog.open(AddEditDialogComponent, {
                 data: { message: 'Are you sure you want to update this satellite?' },
+                position: { left: 'calc(50% - 70px)' },
             });
             dialogRef.afterClosed().subscribe((ok) => {
                 if (ok == 'ok') {
@@ -152,6 +160,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         } else {
             const dialogRef = this.dialog.open(AddEditDialogComponent, {
                 data: { message: 'Are you sure you want to create this satellite?' },
+                position: { left: 'calc(50% - 70px)' },
             });
             dialogRef.afterClosed().subscribe((ok) => {
                 if (ok == 'ok') {

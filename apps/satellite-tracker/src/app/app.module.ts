@@ -65,6 +65,7 @@ import { TabCreatedComponent } from './profile/tab-created/tab-created.component
 import { TabFollowingComponent } from './profile/tab-following/tab-following.component';
 import { TabFollowersComponent } from './profile/tab-followers/tab-followers.component';
 import { TabTrackingComponent } from './profile/tab-tracking/tab-tracking.component';
+import { AddPartDialogComponent } from './pages/satellite/satellite-edit/add-part-dialog/add-part-dialog.component';
 
 const materialModules = [
     MatToolbarModule,
@@ -126,6 +127,7 @@ const materialModules = [
         TabFollowingComponent,
         TabFollowersComponent,
         TabTrackingComponent,
+        AddPartDialogComponent,
     ],
     imports: [
         BrowserModule,
