@@ -5,12 +5,14 @@
     <div *ngIf="!componentExists">
         <h1>Creating new satellite for {{ username }}</h1>
     </div>
+    <mat-divider style="margin-top: -10px; margin-bottom: 10px"></mat-divider>
 
     <!-- Edit form for satellite model -->
 
     <form #satelliteEditForm="ngForm" name="form" (ngSubmit)="onSubmit()" novalidate>
         <div class="cols-2-form">
             <div id="satellite-info">
+                <h2>Information</h2>
                 <!-- name -->
                 <mat-form-field class="form-group" appearance="fill">
                     <mat-label for="name">Name</mat-label>
@@ -73,6 +75,9 @@
                     ></textarea>
                 </mat-form-field>
 
+                <mat-divider style="margin-bottom: 10px"></mat-divider>
+                <h2>Appearance</h2>
+
                 <div class="cols-2">
                     <!-- shape of base -->
                     <mat-form-field class="form-group" appearance="fill">
@@ -84,9 +89,11 @@
 
                     <!-- size of base -->
                     <mat-form-field class="form-group radius" appearance="fill">
-                        <mat-label *ngIf="satellite.shapeOfBase == 'Cube'" for="sizeOfBase">Length of edge</mat-label>
+                        <mat-label *ngIf="satellite.shapeOfBase == 'Cube'" for="sizeOfBase"
+                            >Length of edge (m)</mat-label
+                        >
                         <mat-label *ngIf="satellite.shapeOfBase == 'Sphere'" for="sizeOfBase"
-                            >Diameter of base</mat-label
+                            >Diameter of base (m)</mat-label
                         >
                         <input
                             matInput
@@ -163,6 +170,7 @@
             </div>
 
             <div id="satellite-parts">
+                <mat-divider style="margin-bottom: 10px"></mat-divider>
                 <h2>
                     Satellite parts
                     <button
@@ -176,6 +184,9 @@
                     </button>
                 </h2>
 
+                <div *ngIf="satellitePartError" class="alert alert-danger" role="alert">
+                    {{ satellitePartError }}
+                </div>
                 <mat-table
                     #table
                     [dataSource]="satellite.satelliteParts!"
@@ -242,8 +253,8 @@
                     <ng-container matColumnDef="actions">
                         <mat-header-cell *matHeaderCellDef></mat-header-cell>
                         <mat-cell class="edit icon" layout-align="center center" *matCellDef="let customPart">
-                            <button mat-flat-button (click)="removePart(customPart)">
-                                <mat-icon>remove</mat-icon>
+                            <button mat-button color="warn" (click)="removePart(customPart)" type="button">
+                                <mat-icon>delete</mat-icon>
                             </button>
                         </mat-cell>
                     </ng-container>
@@ -255,12 +266,17 @@
                         [cdkDragData]="row"
                     ></mat-row>
                 </mat-table>
+                <div *ngIf="!satellite.satelliteParts || satellite.satelliteParts.length == 0" style="margin-top: 10px">
+                    <p>This satellite does not have any parts</p>
+                </div>
+                <mat-divider style="margin-top: 20px"></mat-divider>
             </div>
         </div>
 
         <!-- Submit and Cancel buttons -->
         <div class="buttons">
             <div class="">
+                <button mat-flat-button class="btn btn-warning" (click)="backClicked()">Cancel</button>
                 <button
                     mat-flat-button
                     color="primary"
@@ -270,7 +286,6 @@
                 >
                     Submit
                 </button>
-                <button mat-flat-button class="btn btn-warning" (click)="backClicked()">Cancel</button>
             </div>
         </div>
     </form>

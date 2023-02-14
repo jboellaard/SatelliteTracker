@@ -1,6 +1,8 @@
 .edit-container {
     text-align: center;
     padding: 20px;
+    max-width: 700px;
+    margin: auto;
 }
 
 form {
@@ -9,15 +11,12 @@ form {
 
 #satellite-info {
     min-width: 150px;
-    max-width: 700px;
-    // width: 49%;
+    width: 100%;
     margin: auto;
-    // margin-right: 8px;
 }
 
 #satellite-parts {
     width: 100%;
-    max-width: 700px;
     margin: auto;
     max-height: 416px;
     overflow: auto;
@@ -110,4 +109,8 @@ mat-header-cell:nth-child(3) {
 mat-cell,
 mat-header-cell {
     box-sizing: border-box;
+}
+
+.alert {
+    color: #f44336;
 }

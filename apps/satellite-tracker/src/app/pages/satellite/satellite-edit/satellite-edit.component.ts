@@ -37,6 +37,8 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     };
     username: string | undefined;
 
+    satellitePartError: string | undefined = undefined;
+
     userSub: Subscription | undefined;
     satelliteSub: Subscription | undefined;
     satellitePartSub: Subscription | undefined;
@@ -98,7 +100,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     }
 
     drop(event: CdkDragDrop<ICustomSatellitePart[]>) {
-        console.log(event);
+        console.log(event.item.data);
         this.dragDisabled = true;
 
         const previousIndex = this.satellite.satelliteParts?.findIndex((part) => part == event.item.data);
@@ -112,9 +114,13 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     }
 
     removePart(part: ICustomSatellitePart) {
-        this.satellite.satelliteParts?.filter(
-            (satellitePart) => satellitePart.satellitePart.partName != part.satellitePart.partName
-        );
+        const index = this.satellite.satelliteParts?.findIndex((satellitePart) => satellitePart == part);
+        console.log(index);
+        if (index != undefined) {
+            console.log(index);
+            this.satellite.satelliteParts?.splice(index, 1);
+        }
+        this.table?.renderRows();
     }
 
     getContrastYIQ(hexcolor: string) {
@@ -130,15 +136,58 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
             data: { allSatelliteParts: this.allSatelliteParts },
         });
         dialogRef.afterClosed().subscribe((result) => {
-            console.log(result);
             if (result) {
+                this.satellitePartError = undefined;
                 if (!this.satellite.satelliteParts) this.satellite.satelliteParts = [];
                 this.satellite.satelliteParts = [...this.satellite.satelliteParts, result];
             }
         });
     }
 
+    checkDependencies() {
+        if (this.satellite.satelliteParts) {
+            for (let i = 0; i < this.satellite.satelliteParts.length; i++) {
+                if (this.satellite.satelliteParts[i].satellitePart.dependsOn) {
+                    let noDependencies = true;
+                    const part = this.satellite.satelliteParts[i].satellitePart;
+                    for (let j = 0; j < this.satellite.satelliteParts[i].satellitePart.dependsOn!.length!; j++) {
+                        const dependency = part.dependsOn![j];
+                        if (
+                            this.satellite.satelliteParts.find(
+                                (part) => part.satellitePart.partName == dependency.partName
+                            )
+                        ) {
+                            noDependencies = false;
+                        }
+                    }
+                    if (noDependencies && part.dependsOn!.length > 0) {
+                        console.log(part.dependsOn);
+                        let dependencies = '';
+                        for (let i = 0; i < part.dependsOn!.length; i++) {
+                            if (i == part.dependsOn!.length - 1) {
+                                dependencies += part.dependsOn![i].partName;
+                            } else {
+                                dependencies += part.dependsOn![i].partName + ', ';
+                            }
+                        }
+                        this.satellitePartError =
+                            'The part ' +
+                            part.partName +
+                            ' cannot function if the satellite does not have any of the following parts: ' +
+                            dependencies +
+                            ', please add at least one.';
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
     onSubmit() {
+        if (!this.checkDependencies()) {
+            return;
+        }
         if (this.componentExists) {
             this.satellite.orbit = undefined;
             const dialogRef = this.dialog.open(AddEditDialogComponent, {

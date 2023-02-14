@@ -91,6 +91,7 @@ export class SatelliteDetailComponent implements OnInit {
     removeSatellite() {
         const dialogRef = this.dialog.open(DeleteDialogComponent, {
             data: { message: 'Are you sure you want to delete this satellite?' },
+            position: { left: 'calc(50% - 70px)' },
         });
         dialogRef.afterClosed().subscribe((ok) => {
             console.log(ok);
@@ -111,6 +112,7 @@ export class SatelliteDetailComponent implements OnInit {
     removeOrbit() {
         const dialogRef = this.dialog.open(DeleteDialogComponent, {
             data: { message: 'Are you sure you want to delete this orbit?' },
+            position: { left: 'calc(50% - 70px)' },
         });
         dialogRef.afterClosed().subscribe((ok) => {
             console.log(ok);

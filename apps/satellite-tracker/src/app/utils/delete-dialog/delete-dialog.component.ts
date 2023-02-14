@@ -8,7 +8,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
         <div mat-dialog-content>
             <p>{{ data.message }}</p>
         </div>
-        <div mat-dialog-actions>
+        <div mat-dialog-actions style="justify-content: space-between; margin: 10px;">
             <button mat-flat-button (click)="onNoClick()">Cancel</button>
             <button mat-flat-button color="warn" [mat-dialog-close]="'ok'" cdkFocusInitial>Delete</button>
         </div>

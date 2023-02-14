@@ -73,7 +73,11 @@ export class SatelliteService {
     async findOne(id: Id): Promise<APIResult<ISatellite> | HttpException> {
         const satellite = (await this.satelliteModel
             .findById(id)
-            .populate('satelliteParts.satellitePart')) as ISatellite;
+            .populate('satelliteParts.satellitePart')
+            .populate({
+                path: 'satelliteParts.satellitePart',
+                populate: { path: 'dependsOn', model: 'SatellitePart', select: 'partName' },
+            })) as ISatellite;
         if (satellite) {
             return { status: HttpStatus.OK, result: satellite };
         } else {

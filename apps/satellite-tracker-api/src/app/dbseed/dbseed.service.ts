@@ -265,8 +265,8 @@ export class DbseedService implements OnModuleInit {
                 });
                 const satellitePart13 = new this.satellitePartModel({
                     partName: 'Particle detector',
-                    description: 'Observes electron, protons and helium.',
-                    function: 'Detection of particles (Research)',
+                    description: 'Observes electrons, protons and helium.',
+                    function: 'Detection of particles',
                 });
                 const satellitePart14 = new this.satellitePartModel({
                     partName: 'Sensor',

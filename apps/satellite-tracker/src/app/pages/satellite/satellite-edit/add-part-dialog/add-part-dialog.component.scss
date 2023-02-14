@@ -6,7 +6,7 @@
 }
 
 .parts {
-    width: 60%;
+    width: 56%;
     margin: auto;
     direction: rtl;
     max-height: 50vh;
@@ -24,7 +24,7 @@ mat-expansion-panel {
 }
 
 .custom {
-    width: 38%;
+    width: 42%;
 }
 
 mat-expansion-panel-header[aria-disabled='true'] {
@@ -47,4 +47,13 @@ h3 {
     font-size: 18px;
     font-weight: 500;
     color: white;
+}
+
+.col-2 {
+    display: flex;
+    justify-content: space-between;
+}
+
+.col-2 mat-form-field {
+    width: 49%;
 }

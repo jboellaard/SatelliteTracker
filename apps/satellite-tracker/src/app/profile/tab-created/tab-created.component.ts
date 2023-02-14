@@ -40,6 +40,7 @@ export class TabCreatedComponent implements OnInit {
         });
 
         this.userSub = this.profileService.currentUser$.subscribe((user) => {
+            this.satellites = undefined;
             this.user = user;
             this.getSatellites();
         });

@@ -102,3 +102,11 @@ form {
 .time-picker mat-form-field {
     width: 70px;
 }
+
+.buttons {
+    display: flex;
+    justify-content: flex-end;
+    // gap: 10px;
+    margin: 0 10px;
+    max-width: 100%;
+}

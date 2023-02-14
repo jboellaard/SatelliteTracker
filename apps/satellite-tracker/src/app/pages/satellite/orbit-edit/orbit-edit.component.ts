@@ -190,6 +190,7 @@ export class OrbitEditComponent implements OnInit {
         if (this.componentExists) {
             const dialogRef = this.dialog.open(AddEditDialogComponent, {
                 data: { message: 'Are you sure you want to update this orbit?' },
+                position: { left: 'calc(50% - 70px)' },
             });
             dialogRef.afterClosed().subscribe((ok: string) => {
                 if (ok == 'ok') {
@@ -208,6 +209,7 @@ export class OrbitEditComponent implements OnInit {
         } else {
             const dialogRef = this.dialog.open(AddEditDialogComponent, {
                 data: { message: 'Are you sure you want to create this orbit?' },
+                position: { left: 'calc(50% - 70px)' },
             });
             dialogRef.afterClosed().subscribe((ok: string) => {
                 if (ok == 'ok') {

@@ -222,18 +222,16 @@
 
         <!-- Submit and Cancel buttons -->
         <div class="buttons">
-            <div class="">
-                <button
-                    mat-flat-button
-                    color="primary"
-                    type="submit"
-                    class="btn btn-primary"
-                    [disabled]="!orbitEditForm.valid"
-                >
-                    Submit
-                </button>
-                <button mat-flat-button class="btn btn-warning" (click)="backClicked()">Cancel</button>
-            </div>
+            <button mat-flat-button class="btn btn-warning" (click)="backClicked()">Cancel</button>
+            <button
+                mat-flat-button
+                color="primary"
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="!orbitEditForm.valid"
+            >
+                Submit
+            </button>
         </div>
     </form>
 </div>
