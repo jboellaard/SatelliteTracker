@@ -4,6 +4,13 @@
         <section style="margin-bottom: 10px">
             <div id="checkbox-wrapper">
                 <mat-checkbox
+                    [(ngModel)]="orbitService.showOrbit"
+                    name="showOrbit"
+                    (ngModelChange)="orbitService.toggleOrbit()"
+                    color="'accent'"
+                    >Show orbit</mat-checkbox
+                >
+                <mat-checkbox
                     [(ngModel)]="orbitService.guidelines"
                     name="guidelines"
                     (ngModelChange)="orbitService.toggleGuideLines()"
@@ -12,11 +19,18 @@
                     >Add guidelines</mat-checkbox
                 >
                 <mat-checkbox
-                    [(ngModel)]="orbitService.realColorAndSize"
+                    [(ngModel)]="orbitService.realColor"
                     name="realColorAndSize"
-                    (ngModelChange)="orbitService.toggleColorAndSize()"
+                    (ngModelChange)="orbitService.toggleColor()"
                     color="'accent'"
-                    >Real color and size</mat-checkbox
+                    >Real color</mat-checkbox
+                >
+                <mat-checkbox
+                    [(ngModel)]="orbitService.realSize"
+                    name="realColorAndSize"
+                    (ngModelChange)="orbitService.toggleSize()"
+                    color="'accent'"
+                    >Real size</mat-checkbox
                 >
             </div>
             <div id="zoom-slider-wrapper">
@@ -96,7 +110,7 @@
             <!-- inclination -->
             <div class="label-container">
                 <label class="label" for="inclination-slider">Inclination (i)</label>
-                <span class="label-value" id="inclination-value">{{ satellite.orbit!.inclination }}°</span>
+                <span class="label-value" id="inclination-value">{{ satellite.orbit!.inclination }}&#176;</span>
             </div>
             <mat-slider class="slider" step="1" min="0" max="180" discrete="true">
                 <input
@@ -113,8 +127,10 @@
             <!-- <div class="cols-2"> -->
             <!-- longitude (RA) -->
             <div class="label-container">
-                <label class="label" for="inclination-slider">Longitude of ascending node (Ω)</label>
-                <span class="label-value" id="inclination-value">{{ satellite.orbit!.longitudeOfAscendingNode }}°</span>
+                <label class="label" for="inclination-slider">Longitude of ascending node (&#937;)</label>
+                <span class="label-value" id="inclination-value"
+                    >{{ satellite.orbit!.longitudeOfAscendingNode }}&#176;</span
+                >
             </div>
             <mat-slider
                 id="mat-longitude-slider"
@@ -152,7 +168,7 @@
                 <label *ngIf="satellite.orbit!.eccentricity != 0" class="label" for="perigee-slider"
                     >Argument of perigee (ω)</label
                 >
-                <span class="label-value" id="perigee-value">{{ satellite.orbit!.argumentOfPerigee }}°</span>
+                <span class="label-value" id="perigee-value">{{ satellite.orbit!.argumentOfPerigee }}&#176;</span>
             </div>
             <mat-slider class="slider" step="1" min="0" max="360" discrete="true">
                 <input

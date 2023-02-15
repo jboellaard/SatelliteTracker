@@ -27,12 +27,12 @@ export class SatelliteDetailComponent implements OnInit {
     constructor(
         private route: ActivatedRoute,
         private router: Router,
-        public userService: UserService,
-        public satelliteService: SatelliteService,
-        private orbitService: OrbitService,
+        private userService: UserService,
+        private satelliteService: SatelliteService,
+        public orbitService: OrbitService,
         private authService: AuthService,
-        public dialog: MatDialog,
-        public snackBar: SnackBarService
+        private dialog: MatDialog,
+        private snackBar: SnackBarService
     ) {}
 
     ngOnInit(): void {

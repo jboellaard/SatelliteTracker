@@ -18,9 +18,12 @@ form {
 #satellite-parts {
     width: 100%;
     margin: auto;
+    margin-bottom: 22px;
+}
+
+#satellite-parts mat-table {
     max-height: 416px;
     overflow: auto;
-    margin-bottom: 22px;
 }
 
 mat-form-field {

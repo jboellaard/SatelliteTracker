@@ -16,33 +16,131 @@
             {{ satellite.updatedAt | date : 'dd/MM/yyyy' }}
         </p>
     </div>
-    <br />
-
-    <p>This satellite has a mass of {{ satellite.mass }} kg, a base radius of {{ satellite.sizeOfBase }} meters.</p>
+    <mat-divider style="margin: 10px 0px"></mat-divider>
+    <h2>Appearance</h2>
+    <p>This satellite has a mass of {{ satellite.mass }} kg and a base radius of {{ satellite.sizeOfBase }} meters.</p>
 
     <div>
         <p>Color of the base:</p>
         <span class="circle" [ngStyle]="{ 'background-color': satellite.colorOfBase }"></span>
     </div>
-    <br />
-    <p>{{ satellite.orbit ? 'This satellite has an orbit' : 'This satellite does not have an orbit yet.' }}</p>
-    <div *ngIf="satellite.orbit">
-        <div *ngIf="canEdit" class="buttons">
-            <button mat-flat-button class="muted-button" routerLink="orbit">
-                <mat-icon>edit</mat-icon> Edit orbit
-            </button>
-            <button mat-flat-button color="warn" (click)="removeOrbit()">
-                <mat-icon>delete</mat-icon> Remove orbit
-            </button>
+    <mat-divider style="margin: 10px 0px"></mat-divider>
+    <div style="display: flex; justify-content: space-between">
+        <h2>Orbit</h2>
+        <div *ngIf="canEdit">
+            <div *ngIf="satellite.orbit; else noOrbit" class="buttons">
+                <button mat-flat-button class="muted-button" routerLink="orbit">
+                    <mat-icon>edit</mat-icon> Edit orbit
+                </button>
+                <button mat-flat-button color="warn" (click)="removeOrbit()">
+                    <mat-icon>delete</mat-icon> Remove orbit
+                </button>
+            </div>
+            <ng-template #noOrbit>
+                <div class="buttons">
+                    <button mat-flat-button class="muted-button" routerLink="orbit">
+                        <mat-icon>add</mat-icon> Add orbit
+                    </button>
+                </div>
+            </ng-template>
         </div>
-        <div id="canvas-wrapper" style="width: 100%"><canvas style="width: 100%"></canvas></div>
     </div>
-    <div *ngIf="!satellite.orbit">
-        <div *ngIf="canEdit" class="buttons">
-            <button mat-flat-button class="muted-button" routerLink="orbit"><mat-icon>add</mat-icon> Add orbit</button>
+    <div *ngIf="!satellite.orbit; else orbitScene">
+        <p>This satellite does not have an orbit yet.</p>
+    </div>
+    <ng-template #orbitScene>
+        <div style="display: flex; justify-content: space-between">
+            <div id="canvas-wrapper"><canvas></canvas></div>
+            <div class="orbit-info">
+                <h3>Information</h3>
+                <p>
+                    <span class="orbit-info-label">Semimajor axis (a):</span>
+                    {{ satellite.orbit?.semiMajorAxis }} kilometers
+                </p>
+                <p>
+                    <span class="orbit-info-label">Period (P):</span> {{ satellite.orbit?.period?.toFixed(3) }} days
+                    {{
+                        satellite.orbit?.period && satellite.orbit!.period! < 5
+                            ? '(' + (satellite.orbit!.period! * 24 * 60).toFixed(0) + ' minutes)'
+                            : ''
+                    }}
+                </p>
+                <p><span class="orbit-info-label">Eccentricity (e):</span> {{ satellite.orbit?.eccentricity }}</p>
+                <p><span class="orbit-info-label">Inclination (i):</span> {{ satellite.orbit?.inclination }}&#176;</p>
+                <p>
+                    <span class="orbit-info-label">Longitude of the ascending node (&#937;):</span>
+                    {{ satellite.orbit?.longitudeOfAscendingNode }}&#176;
+                </p>
+                <p>
+                    <span class="orbit-info-label">
+                        {{
+                            satellite.orbit!.inclination == 0 && satellite.orbit!.eccentricity == 0
+                                ? 'True longitude (l): '
+                                : satellite.orbit!.inclination != 0 && satellite.orbit!.eccentricity == 0
+                                ? 'Argument of latitude (u): '
+                                : 'Argument of perigee (ω): '
+                        }}</span
+                    >
+                    {{ satellite.orbit?.argumentOfPerigee }}&#176;
+                </p>
+                <mat-divider style="margin-bottom: 10px"></mat-divider>
+                <section id="options-wrapper" style="margin-bottom: 10px">
+                    <h3>Canvas options</h3>
+                    <div id="checkbox-wrapper">
+                        <div>
+                            <mat-checkbox
+                                [(ngModel)]="orbitService.guidelines"
+                                name="guidelines"
+                                (ngModelChange)="orbitService.toggleGuideLines()"
+                                color="'accent'"
+                                >Add guidelines</mat-checkbox
+                            >
+                            <mat-checkbox
+                                [(ngModel)]="orbitService.showOrbit"
+                                name="showOrbit"
+                                (ngModelChange)="orbitService.toggleOrbit()"
+                                color="'accent'"
+                                >Show orbit</mat-checkbox
+                            >
+                        </div>
+                        <div>
+                            <mat-checkbox
+                                [(ngModel)]="orbitService.realColor"
+                                name="realColorAndSize"
+                                (ngModelChange)="orbitService.toggleColor()"
+                                color="'accent'"
+                                >Real color</mat-checkbox
+                            >
+                            <mat-checkbox
+                                [(ngModel)]="orbitService.realSize"
+                                name="realColorAndSize"
+                                (ngModelChange)="orbitService.toggleSize()"
+                                color="'accent'"
+                                >Real size</mat-checkbox
+                            >
+                        </div>
+                    </div>
+                    <p class="text-muted">Try toggling the real size if the satellite is too small to be seen.</p>
+                    <div id="zoom-slider-wrapper">
+                        <mat-label for="mat-zoom-slider">Zoom</mat-label>
+                        <mat-slider class="slider" id="mat-zoom-slider" step="0.02" min="0.4" max="2" discrete="true">
+                            <input
+                                matSliderThumb
+                                name="zoom-slider"
+                                id="zoom-slider"
+                                [(ngModel)]="orbitService.zoom"
+                                (ngModelChange)="orbitService.changeZoom(satellite.orbit!)"
+                                #eccentricitySlider="ngModel"
+                            />
+                        </mat-slider>
+                    </div>
+                </section>
+            </div>
         </div>
-    </div>
-    <br />
+    </ng-template>
+    <mat-divider style="margin: 10px 0px"></mat-divider>
+
+    <h2>Satellite parts</h2>
 </div>
 <ng-template #loadingMessage>
     <mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar>
