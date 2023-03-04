@@ -34,6 +34,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         colorOfBase: '#000000',
         shapeOfBase: Shape.Cube,
         orbit: undefined,
+        satelliteParts: [],
     };
     username: string | undefined;
 
@@ -59,7 +60,8 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
 
     ngOnInit(): void {
         this.satellitePartSub = this.satelliteService.getSatelliteParts().subscribe((satelliteParts) => {
-            this.allSatelliteParts = satelliteParts.sort((a, b) => a.partName.localeCompare(b.partName));
+            satelliteParts.sort((a, b) => a.partName.localeCompare(b.partName));
+            this.allSatelliteParts = satelliteParts;
         });
         this.paramSub = this.route.paramMap.subscribe((params) => {
             this.id = params.get('satelliteId')!;
@@ -74,10 +76,6 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                         if (this.satellite.purpose && this.purposes.indexOf(this.satellite.purpose) == -1) {
                             this.purposes.push(this.satellite.purpose);
                         }
-                        if (this.satellite.orbit) {
-                            this.satellite.orbit.period = Number(this.satellite.orbit.period?.toFixed(3));
-                            this.satellite.orbit.semiMajorAxis = Math.round(this.satellite.orbit.semiMajorAxis);
-                        }
                     }
                 });
             }
@@ -91,7 +89,9 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     }
 
     openPurposeDialog() {
-        const dialogRef = this.dialog.open(AddPurposeDialogComponent);
+        const dialogRef = this.dialog.open(AddPurposeDialogComponent, {
+            position: { left: '50%' },
+        });
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.purposes.push(result);
@@ -124,10 +124,10 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     }
 
     getContrastYIQ(hexcolor: string) {
-        var r = parseInt(hexcolor.substring(1, 3), 16);
-        var g = parseInt(hexcolor.substring(3, 5), 16);
-        var b = parseInt(hexcolor.substring(5, 7), 16);
-        var yiq = (r * 299 + g * 587 + b * 114) / 1000;
+        let r = parseInt(hexcolor.substring(1, 3), 16);
+        let g = parseInt(hexcolor.substring(3, 5), 16);
+        let b = parseInt(hexcolor.substring(5, 7), 16);
+        let yiq = (r * 299 + g * 587 + b * 114) / 1000;
         return yiq >= 128 ? 'black' : 'white';
     }
 
@@ -146,22 +146,20 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
 
     checkDependencies() {
         if (this.satellite.satelliteParts) {
-            for (let i = 0; i < this.satellite.satelliteParts.length; i++) {
-                if (this.satellite.satelliteParts[i].satellitePart.dependsOn) {
+            for (const customPart of this.satellite.satelliteParts) {
+                if (customPart.satellitePart.dependsOn) {
                     let noDependencies = true;
-                    const part = this.satellite.satelliteParts[i].satellitePart;
-                    for (let j = 0; j < this.satellite.satelliteParts[i].satellitePart.dependsOn!.length!; j++) {
-                        const dependency = part.dependsOn![j];
+                    const part = customPart.satellitePart;
+                    for (const element of part.dependsOn!) {
                         if (
                             this.satellite.satelliteParts.find(
-                                (part) => part.satellitePart.partName == dependency.partName
+                                (customPart) => customPart.satellitePart.partName == element.partName
                             )
                         ) {
                             noDependencies = false;
                         }
                     }
                     if (noDependencies && part.dependsOn!.length > 0) {
-                        console.log(part.dependsOn);
                         let dependencies = '';
                         for (let i = 0; i < part.dependsOn!.length; i++) {
                             if (i == part.dependsOn!.length - 1) {
@@ -184,45 +182,51 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         return true;
     }
 
+    private create() {
+        const dialogref = this.dialog.open(AddEditDialogComponent, {
+            data: { message: 'Are you sure you want to create this satellite?' },
+            position: { left: 'calc(50% - 70px)' },
+        });
+        dialogref.afterClosed().subscribe((ok) => {
+            if (ok == 'ok') {
+                this.satelliteService.create(this.satellite).subscribe((satellite) => {
+                    if (satellite) {
+                        this.snackBar.success('Satellite created successfully');
+                        this.router.navigate(['/users/' + this.username + '/satellites/' + satellite._id]);
+                    } else {
+                        this.snackBar.error('Satellite could not be created');
+                    }
+                });
+            }
+        });
+    }
+
+    private update() {
+        this.satellite.orbit = undefined;
+        const dialogRef = this.dialog.open(AddEditDialogComponent, {
+            data: { message: 'Are you sure you want to update this satellite?' },
+            position: { left: 'calc(50% - 70px)' },
+        });
+        dialogRef.afterClosed().subscribe((ok) => {
+            if (ok == 'ok') {
+                this.satelliteService.update(this.satellite).subscribe((satellite) => {
+                    if (satellite) {
+                        this.snackBar.success('Satellite updated successfully');
+                        this.router.navigate(['/users/' + this.username + '/satellites/' + satellite._id]);
+                    } else {
+                        this.snackBar.error('Satellite could not be updated');
+                    }
+                });
+            }
+        });
+    }
+
     onSubmit() {
-        if (!this.checkDependencies()) {
-            return;
-        }
+        if (!this.checkDependencies()) return;
         if (this.componentExists) {
-            this.satellite.orbit = undefined;
-            const dialogRef = this.dialog.open(AddEditDialogComponent, {
-                data: { message: 'Are you sure you want to update this satellite?' },
-                position: { left: 'calc(50% - 70px)' },
-            });
-            dialogRef.afterClosed().subscribe((ok) => {
-                if (ok == 'ok') {
-                    this.satelliteService.update(this.satellite!).subscribe((satellite) => {
-                        if (satellite) {
-                            this.snackBar.success('Satellite updated successfully');
-                            this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
-                        } else {
-                            this.snackBar.error('Satellite could not be updated');
-                        }
-                    });
-                }
-            });
+            this.update();
         } else {
-            const dialogRef = this.dialog.open(AddEditDialogComponent, {
-                data: { message: 'Are you sure you want to create this satellite?' },
-                position: { left: 'calc(50% - 70px)' },
-            });
-            dialogRef.afterClosed().subscribe((ok) => {
-                if (ok == 'ok') {
-                    this.satelliteService.create(this.satellite!).subscribe((satellite) => {
-                        if (satellite) {
-                            this.snackBar.success('Satellite created successfully');
-                            this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
-                        } else {
-                            this.snackBar.error('Satellite could not be created');
-                        }
-                    });
-                }
-            });
+            this.create();
         }
     }
 

@@ -5,6 +5,8 @@
 
 section {
     padding: 0px 20px 0px 20px;
+    max-width: 800px;
+    margin: auto;
 }
 
 #checkbox-wrapper {
@@ -25,9 +27,31 @@ section {
 
 form {
     padding: 0px 20px 20px 20px;
+    max-width: 800px;
+    margin: auto;
 }
 
-@media only screen and (min-width: 1180px) {
+@media only screen and (max-width: 1000px) {
+    section {
+        display: flex;
+        flex-direction: column;
+    }
+
+    #checkbox-wrapper {
+        float: none;
+        display: flex;
+        justify-content: center;
+        margin-left: -10px;
+    }
+
+    #zoom-slider-wrapper {
+        justify-content: center;
+        margin: auto;
+        width: 100%;
+    }
+}
+
+@media only screen and (min-width: 1360px) {
     #checkbox-wrapper {
         float: none;
         display: flex;
@@ -56,9 +80,13 @@ form {
         min-height: 350px;
     }
 
-    .col-2 #visual,
     .col-2 form {
-        width: 49%;
+        width: 40%;
+        min-width: 250px;
+    }
+
+    .col-2 #visual {
+        width: 58%;
     }
 }
 

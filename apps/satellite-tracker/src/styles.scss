@@ -8,61 +8,6 @@
 // Be sure that you only ever include this mixin once!
 @include mat.core();
 
-@function modify-background($theme, $background-color) {
-    // Replace the background in the color object's background palette.
-    $theme-color: map-get($theme, color);
-    $color-background-palette: map-get($theme-color, background);
-    $color-background-palette: map-merge(
-        $color-background-palette,
-        (
-            background: $background-color,
-        )
-    );
-    $color-background-palette: map-merge(
-        $color-background-palette,
-        (
-            raised-button: $background-color,
-        )
-    );
-
-    // Replace the background in the background palette.
-    $background-palette: map-get($theme, background);
-    $background-palette: map-merge(
-        $background-palette,
-        (
-            background: $background-color,
-        )
-    );
-    $background-palette: map-merge(
-        $background-palette,
-        (
-            raised-button: $background-color,
-        )
-    );
-
-    // Merge the changes into a new theme.
-    $modified-theme-color: map-merge(
-        $theme-color,
-        (
-            background: $color-background-palette,
-        )
-    );
-    $modified-theme: map-merge(
-        $theme,
-        (
-            color: $modified-theme-color,
-        )
-    );
-    $modified-theme: map-merge(
-        $modified-theme,
-        (
-            background: $background-palette,
-        )
-    );
-
-    @return $modified-theme;
-}
-
 // Define the palettes for your theme using the Material Design palettes available in palette.scss
 // (imported above). For each palette, you can optionally specify a default, lighter, and darker
 // hue. Available color palettes: https://material.io/design/color/
@@ -241,3 +186,9 @@ app-root {
 // div.mat-mdc-dialog-surface.mdc-dialog__surface {
 //     background: #313131;
 // }
+
+.mat-mdc-table#parts-table {
+    width: 100%;
+    max-height: 400px;
+    overflow: auto;
+}

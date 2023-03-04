@@ -81,10 +81,6 @@ mat-form-field {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-.cdk-drop-list-dragging .mat-mdc-row:not(.cdk-drag-placeholder) {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
 mat-cell:nth-child(1),
 mat-header-cell:nth-child(1),
 mat-cell:nth-child(6),

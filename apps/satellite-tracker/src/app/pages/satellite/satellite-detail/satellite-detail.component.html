@@ -1,28 +1,55 @@
 <div class="component-container" *ngIf="satellite; else loadingMessage">
+    <div *ngIf="waiting"><mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar></div>
     <div class="header">
-        <h1>{{ satellite.satelliteName }} created by {{ username }}</h1>
-        <div *ngIf="canEdit" class="buttons">
-            <button mat-flat-button class="muted-button" routerLink="edit"><mat-icon>edit</mat-icon> Edit</button>
-            <button mat-flat-button color="warn" (click)="removeSatellite()"><mat-icon>delete</mat-icon> Remove</button>
+        <h1 style="margin-bottom: 0">
+            {{ satellite.satelliteName }}
+        </h1>
+        <div class="buttons">
+            <button *ngIf="isTracking()" mat-flat-button color="primary" (click)="untrack()">Untrack</button>
+            <button *ngIf="!isTracking()" mat-flat-button color="primary" (click)="track()">Track</button>
+            <button *ngIf="canEdit" mat-flat-button class="muted-button" routerLink="edit">
+                <mat-icon>edit</mat-icon> Edit
+            </button>
+            <button *ngIf="canEdit" mat-flat-button color="warn" (click)="removeSatellite()">
+                <mat-icon>delete</mat-icon> Remove
+            </button>
         </div>
     </div>
     <div class="text-muted">
-        <p>
-            Created on:
-            {{ satellite.createdAt | date : 'dd/MM/yyyy' }}
-        </p>
-        <p>
-            Last updated:
-            {{ satellite.updatedAt | date : 'dd/MM/yyyy' }}
+        <p style="width: 100%; display: flex; justify-content: space-between">
+            <span>{{ satellite.description }}</span>
         </p>
     </div>
     <mat-divider style="margin: 10px 0px"></mat-divider>
-    <h2>Appearance</h2>
-    <p>This satellite has a mass of {{ satellite.mass }} kg and a base radius of {{ satellite.sizeOfBase }} meters.</p>
-
+    <h2>Information</h2>
     <div>
-        <p>Color of the base:</p>
-        <span class="circle" [ngStyle]="{ 'background-color': satellite.colorOfBase }"></span>
+        <p>
+            <span class="info-label"
+                >Creator: <a routerLink="'/profile/' + username"> {{ username }}</a>
+            </span>
+        </p>
+        <p><span class="info-label">Created at: </span>{{ satellite.createdAt | date : 'dd/MM/yyyy' }}</p>
+        <p><span class="info-label">Last updated at: </span>{{ satellite.updatedAt | date : 'dd/MM/yyyy' }}</p>
+        <p><span class="info-label">Purpose: </span>{{ satellite.purpose }}</p>
+    </div>
+    <mat-divider style="margin: 10px 0px"></mat-divider>
+    <h2>Appearance</h2>
+    <div style="display: flex; gap: 10px">
+        <span
+            class="circle"
+            [ngClass]="{ circle: satellite.shapeOfBase == 'Sphere', square: satellite.shapeOfBase == 'Cube' }"
+            [ngStyle]="{ 'background-color': satellite.colorOfBase }"
+        ></span>
+
+        <div>
+            <p><span class="info-label">Mass: </span> {{ satellite.mass }} kg</p>
+            <p *ngIf="satellite.shapeOfBase == 'Sphere'">
+                <span class="info-label">Diameter of base: </span> {{ satellite.sizeOfBase }} meters
+            </p>
+            <p *ngIf="satellite.shapeOfBase == 'Cube'">
+                <span class="info-label">Length of sides: </span> {{ satellite.sizeOfBase }} meters
+            </p>
+        </div>
     </div>
     <mat-divider style="margin: 10px 0px"></mat-divider>
     <div style="display: flex; justify-content: space-between">
@@ -49,41 +76,43 @@
         <p>This satellite does not have an orbit yet.</p>
     </div>
     <ng-template #orbitScene>
-        <div style="display: flex; justify-content: space-between">
+        <div id="orbit-wrapper">
             <div id="canvas-wrapper"><canvas></canvas></div>
-            <div class="orbit-info">
-                <h3>Information</h3>
-                <p>
-                    <span class="orbit-info-label">Semimajor axis (a):</span>
-                    {{ satellite.orbit?.semiMajorAxis }} kilometers
-                </p>
-                <p>
-                    <span class="orbit-info-label">Period (P):</span> {{ satellite.orbit?.period?.toFixed(3) }} days
-                    {{
-                        satellite.orbit?.period && satellite.orbit!.period! < 5
-                            ? '(' + (satellite.orbit!.period! * 24 * 60).toFixed(0) + ' minutes)'
-                            : ''
-                    }}
-                </p>
-                <p><span class="orbit-info-label">Eccentricity (e):</span> {{ satellite.orbit?.eccentricity }}</p>
-                <p><span class="orbit-info-label">Inclination (i):</span> {{ satellite.orbit?.inclination }}&#176;</p>
-                <p>
-                    <span class="orbit-info-label">Longitude of the ascending node (&#937;):</span>
-                    {{ satellite.orbit?.longitudeOfAscendingNode }}&#176;
-                </p>
-                <p>
-                    <span class="orbit-info-label">
+            <div id="orbit-info">
+                <section id="info-wrapper">
+                    <h3>Information</h3>
+                    <p>
+                        <span class="info-label">Semimajor axis (a):</span>
+                        {{ satellite.orbit?.semiMajorAxis }} kilometers
+                    </p>
+                    <p>
+                        <span class="info-label">Period (P):</span> {{ satellite.orbit?.period?.toFixed(3) }} days
                         {{
-                            satellite.orbit!.inclination == 0 && satellite.orbit!.eccentricity == 0
-                                ? 'True longitude (l): '
-                                : satellite.orbit!.inclination != 0 && satellite.orbit!.eccentricity == 0
-                                ? 'Argument of latitude (u): '
-                                : 'Argument of perigee (ω): '
-                        }}</span
-                    >
-                    {{ satellite.orbit?.argumentOfPerigee }}&#176;
-                </p>
-                <mat-divider style="margin-bottom: 10px"></mat-divider>
+                            satellite.orbit?.period && satellite.orbit!.period! < 5
+                                ? '(' + (satellite.orbit!.period! * 24 * 60).toFixed(0) + ' minutes)'
+                                : ''
+                        }}
+                    </p>
+                    <p><span class="info-label">Eccentricity (e):</span> {{ satellite.orbit?.eccentricity }}</p>
+                    <p><span class="info-label">Inclination (i):</span> {{ satellite.orbit?.inclination }}&#176;</p>
+                    <p>
+                        <span class="info-label">Longitude of the ascending node (&#937;):</span>
+                        {{ satellite.orbit?.longitudeOfAscendingNode }}&#176;
+                    </p>
+                    <p>
+                        <span class="info-label">
+                            {{
+                                satellite.orbit!.inclination == 0 && satellite.orbit!.eccentricity == 0
+                                    ? 'True longitude (l): '
+                                    : satellite.orbit!.inclination != 0 && satellite.orbit!.eccentricity == 0
+                                    ? 'Argument of latitude (u): '
+                                    : 'Argument of perigee (ω): '
+                            }}</span
+                        >
+                        {{ satellite.orbit?.argumentOfPerigee }}&#176;
+                    </p>
+                    <mat-divider id="orbit-info-divider" style="margin-bottom: 10px"></mat-divider>
+                </section>
                 <section id="options-wrapper" style="margin-bottom: 10px">
                     <h3>Canvas options</h3>
                     <div id="checkbox-wrapper">
@@ -123,7 +152,7 @@
                     <p class="text-muted">Try toggling the real size if the satellite is too small to be seen.</p>
                     <div id="zoom-slider-wrapper">
                         <mat-label for="mat-zoom-slider">Zoom</mat-label>
-                        <mat-slider class="slider" id="mat-zoom-slider" step="0.02" min="0.4" max="2" discrete="true">
+                        <mat-slider class="slider" id="mat-zoom-slider" step="0.02" min="0.4" max="3" discrete="true">
                             <input
                                 matSliderThumb
                                 name="zoom-slider"
@@ -141,6 +170,92 @@
     <mat-divider style="margin: 10px 0px"></mat-divider>
 
     <h2>Satellite parts</h2>
+    <div id="parts-wrapper">
+        <div id="table-wrapper">
+            <mat-table
+                id="parts-table"
+                [dataSource]="satellite.satelliteParts"
+                class="mat-elevation-z8"
+                *ngIf="satellite.satelliteParts && satellite.satelliteParts.length > 0; else noParts"
+            >
+                <caption style="display: none">
+                    Satellite parts
+                </caption>
+                <ng-container matColumnDef="position">
+                    <mat-header-cell *matHeaderCellDef>Order</mat-header-cell>
+                    <mat-cell *matCellDef="let part; let i = index">{{ i + 1 }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="name">
+                    <mat-header-cell *matHeaderCellDef>Part</mat-header-cell>
+                    <mat-cell *matCellDef="let part">{{ part.satellitePart.partName }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="color">
+                    <mat-header-cell *matHeaderCellDef>Color</mat-header-cell>
+                    <mat-cell *matCellDef="let part">
+                        <div style="width: 100%">
+                            <p
+                                style="
+                                    width: 100%;
+                                    height: 100%;
+                                    text-align: center;
+                                    border-radius: 5px;
+                                    padding: 5px;
+                                    align-self: center;
+                                    margin: 0;
+                                "
+                                [style.background]="part.color"
+                                [style.color]="getContrastYIQ(part.color)"
+                            >
+                                {{ part.color }}
+                            </p>
+                        </div>
+                    </mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="size">
+                    <mat-header-cell *matHeaderCellDef>Size (m)</mat-header-cell>
+                    <mat-cell *matCellDef="let part">{{ part.size }}</mat-cell>
+                </ng-container>
+                <ng-container matColumnDef="quantity">
+                    <mat-header-cell *matHeaderCellDef>Quantity</mat-header-cell>
+                    <mat-cell *matCellDef="let part">{{ part.quantity }}</mat-cell>
+                </ng-container>
+                <mat-header-row *matHeaderRowDef="customPartTableColumns; sticky: true"></mat-header-row>
+                <mat-row
+                    class="table-row"
+                    *matRowDef="let row; columns: customPartTableColumns"
+                    (click)="currentPart = row"
+                    [ngClass]="{ selected: row == currentPart }"
+                ></mat-row>
+            </mat-table>
+        </div>
+
+        <div id="part-info" *ngIf="satellite.satelliteParts && satellite.satelliteParts.length > 0">
+            <h3 style="margin-bottom: 0">{{ currentPart?.satellitePart?.partName }}</h3>
+            <p class="text-muted">{{ currentPart?.satellitePart?.description }}</p>
+            <p><span class="info-label">Function:</span> {{ currentPart?.satellitePart?.function }}</p>
+            <p>
+                <span class="info-label">Material:</span>
+                {{ currentPart?.satellitePart?.material ? currentPart?.satellitePart?.material : 'Unknown' }}
+            </p>
+            <p><span class="info-label">Size:</span> {{ currentPart?.size }} meters</p>
+            <p><span class="info-label">Color:</span> {{ currentPart?.color }}</p>
+            <p><span class="info-label">Quantity:</span> {{ currentPart?.quantity }}</p>
+            <div style="display: flex; gap: 5px">
+                <ng-container *ngFor="let _ of [].constructor(currentPart?.quantity)">
+                    <div
+                        class="part"
+                        [style.background]="currentPart?.color"
+                        [style.width]="'3px'"
+                        [style.height]="currentPart?.size + 'px'"
+                        [style.border]="'1px solid #424242'"
+                    ></div>
+                </ng-container>
+            </div>
+        </div>
+        <ng-template #noParts>
+            <p>This satellite does not have any parts yet.</p>
+        </ng-template>
+    </div>
 </div>
 <ng-template #loadingMessage>
     <mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar>

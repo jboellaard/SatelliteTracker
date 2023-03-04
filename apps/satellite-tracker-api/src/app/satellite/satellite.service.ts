@@ -73,6 +73,7 @@ export class SatelliteService {
     async findOne(id: Id): Promise<APIResult<ISatellite> | HttpException> {
         const satellite = (await this.satelliteModel
             .findById(id)
+            .populate('createdBy', 'username')
             .populate('satelliteParts.satellitePart')
             .populate({
                 path: 'satelliteParts.satellitePart',

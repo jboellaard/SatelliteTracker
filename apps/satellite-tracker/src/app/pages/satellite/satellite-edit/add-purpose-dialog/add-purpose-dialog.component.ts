@@ -8,12 +8,20 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
         <div mat-dialog-content>
             <mat-form-field>
                 <mat-label>Purpose</mat-label>
-                <input matInput [(ngModel)]="purpose" />
+                <input matInput [(ngModel)]="purpose" required />
             </mat-form-field>
         </div>
-        <div mat-dialog-actions>
-            <button mat-button (click)="onNoClick()">Cancel</button>
-            <button mat-button [mat-dialog-close]="purpose" cdkFocusInitial>Add</button>
+        <div mat-dialog-actions style="justify-content: space-between; margin: 10px;">
+            <button mat-flat-button (click)="onNoClick()">Cancel</button>
+            <button
+                mat-flat-button
+                color="primary"
+                [mat-dialog-close]="purpose"
+                cdkFocusInitial
+                [disabled]="!purpose || purpose == ''"
+            >
+                Add
+            </button>
         </div>
     `,
 })
