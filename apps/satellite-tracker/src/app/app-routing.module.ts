@@ -29,6 +29,7 @@ import { TabCreatedComponent } from './profile/tab-created/tab-created.component
 import { TabFollowingComponent } from './profile/tab-following/tab-following.component';
 import { TabFollowersComponent } from './profile/tab-followers/tab-followers.component';
 import { TabTrackingComponent } from './profile/tab-tracking/tab-tracking.component';
+import { RecentComponent } from './pages/dashboard/discover/recent/recent.component';
 
 const routes: Routes = [
     { path: 'home', pathMatch: 'full', redirectTo: 'feed' },
@@ -40,6 +41,7 @@ const routes: Routes = [
             { path: '', redirectTo: 'for-you', pathMatch: 'full' },
             { path: 'for-you', pathMatch: 'full', component: ForYouComponent },
             { path: 'popular', pathMatch: 'full', component: PopularComponent },
+            { path: 'new', pathMatch: 'full', component: RecentComponent },
         ],
     },
     {

@@ -1,0 +1,29 @@
+<mat-toolbar>
+    <button mat-button routerLink="/feed" routerLinkActive="active">
+        <mat-icon>timeline</mat-icon>
+        <span>Feed</span>
+    </button>
+    <button mat-button routerLink="/discover" routerLinkActive="active">
+        <mat-icon>explore</mat-icon>
+        <span>Discover</span>
+    </button>
+    <button
+        mat-button
+        routerLink="/profile/{{ user?.username }}"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: isProfileRoute }"
+    >
+        <mat-icon>person</mat-icon>
+        <span>Profile</span>
+    </button>
+    <button
+        mat-button
+        *ngIf="admin"
+        routerLink="/user-overview"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+    >
+        <mat-icon>supervisor_account</mat-icon>
+        <span>User overview</span>
+    </button>
+</mat-toolbar>

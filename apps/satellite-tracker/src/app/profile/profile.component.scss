@@ -56,3 +56,15 @@ table {
     font-size: 13px;
     margin-bottom: 6px;
 }
+
+@media only screen and (max-width: 990px) {
+    .component-container {
+        grid-template-columns: 100%;
+    }
+
+    #profile {
+        margin: 0px 0px 20px 0px;
+        padding-right: 0px;
+        border-right: none;
+    }
+}

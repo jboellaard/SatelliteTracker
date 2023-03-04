@@ -1,0 +1,57 @@
+.cards-wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 330px));
+    align-content: space-around;
+    justify-content: center;
+}
+
+.cards-wrapper div {
+    flex: 1 1 300px;
+    margin: 0 10px;
+    text-align: center;
+}
+
+.divider {
+    display: none;
+}
+
+mat-card {
+    margin: auto;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+mat-card-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+mat-card-content a,
+mat-card-content p.link {
+    text-align: left;
+    align-self: center;
+    flex: 1 1 auto;
+    word-wrap: break-word;
+}
+
+mat-card-content p.icon-wrapper,
+mat-card-content p.link {
+    margin: 0;
+    align-self: center;
+}
+
+mat-card-content .buttons,
+mat-card-content p.icon-wrapper {
+    margin: 0;
+    flex: 0 0 fit-content;
+}
+
+.title {
+    margin: 11px 10px 16px 10px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid #494949;
+}

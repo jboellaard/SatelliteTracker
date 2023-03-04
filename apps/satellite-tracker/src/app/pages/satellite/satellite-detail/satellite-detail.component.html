@@ -25,7 +25,7 @@
     <div>
         <p>
             <span class="info-label"
-                >Creator: <a routerLink="'/profile/' + username"> {{ username }}</a>
+                >Creator: <a [routerLink]="'/profile/' + username"> {{ username }}</a>
             </span>
         </p>
         <p><span class="info-label">Created at: </span>{{ satellite.createdAt | date : 'dd/MM/yyyy' }}</p>
@@ -77,7 +77,10 @@
     </div>
     <ng-template #orbitScene>
         <div id="orbit-wrapper">
-            <div id="canvas-wrapper"><canvas></canvas></div>
+            <div id="canvas-wrapper">
+                <canvas></canvas>
+                <span class="text-muted"> Rotate using left mouse button, pan using right mouse button. </span>
+            </div>
             <div id="orbit-info">
                 <section id="info-wrapper">
                     <h3>Information</h3>
@@ -110,6 +113,14 @@
                             }}</span
                         >
                         {{ satellite.orbit?.argumentOfPerigee }}&#176;
+                    </p>
+                    <p>
+                        <span class="info-label"> Datetime of perigee passage (T<sub>p</sub>): </span>
+                        {{
+                            satellite.orbit?.dateTimeOfLaunch
+                                ? satellite.orbit!.dateTimeOfLaunch!.toLocaleString()
+                                : 'N/A'
+                        }}
                     </p>
                     <mat-divider id="orbit-info-divider" style="margin-bottom: 10px"></mat-divider>
                 </section>
@@ -259,5 +270,5 @@
 </div>
 <ng-template #loadingMessage>
     <mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar>
-    <div>Retrieving satellite...</div></ng-template
+    <div style="padding: 20px">Retrieving satellite...</div></ng-template
 >

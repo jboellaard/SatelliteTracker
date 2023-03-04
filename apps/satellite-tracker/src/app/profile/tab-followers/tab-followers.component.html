@@ -12,7 +12,7 @@
                     <button
                         *ngIf="following && user.username != loggedInUser?.username && !isFollowing(user.username)"
                         mat-stroked-button
-                        (click)="isFollowing(user.username)"
+                        (click)="follow(user.username)"
                     >
                         Follow
                     </button>

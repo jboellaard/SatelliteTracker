@@ -10,6 +10,4 @@ export class FeedComponent {
         { label: 'Following', route: 'following' },
         { label: 'Tracked Satellites', route: 'tracked-satellites' },
     ];
-
-    constructor() {}
 }

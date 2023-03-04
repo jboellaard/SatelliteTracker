@@ -61,10 +61,6 @@ body {
     font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
 
-.darkMode .mat-toolbar {
-    background: #161b22;
-}
-
 table {
     margin-bottom: 20px;
     // width: 100%;
@@ -191,4 +187,13 @@ app-root {
     width: 100%;
     max-height: 400px;
     overflow: auto;
+}
+
+.darkMode app-breadcrumbs .mat-toolbar {
+    background: #2d3a85;
+}
+
+app-breadcrumbs .mat-toolbar-row,
+app-breadcrumbs .mat-toolbar-single-row {
+    height: 48px;
 }

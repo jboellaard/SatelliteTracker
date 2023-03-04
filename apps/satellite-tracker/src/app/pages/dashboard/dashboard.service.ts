@@ -31,4 +31,61 @@ export class DashboardService {
             })
         );
     }
+
+    getFollowRecommendations() {
+        return this.http.get<APIResponse<any[]>>(`${environment.API_URL}recommendations/to-follow`).pipe(
+            map((response: any) => {
+                return response.result;
+            })
+        );
+    }
+
+    getSatelliteRecommendations() {
+        return this.http.get<APIResponse<any[]>>(`${environment.API_URL}recommendations/to-track`).pipe(
+            map((response: any) => {
+                response.result.forEach((satellite: any) => {
+                    satellite.id = satellite._id;
+                });
+                return response.result;
+            })
+        );
+    }
+
+    getSimilarCreators() {
+        return this.http.get<APIResponse<any[]>>(`${environment.API_URL}recommendations/similar-creators`).pipe(
+            map((response: any) => {
+                return response.result;
+            })
+        );
+    }
+
+    getPopularCreators() {
+        return this.http.get<APIResponse<any[]>>(`${environment.API_URL}recommendations/popular-creators`).pipe(
+            map((response: any) => {
+                return response.result;
+            })
+        );
+    }
+
+    getPopularSatellites() {
+        return this.http.get<APIResponse<any[]>>(`${environment.API_URL}recommendations/popular-satellites`).pipe(
+            map((response: any) => {
+                response.result.forEach((satellite: any) => {
+                    satellite.id = satellite._id;
+                });
+                return response.result;
+            })
+        );
+    }
+
+    getRecentlyCreatedSatellites() {
+        return this.http.get<APIResponse<any[]>>(`${environment.API_URL}recommendations/new-satellites`).pipe(
+            map((response: any) => {
+                response.result.forEach((satellite: any) => {
+                    satellite.id = satellite._id;
+                });
+                return response.result;
+            })
+        );
+    }
 }

@@ -1,3 +1,7 @@
+.component-container {
+    max-width: 100%;
+}
+
 .header {
     display: flex;
     justify-content: space-between;
@@ -64,6 +68,11 @@
     #orbit-info-divider {
         display: none;
     }
+
+    #orbit-info,
+    #part-info {
+        margin-left: 0px;
+    }
 }
 
 @media only screen and (max-width: 860px) {
@@ -80,7 +89,7 @@
 
 #canvas-wrapper canvas {
     width: 100%;
-    min-height: 481px;
+    min-height: 490px;
 }
 
 table tr.table-row {
@@ -115,24 +124,45 @@ table tr.table-row {
     background-color: #505050;
 }
 
-mat-cell:nth-child(1),
-mat-header-cell:nth-child(1) {
-    min-width: 50px;
+@media only screen and (max-width: 930px) {
+    #orbit-wrapper,
+    #canvas-wrapper,
+    #parts-wrapper {
+        min-height: 10px;
+        max-width: 100%;
+    }
+
+    #canvas-wrapper canvas {
+        min-height: 10px;
+        width: 100%;
+    }
+
+    #parts-wrapper #table-wrapper {
+        width: 100%;
+        overflow: auto;
+    }
 }
 
-mat-cell:nth-child(4),
-mat-header-cell:nth-child(4),
-mat-cell:nth-child(5),
-mat-header-cell:nth-child(5) {
-    min-width: 90px;
-}
+@media only screen and (min-width: 930px) {
+    mat-cell:nth-child(1),
+    mat-header-cell:nth-child(1) {
+        min-width: 50px;
+    }
 
-mat-cell:nth-child(2),
-mat-header-cell:nth-child(2) {
-    min-width: 250px;
-}
+    mat-cell:nth-child(4),
+    mat-header-cell:nth-child(4),
+    mat-cell:nth-child(5),
+    mat-header-cell:nth-child(5) {
+        min-width: 90px;
+    }
 
-mat-cell:nth-child(3),
-mat-header-cell:nth-child(3) {
-    min-width: 100px;
+    mat-cell:nth-child(2),
+    mat-header-cell:nth-child(2) {
+        min-width: 250px;
+    }
+
+    mat-cell:nth-child(3),
+    mat-header-cell:nth-child(3) {
+        min-width: 100px;
+    }
 }

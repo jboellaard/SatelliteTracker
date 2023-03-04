@@ -1,1 +1,84 @@
-<p>popular works!</p>
+<ng-container *ngIf="contentLoad || waiting">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</ng-container>
+<div *ngIf="!contentLoad" class="cards-wrapper">
+    <mat-divider class="divider"></mat-divider>
+    <div>
+        <h3 class="title">Popular creators</h3>
+        <div class="creators" *ngIf="creators; else noCreators">
+            <mat-card *ngFor="let creator of creators">
+                <mat-card-content>
+                    <p class="icon-wrapper"><mat-icon>person</mat-icon></p>
+                    <p class="link">
+                        <a routerLink="/profile/{{ creator.username }}">{{ creator.username }}</a>
+                        <br />
+                        <span class="text-muted"
+                            >{{ creator.followerCount }}
+                            {{ creator.followerCount === 1 ? 'follower' : 'followers' }}</span
+                        >
+                    </p>
+                    <div class="buttons">
+                        <button
+                            *ngIf="
+                                following &&
+                                creator.username != loggedInUser?.username &&
+                                !isFollowing(creator.username)
+                            "
+                            mat-stroked-button
+                            (click)="follow(creator.username)"
+                        >
+                            Follow
+                        </button>
+                        <button
+                            *ngIf="creator.username != loggedInUser?.username && isFollowing(creator.username)"
+                            mat-stroked-button
+                            (click)="unfollow(creator.username)"
+                        >
+                            Unfollow
+                        </button>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
+        <ng-template #noCreators>
+            <p>There are no popular creators at this time.</p>
+        </ng-template>
+        <mat-divider class="divider"></mat-divider>
+    </div>
+    <div>
+        <h3 class="title">Popular satellites</h3>
+        <div class="satellites" *ngIf="satellites; else noSatellites">
+            <mat-card *ngFor="let satellite of satellites">
+                <mat-card-content>
+                    <p class="icon-wrapper"><mat-icon>satellite_alt</mat-icon></p>
+                    <p class="link">
+                        <a routerLink="/users/{{ satellite.createdBy }}/satellites/{{ satellite.id }}">{{
+                            satellite.satelliteName
+                        }}</a>
+                        <br />
+                        <span class="text-muted"
+                            >{{ satellite.trackerCount }}
+                            {{ satellite.trackerCount === 1 ? 'tracker' : 'trackers' }}</span
+                        >
+                    </p>
+                    <div class="buttons">
+                        <button
+                            *ngIf="tracking && !isTracking(satellite.id)"
+                            mat-stroked-button
+                            (click)="track(satellite.id)"
+                        >
+                            Track
+                        </button>
+                        <button *ngIf="isTracking(satellite.id)" mat-stroked-button (click)="untrack(satellite.id)">
+                            Untrack
+                        </button>
+                    </div>
+                </mat-card-content>
+            </mat-card>
+        </div>
+        <ng-template #noSatellites>
+            <p>There are no popular satellites at this time.</p>
+        </ng-template>
+        <mat-divider class="divider"></mat-divider>
+    </div>
+</div>

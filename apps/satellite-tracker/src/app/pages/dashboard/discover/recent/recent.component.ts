@@ -1,28 +1,22 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { AuthService } from 'apps/satellite-tracker/src/app/auth/auth.service';
 import { ProfileService } from 'apps/satellite-tracker/src/app/profile/profile.service';
 import { RelationsService } from 'apps/satellite-tracker/src/app/profile/relations.service';
 import { Subscription } from 'rxjs';
-import { Id, ISatellite, IUser, UserIdentity } from 'shared/domain';
+import { ISatellite, UserIdentity, IUser, Id } from 'shared/domain';
 import { DashboardService } from '../../dashboard.service';
 
 @Component({
-    selector: 'app-for-you',
-    templateUrl: './for-you.component.html',
+    selector: 'app-recent',
+    templateUrl: './recent.component.html',
     styleUrls: ['../discover.component.scss'],
 })
-export class ForYouComponent implements OnInit, OnDestroy {
-    creators: IUser[] | undefined;
-    creatorSub: Subscription | undefined;
+export class RecentComponent {
     satellites: ISatellite[] | undefined;
     satelliteSub: Subscription | undefined;
-    similarCreators: IUser[] | undefined;
-    similarCreatorSub: Subscription | undefined;
 
     loggedInUser: UserIdentity | undefined;
     loggedInUserSub: Subscription | undefined;
-    following: IUser[] | undefined;
-    followingSub: Subscription | undefined;
     tracking: ISatellite[] | undefined;
     trackingSub: Subscription | undefined;
 
@@ -41,42 +35,12 @@ export class ForYouComponent implements OnInit, OnDestroy {
         this.loggedInUserSub = this.authService.user$.subscribe((user) => {
             this.loggedInUser = user;
         });
-
-        this.followingSub = this.relationsService.following$.subscribe((following) => {
-            this.following = following;
-        });
         this.trackingSub = this.relationsService.tracking$.subscribe((tracking) => {
             this.tracking = tracking;
         });
-        this.creatorSub = this.dashboardService.getFollowRecommendations().subscribe((creators) => {
-            this.creators = creators;
-            this.contentLoad = false;
-        });
-        this.satelliteSub = this.dashboardService.getSatelliteRecommendations().subscribe((satellites) => {
+        this.satelliteSub = this.dashboardService.getRecentlyCreatedSatellites().subscribe((satellites) => {
             this.satellites = satellites;
             this.contentLoad = false;
-        });
-        this.similarCreatorSub = this.dashboardService.getSimilarCreators().subscribe((creators) => {
-            this.similarCreators = creators;
-            this.contentLoad = false;
-        });
-    }
-
-    isFollowing(username: string | undefined) {
-        return this.following?.some((user) => user.username == username);
-    }
-
-    follow(username: string) {
-        this.waiting = true;
-        this.profileService.followUser(username).subscribe(() => {
-            this.waiting = false;
-        });
-    }
-
-    unfollow(username: string) {
-        this.waiting = true;
-        this.profileService.unfollowUser(username).subscribe(() => {
-            this.waiting = false;
         });
     }
 
@@ -100,10 +64,7 @@ export class ForYouComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         if (this.loggedInUserSub) this.loggedInUserSub.unsubscribe();
-        if (this.followingSub) this.followingSub.unsubscribe();
         if (this.trackingSub) this.trackingSub.unsubscribe();
-        if (this.creatorSub) this.creatorSub.unsubscribe();
         if (this.satelliteSub) this.satelliteSub.unsubscribe();
-        if (this.similarCreatorSub) this.similarCreatorSub.unsubscribe();
     }
 }

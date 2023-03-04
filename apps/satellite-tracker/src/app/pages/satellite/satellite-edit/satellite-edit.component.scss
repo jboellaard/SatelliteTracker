@@ -81,28 +81,30 @@ mat-form-field {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-mat-cell:nth-child(1),
-mat-header-cell:nth-child(1),
-mat-cell:nth-child(6),
-mat-header-cell:nth-child(6) {
-    min-width: 80px;
-}
+@media only screen and (min-width: 970px) {
+    mat-cell:nth-child(1),
+    mat-header-cell:nth-child(1),
+    mat-cell:nth-child(6),
+    mat-header-cell:nth-child(6) {
+        min-width: 80px;
+    }
 
-mat-cell:nth-child(4),
-mat-header-cell:nth-child(4),
-mat-cell:nth-child(5),
-mat-header-cell:nth-child(5) {
-    min-width: 90px;
-}
+    mat-cell:nth-child(4),
+    mat-header-cell:nth-child(4),
+    mat-cell:nth-child(5),
+    mat-header-cell:nth-child(5) {
+        min-width: 90px;
+    }
 
-mat-cell:nth-child(2),
-mat-header-cell:nth-child(2) {
-    min-width: 200px;
-}
+    mat-cell:nth-child(2),
+    mat-header-cell:nth-child(2) {
+        min-width: 200px;
+    }
 
-mat-cell:nth-child(3),
-mat-header-cell:nth-child(3) {
-    min-width: 100px;
+    mat-cell:nth-child(3),
+    mat-header-cell:nth-child(3) {
+        min-width: 100px;
+    }
 }
 
 mat-cell,

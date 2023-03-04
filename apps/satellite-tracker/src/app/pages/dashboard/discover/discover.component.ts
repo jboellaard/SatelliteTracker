@@ -9,7 +9,6 @@ export class DiscoverComponent {
     tabs: { label: string; route: string }[] = [
         { label: 'For you', route: 'for-you' },
         { label: 'Popular', route: 'popular' },
+        { label: 'New', route: 'new' },
     ];
-
-    constructor() {}
 }

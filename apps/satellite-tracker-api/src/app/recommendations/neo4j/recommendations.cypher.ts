@@ -5,7 +5,7 @@ export const RecommendationsNeoQueries = {
     // who users you follow follow
     // params: username, depth, skip, limit
     getRecommendedUsers:
-        'MATCH (u:User {username: $username})-[:FOLLOWS*2..$depth]->(f:User) WHERE NOT (u)-[:FOLLOWS]->(f) AND f<>u RETURN DISTINCT f ORDER BY f.username SKIP toInteger($skip) LIMIT toInteger($limit)',
+        'MATCH (u:User {username: $username})-[:FOLLOWS*2..4]->(user:User) WHERE NOT (u)-[:FOLLOWS]->(user) AND user<>u RETURN DISTINCT user ORDER BY user.username SKIP toInteger($skip) LIMIT toInteger($limit)',
     // params: username, count, skip, limit
     getUsersWhoFollowYouFollow:
         'MATCH (u:User {username: $username})<-[:FOLLOWS]-(f:User)-[:FOLLOWS]->(user:User) WITH u, user, count(user) AS count WHERE count >= toInteger($count) AND NOT (u)-[:FOLLOWS]->(user) AND user<>u RETURN DISTINCT user ORDER BY user.username SKIP toInteger($skip) LIMIT toInteger($limit)',
@@ -22,7 +22,7 @@ export const RecommendationsNeoQueries = {
     // satellites that users you follow and who they follow track
     // params: username, depth, count, skip, limit
     getRecommendSatellitesFromFollowing:
-        'MATCH (u:User {username: $username})-[:TRACKS|FOLLOWS*1..$depth]->(satellite:Satellite) WITH u, satellite, count(satellite) AS count WHERE count >= toInteger($count) AND NOT (u)-[:TRACKS]->(satellite) AND NOT satellite.createdBy=$username RETURN DISTINCT satellite ORDER BY satellite.satelliteName SKIP toInteger($skip) LIMIT toInteger($limit)',
+        'MATCH (u:User {username: $username})-[:TRACKS|FOLLOWS*1..2]->(satellite:Satellite) WITH u, satellite, count(satellite) AS count WHERE count >= toInteger($count) AND NOT (u)-[:TRACKS]->(satellite) AND NOT satellite.createdBy=$username RETURN DISTINCT satellite ORDER BY satellite.satelliteName SKIP toInteger($skip) LIMIT toInteger($limit)',
     // params: skip, limit
     getMostFollowedUsers:
         'MATCH (user:User)<-[:FOLLOWS]-(f:User) RETURN DISTINCT user, count(f) AS followers ORDER BY followers DESC SKIP toInteger($skip) LIMIT toInteger($limit)',

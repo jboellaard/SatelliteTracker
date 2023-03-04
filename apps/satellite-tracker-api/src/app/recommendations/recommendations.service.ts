@@ -19,10 +19,15 @@ export class RecommendationsService {
     async getSimilarCreators(username: string): Promise<APIResult<IUser[]>> {
         const similarCreators = await this.neo4jService.read(RecommendationsNeoQueries.getSimilarCreators, {
             username,
+            count: 2,
+            skip: 0,
+            limit: 10,
         });
 
         const users = await this.userModel
-            .find({ username: { $in: similarCreators.records.map((record) => record.get('username')) } })
+            .find({
+                username: { $in: similarCreators.records.map((record) => record.get('creator').properties.username) },
+            })
             .exec();
         return { status: HttpStatus.OK, result: users };
     }
@@ -30,11 +35,16 @@ export class RecommendationsService {
     async getFollowRecommendations(username: string): Promise<APIResult<IUser[]>> {
         const followRecommendations = await this.neo4jService.read(RecommendationsNeoQueries.getRecommendedUsers, {
             username,
-            depth: 4,
+            skip: 0,
+            limit: 10,
         });
 
         const users = await this.userModel
-            .find({ username: { $in: followRecommendations.records.map((record) => record.get('username')) } })
+            .find({
+                username: {
+                    $in: followRecommendations.records.map((record) => record.get('user').properties.username),
+                },
+            })
             .exec();
         return { status: HttpStatus.OK, result: users };
     }
@@ -44,8 +54,7 @@ export class RecommendationsService {
             RecommendationsNeoQueries.getRecommendSatellitesFromFollowing,
             {
                 username,
-                depth: 2,
-                count: 2,
+                count: 0,
                 skip: 0,
                 limit: 10,
             }
@@ -57,7 +66,6 @@ export class RecommendationsService {
             };
         });
         mappedSatellites = mappedSatellites.filter((satellite) => satellite.createdBy !== username);
-
         const satellites = await this.getSatelliteInformation(mappedSatellites);
         return { status: HttpStatus.OK, result: satellites };
     }
@@ -71,6 +79,7 @@ export class RecommendationsService {
             return {
                 satelliteName: record.get('satellite').properties.satelliteName,
                 createdBy: record.get('satellite').properties.createdBy,
+                trackerCount: record.get('trackers').toNumber(),
             };
         });
 
@@ -79,9 +88,12 @@ export class RecommendationsService {
     }
 
     private async getSatelliteInformation(satellites: any): Promise<ISatellite[]> {
-        const users = await this.userModel.find({
-            username: { $in: satellites.map((satellite) => satellite.createdBy) },
-        });
+        if (satellites.length === 0) return [];
+        let users = await this.userModel
+            .find({
+                username: { $in: satellites.map((satellite) => satellite.createdBy) },
+            })
+            .exec();
 
         satellites.forEach((satellite) => {
             const user = users.find((user) => user.username === satellite.createdBy);
@@ -95,8 +107,17 @@ export class RecommendationsService {
             });
         });
 
-        const satellitesWithInfo = await this.satelliteModel.find(query).populate('createdBy', 'username').exec();
-        return satellitesWithInfo;
+        let satellitesWithInfo = await this.satelliteModel.find(query).populate('createdBy', 'username').exec();
+
+        let finalSatellites = satellitesWithInfo.map((satellite) => {
+            return {
+                ...(satellite.toObject() as ISatellite),
+                createdBy: ((satellite.toObject() as ISatellite).createdBy as any).username,
+                trackerCount: satellites.find((sat) => sat.satelliteName === satellite.satelliteName).trackerCount,
+            };
+        });
+
+        return finalSatellites;
     }
 
     async getPopularCreators(): Promise<APIResult<IUser[]>> {

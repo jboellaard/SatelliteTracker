@@ -141,13 +141,15 @@ export class FeedService {
             })
         );
 
-        for (let i = 0; i < satellites.length; i++) {
-            const user = await this.userModel.findOne({ username: satellites[i].createdBy });
-            const satellite = await this.satelliteModel.findOne({
-                satelliteName: satellites[i].satelliteName,
-                createdBy: user._id,
-            });
-            satellites[i].satelliteId = satellite._id;
+        for (const element of satellites) {
+            let user = await this.userModel.findOne({ username: element.createdBy }).exec();
+            let satellite = await this.satelliteModel
+                .findOne({
+                    satelliteName: element.satelliteName,
+                    createdBy: user._id,
+                })
+                .exec();
+            element.satelliteId = satellite._id;
         }
 
         const mostRecentlyFollowed = await this.neo4jService.read(UserNeoQueries.getMostRecentlyFollowed, {
@@ -193,74 +195,76 @@ export class FeedService {
                 $and: [{ createdBy: currentSatellite.createdBy }, { satelliteName: currentSatellite.satelliteName }],
             });
         });
-        const mostRecentlyUpdatedSatellites = await this.satelliteModel.aggregate([
-            { $match: query },
-            { $unwind: { path: '$orbit', preserveNullAndEmptyArrays: true } },
-            {
-                $addFields: {
-                    mostRecentChange: { $max: ['$updatedAt', '$orbit.updatedAt'] },
-                    changed: {
-                        $cond: [
-                            {
-                                $or: [
-                                    { $gt: ['$updatedAt', '$orbit.updatedAt'] },
-                                    { $eq: [{ $ifNull: ['$orbit', 0] }, 0] },
-                                ],
-                            },
-                            'satellite',
-                            'orbit',
-                        ],
+        const mostRecentlyUpdatedSatellites = await this.satelliteModel
+            .aggregate([
+                { $match: query },
+                { $unwind: { path: '$orbit', preserveNullAndEmptyArrays: true } },
+                {
+                    $addFields: {
+                        mostRecentChange: { $max: ['$updatedAt', '$orbit.updatedAt'] },
+                        changed: {
+                            $cond: [
+                                {
+                                    $or: [
+                                        { $gt: ['$updatedAt', '$orbit.updatedAt'] },
+                                        { $eq: [{ $ifNull: ['$orbit', 0] }, 0] },
+                                    ],
+                                },
+                                'satellite',
+                                'orbit',
+                            ],
+                        },
                     },
                 },
-            },
-            { $sort: { mostRecentChange: -1 } },
-            { $skip: 0 },
-            { $limit: 10 },
-            {
-                $lookup: {
-                    from: 'users',
-                    let: { createdBy: '$createdBy' },
-                    pipeline: [
-                        { $match: { $expr: { $eq: ['$_id', '$$createdBy'] } } },
-                        { $project: { _id: 1, username: 1 } },
-                    ],
-                    as: 'createdBy',
+                { $sort: { mostRecentChange: -1 } },
+                { $skip: 0 },
+                { $limit: 10 },
+                {
+                    $lookup: {
+                        from: 'users',
+                        let: { createdBy: '$createdBy' },
+                        pipeline: [
+                            { $match: { $expr: { $eq: ['$_id', '$$createdBy'] } } },
+                            { $project: { _id: 1, username: 1 } },
+                        ],
+                        as: 'createdBy',
+                    },
                 },
-            },
-            // { $unwind: { path: '$satelliteParts', preserveNullAndEmptyArrays: true } },
-            // {
-            //     $lookup: {
-            //         from: 'satelliteparts',
-            //         let: { satellitePartId: '$satelliteParts.satellitePart' },
-            //         pipeline: [
-            //             { $match: { $expr: { $eq: ['$_id', '$$satellitePartId'] } } },
-            //             { $project: { _id: 1, partName: 1, description: 1, function: 1, dependsOn: 1 } },
-            //         ],
-            //         as: 'satelliteParts.satellitePart',
-            //     },
-            // },
-            // { $unwind: { path: '$satelliteParts.satellitePart', preserveNullAndEmptyArrays: true } },
-            {
-                $group: {
-                    _id: '$_id',
-                    satelliteId: { $first: '$_id' },
-                    satelliteName: { $first: '$satelliteName' },
-                    // mass: { $first: '$mass' },
-                    // sizeOfBase: { $first: '$sizeOfBase' },
-                    // colorOfBase: { $first: '$colorOfBase' },
-                    // shapeOfBase: { $first: '$shapeOfBase' },
-                    // purpose: { $first: '$purpose' },
-                    username: { $first: '$createdBy.username' },
-                    // createdAt: { $first: '$createdAt' },
-                    // updatedAt: { $first: '$updatedAt' },
-                    orbit: { $first: '$orbit' },
-                    // satelliteParts: { $push: '$satelliteParts' },
-                    date: { $first: '$mostRecentChange' },
-                    changed: { $first: '$changed' },
+                // { $unwind: { path: '$satelliteParts', preserveNullAndEmptyArrays: true } },
+                // {
+                //     $lookup: {
+                //         from: 'satelliteparts',
+                //         let: { satellitePartId: '$satelliteParts.satellitePart' },
+                //         pipeline: [
+                //             { $match: { $expr: { $eq: ['$_id', '$$satellitePartId'] } } },
+                //             { $project: { _id: 1, partName: 1, description: 1, function: 1, dependsOn: 1 } },
+                //         ],
+                //         as: 'satelliteParts.satellitePart',
+                //     },
+                // },
+                // { $unwind: { path: '$satelliteParts.satellitePart', preserveNullAndEmptyArrays: true } },
+                {
+                    $group: {
+                        _id: '$_id',
+                        satelliteId: { $first: '$_id' },
+                        satelliteName: { $first: '$satelliteName' },
+                        // mass: { $first: '$mass' },
+                        // sizeOfBase: { $first: '$sizeOfBase' },
+                        // colorOfBase: { $first: '$colorOfBase' },
+                        // shapeOfBase: { $first: '$shapeOfBase' },
+                        // purpose: { $first: '$purpose' },
+                        username: { $first: '$createdBy.username' },
+                        // createdAt: { $first: '$createdAt' },
+                        // updatedAt: { $first: '$updatedAt' },
+                        orbit: { $first: '$orbit' },
+                        // satelliteParts: { $push: '$satelliteParts' },
+                        date: { $first: '$mostRecentChange' },
+                        changed: { $first: '$changed' },
+                    },
                 },
-            },
-            { $sort: { date: -1 } },
-        ]);
+                { $sort: { date: -1 } },
+            ])
+            .exec();
 
         mostRecentlyUpdatedSatellites.forEach((item) => {
             if (

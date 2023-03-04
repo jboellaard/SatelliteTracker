@@ -73,4 +73,6 @@ export interface ISatellite {
     createdBy?: Id;
     createdAt?: Date;
     updatedAt?: Date;
+    trackers?: IUser[];
+    trackerCount?: number;
 }
