@@ -29,7 +29,7 @@ export class RelationsService {
         return this.http.get<APIResponse<IUserInfo[]>>(`${environment.API_URL}users/${username}/following`).pipe(
             map((res) => res.result),
             catchError((err) => {
-                console.log("couldn't get following", err);
+                console.log("Couldn't get following", err);
                 return of(undefined);
             })
         );
@@ -39,7 +39,7 @@ export class RelationsService {
         return this.http.get<APIResponse<ISatellite[]>>(`${environment.API_URL}users/${username}/tracking`).pipe(
             map((res) => res.result),
             catchError((err) => {
-                console.log("couldn't get tracking", err);
+                console.log("Couldn't get tracking", err);
                 return of(undefined);
             })
         );

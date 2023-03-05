@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'apps/satellite-tracker/src/environments/environment';
 import { map, Observable, tap } from 'rxjs';
-import { APIResponse, Id, IOrbit, ISatellite, ISatellitePart } from 'shared/domain';
+import { APIResponse, Id, IOrbit, ISatellite, ISatellitePart, IUser } from 'shared/domain';
 import { EntityService } from 'ui/entity';
 
 @Injectable({
@@ -22,9 +22,6 @@ export class SatelliteService extends EntityService<ISatellite> {
     getSatelliteParts(): Observable<ISatellitePart[]> {
         return this.http.get<APIResponse<ISatellitePart[]>>(environment.API_URL + 'satellites/parts').pipe(
             map((response: any) => {
-                response.result.forEach((part: ISatellitePart) => {
-                    part.id = part._id;
-                });
                 return response.result;
             })
         );
@@ -36,7 +33,6 @@ export class SatelliteService extends EntityService<ISatellite> {
                 this._refreshRequired.next();
             }),
             map((response: any) => {
-                response.result.id = response.result._id;
                 return response.result;
             })
         );
@@ -48,7 +44,6 @@ export class SatelliteService extends EntityService<ISatellite> {
                 this._refreshRequired.next();
             }),
             map((response: any) => {
-                response.result.id = response.result._id;
                 return response.result;
             })
         );
@@ -60,7 +55,14 @@ export class SatelliteService extends EntityService<ISatellite> {
                 this._refreshRequired.next();
             }),
             map((response: any) => {
-                response.result.id = response.result._id;
+                return response.result;
+            })
+        );
+    }
+
+    getTrackers(id: Id): Observable<IUser[]> {
+        return this.http.get<APIResponse<IUser[]>>(`${environment.API_URL}satellites/${id}/track`).pipe(
+            map((response: any) => {
                 return response.result;
             })
         );

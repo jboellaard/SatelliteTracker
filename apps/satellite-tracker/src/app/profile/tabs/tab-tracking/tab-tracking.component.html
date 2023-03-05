@@ -33,11 +33,13 @@
     </div>
 
     <ng-template #none>
-        <div *ngIf="canEdit">
-            <p>You aren't tracking any satellites yet.</p>
-        </div>
-        <div *ngIf="!canEdit">
-            <p>This user isn't tracking any satellites yet.</p>
+        <div class="none-message">
+            <div *ngIf="canEdit">
+                <p>You aren't tracking any satellites yet.</p>
+            </div>
+            <div *ngIf="!canEdit">
+                <p>This user isn't tracking any satellites yet.</p>
+            </div>
         </div>
     </ng-template>
 </div>

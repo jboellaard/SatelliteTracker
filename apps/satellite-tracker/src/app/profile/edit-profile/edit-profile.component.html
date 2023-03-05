@@ -1,0 +1,80 @@
+<div class="component-container" *ngIf="user; else loading">
+    <form #profileEditForm="ngForm" name="form" (ngSubmit)="onSubmit()">
+        <div id="profile">
+            <h1 style="display: flex; margin-bottom: 0px">
+                <mat-icon style="align-self: center; margin-right: 10px">portrait</mat-icon>
+                <mat-form-field class="form-group" appearance="fill">
+                    <mat-label for="username">Username</mat-label>
+                    <input
+                        matInput
+                        type="text"
+                        name="username"
+                        id="username"
+                        class="form-control"
+                        [(ngModel)]="user.username"
+                        #username="ngModel"
+                        minlength="1"
+                        required
+                        [ngClass]="{
+                            'is-invalid': username.invalid && username.touched
+                        }"
+                    />
+                    <mat-error *ngIf="username.invalid && username.touched" class="invalid-feedback">
+                        <mat-error *ngIf="username.errors!['required']">Username is required</mat-error>
+                        <mat-error *ngIf="username.errors!['minlength']"
+                            >Username must be at least 1 character long.</mat-error
+                        >
+                    </mat-error>
+                </mat-form-field>
+            </h1>
+            <div class="text-muted">
+                <p>
+                    <i>
+                        Member since:
+                        {{ user.createdAt | date : 'dd/MM/yyyy' }}
+                    </i>
+                </p>
+            </div>
+            <div class="profile-button">
+                <div>
+                    <a routerLink="/profile/{{ user.username }}/edit" routerLinkActive="active">
+                        <button mat-raised-button><mat-icon>edit</mat-icon>Edit profile</button>
+                    </a>
+                </div>
+            </div>
+            <mat-form-field class="form-group" appearance="fill">
+                <mat-label for="profileDescription">Profile description</mat-label>
+                <textarea
+                    matInput
+                    name="profileDescription"
+                    type="text"
+                    id="profileDescription"
+                    [(ngModel)]="user.profileDescription"
+                    #description="ngModel"
+                ></textarea>
+            </mat-form-field>
+            <div>
+                <mat-icon style="margin-right: 10px; margin-bottom: -4px">location_on</mat-icon>
+                [
+                {{ user.location?.coordinates?.latitude?.toFixed(5) }},
+                {{ user.location?.coordinates?.longitude?.toFixed(5) }} ]
+            </div>
+        </div>
+        <div class="buttons">
+            <div class="">
+                <button mat-flat-button class="btn btn-warning" routerLink="..">Cancel</button>
+                <button
+                    mat-flat-button
+                    color="primary"
+                    type="submit"
+                    class="btn btn-primary"
+                    [disabled]="!profileEditForm.valid"
+                >
+                    Submit
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<ng-template #loading><mat-progress-bar value="indeterminate"></mat-progress-bar></ng-template>

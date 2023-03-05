@@ -83,7 +83,8 @@ export class RecommendationsService {
             };
         });
 
-        const satellites = await this.getSatelliteInformation(mappedSatellites);
+        let satellites = await this.getSatelliteInformation(mappedSatellites);
+        satellites = satellites.filter((satellite) => satellite.trackerCount > 1);
         return { status: HttpStatus.OK, result: satellites };
     }
 
@@ -112,6 +113,8 @@ export class RecommendationsService {
         let finalSatellites = satellitesWithInfo.map((satellite) => {
             return {
                 ...(satellite.toObject() as ISatellite),
+                id: satellite._id.toString(),
+                _id: undefined,
                 createdBy: ((satellite.toObject() as ISatellite).createdBy as any).username,
                 trackerCount: satellites.find((sat) => sat.satelliteName === satellite.satelliteName).trackerCount,
             };
@@ -131,13 +134,14 @@ export class RecommendationsService {
             })
             .exec();
 
-        const usersWithCount = users.map((user) => ({
+        let usersWithCount = users.map((user) => ({
             ...(user.toObject() as IUser),
             followerCount: popularCreators.records
                 .find((record) => record.get('user').properties.username == user.username)
                 .get('followers')
                 .toNumber(),
         }));
+        usersWithCount = usersWithCount.filter((user) => user.followerCount > 1);
         usersWithCount.sort((a, b) => b.followerCount - a.followerCount);
 
         return { status: HttpStatus.OK, result: usersWithCount };

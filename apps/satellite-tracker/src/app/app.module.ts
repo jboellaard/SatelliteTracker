@@ -10,10 +10,8 @@ import { AppComponent } from './app.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { SatelliteDetailComponent } from './pages/satellite/satellite-detail/satellite-detail.component';
 import { SatelliteEditComponent } from './pages/satellite/satellite-edit/satellite-edit.component';
-import { SatelliteListComponent } from './pages/satellite/satellite-list/satellite-list.component';
 import { FooterComponent } from './shared/footer/footer.component';
 import { UserComponent } from './pages/user/user.component';
-import { UserDetailComponent } from './pages/user/user-detail/user-detail.component';
 import { UserEditComponent } from './pages/user/user-edit/user-edit.component';
 import { UserListComponent } from './pages/user/user-list/user-list.component';
 import { NavbarComponent } from './shared/navbar/navbar.component';
@@ -27,7 +25,6 @@ import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.comp
 import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
 import { ProfileComponent } from './profile/profile.component';
 import { SidebarComponent } from './profile/sidebar/sidebar.component';
-import { SatelliteComponent } from './pages/satellite/satellite.component';
 import { FeedComponent } from './pages/dashboard/feed/feed.component';
 import { DiscoverComponent } from './pages/dashboard/discover/discover.component';
 import { DeleteDialogComponent } from './utils/delete-dialog/delete-dialog.component';
@@ -61,13 +58,15 @@ import { FollowingComponent } from './pages/dashboard/feed/following/following.c
 import { TrackingComponent } from './pages/dashboard/feed/tracking/tracking.component';
 import { ForYouComponent } from './pages/dashboard/discover/for-you/for-you.component';
 import { PopularComponent } from './pages/dashboard/discover/popular/popular.component';
-import { TabCreatedComponent } from './profile/tab-created/tab-created.component';
-import { TabFollowingComponent } from './profile/tab-following/tab-following.component';
-import { TabFollowersComponent } from './profile/tab-followers/tab-followers.component';
-import { TabTrackingComponent } from './profile/tab-tracking/tab-tracking.component';
+import { TabCreatedComponent } from './profile/tabs/tab-created/tab-created.component';
+import { TabFollowingComponent } from './profile/tabs/tab-following/tab-following.component';
+import { TabFollowersComponent } from './profile/tabs/tab-followers/tab-followers.component';
+import { TabTrackingComponent } from './profile/tabs/tab-tracking/tab-tracking.component';
 import { AddPartDialogComponent } from './pages/satellite/satellite-edit/add-part-dialog/add-part-dialog.component';
 import { RecentComponent } from './pages/dashboard/discover/recent/recent.component';
 import { BreadcrumbsComponent } from './profile/breadcrumbs/breadcrumbs.component';
+import { EditProfileComponent } from './profile/edit-profile/edit-profile.component';
+import { SatelliteTrackersComponent } from './pages/satellite/satellite-detail/satellite-trackers/satellite-trackers.component';
 
 const materialModules = [
     MatToolbarModule,
@@ -101,10 +100,8 @@ const materialModules = [
         DashboardComponent,
         SatelliteDetailComponent,
         SatelliteEditComponent,
-        SatelliteListComponent,
         FooterComponent,
         UserComponent,
-        UserDetailComponent,
         UserEditComponent,
         NavbarComponent,
         AboutComponent,
@@ -116,7 +113,6 @@ const materialModules = [
         PageNotFoundComponent,
         ProfileComponent,
         SidebarComponent,
-        SatelliteComponent,
         FeedComponent,
         DiscoverComponent,
         DeleteDialogComponent,
@@ -132,6 +128,8 @@ const materialModules = [
         AddPartDialogComponent,
         RecentComponent,
         BreadcrumbsComponent,
+        EditProfileComponent,
+        SatelliteTrackersComponent,
     ],
     imports: [
         BrowserModule,

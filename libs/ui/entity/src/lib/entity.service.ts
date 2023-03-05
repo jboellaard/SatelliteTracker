@@ -81,7 +81,7 @@ export class EntityService<T extends IEntity> {
 
         const errorResponse = {
             type: 'error',
-            message: error.error.message || error.message,
+            message: error,
         };
         return new Observable((observer) => {
             observer.error(errorResponse);

@@ -15,7 +15,6 @@ export class UserService extends EntityService<IUser> {
 
     public getByUsername(username: string | null, options?: any): Observable<IUser | undefined> {
         return this.http.get<APIResponse<IUser | undefined>>(`${this.url}${this.endpoint}/${username}`).pipe(
-            tap((response) => console.log(response)),
             map((response: any) => response.result),
             catchError(this.handleError)
         );

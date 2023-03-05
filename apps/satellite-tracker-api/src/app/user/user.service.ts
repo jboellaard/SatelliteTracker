@@ -20,6 +20,9 @@ export class UserService {
 
     async findAll(): Promise<APIResult<IUser[]>> {
         const users = await this.userModel.find();
+        users.forEach((user) => {
+            user.id = user._id.toString();
+        });
         return { status: HttpStatus.OK, result: users };
     }
 
@@ -58,22 +61,22 @@ export class UserService {
         return userWithRelations;
     }
 
-    async findOne(username: string): Promise<APIResult<IUser> | HttpException> {
+    async findOne(username: string): Promise<APIResult<IUser>> {
         const user = (
             await this.userModel.findOne({ username }).select('-location').populate('satellites')
         ).toObject() as IUser; // .populate('satellites.satelliteParts.satellitePart'))
         if (!user) {
-            return new HttpException('User not found', HttpStatus.NOT_FOUND);
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
 
         const userWithRelations = await this.getRelations(user);
         return { status: HttpStatus.OK, result: userWithRelations };
     }
 
-    async getSelf(username: string): Promise<APIResult<IUser> | HttpException> {
+    async getSelf(username: string): Promise<APIResult<IUser>> {
         const user = (await this.userModel.findOne({ username }).populate('satellites')).toObject() as IUser;
         if (!user) {
-            return new HttpException('User not found', HttpStatus.NOT_FOUND);
+            throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
 
         const userWithRelations = await this.getRelations(user);
@@ -127,27 +130,27 @@ export class UserService {
         return { status: HttpStatus.OK, result: updatedUser };
     }
 
-    async followUser(username: string, toFollow: string): Promise<APIResult<{ message: string }> | HttpException> {
+    async followUser(username: string, toFollow: string): Promise<APIResult<{ message: string }>> {
         try {
             const result = await this.neo4jService.write(UserNeoQueries.followUser, { username, toFollow });
             if (result.summary.counters.updates().relationshipsCreated == 0)
-                return new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
             return { status: HttpStatus.OK, result: { message: 'User followed' } };
         } catch (error) {
             this.logger.error(error);
-            return new HttpException('Could not follow user', HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException('Could not follow user', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    async unfollowUser(username: string, toUnfollow: string): Promise<APIResult<{ message: string }> | HttpException> {
+    async unfollowUser(username: string, toUnfollow: string): Promise<APIResult<{ message: string }>> {
         try {
             const result = await this.neo4jService.write(UserNeoQueries.unfollowUser, { username, toUnfollow });
             if (result.summary.counters.updates().relationshipsDeleted == 0)
-                return new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
             return { status: HttpStatus.OK, result: { message: 'User unfollowed' } };
         } catch (error) {
             this.logger.error(error);
-            return new HttpException('Could not unfollow user', HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new HttpException('Could not unfollow user', HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

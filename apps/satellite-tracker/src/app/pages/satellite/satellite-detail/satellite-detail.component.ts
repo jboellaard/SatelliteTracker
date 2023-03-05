@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { ICustomSatellitePart, Id, ISatellite, Shape } from 'shared/domain';
+import { ICustomSatellitePart, Id, ISatellite, IUser, Shape, UserIdentity } from 'shared/domain';
 import { AuthService } from '../../../auth/auth.service';
 import { ProfileService } from '../../../profile/profile.service';
 import { RelationsService } from '../../../profile/relations.service';
@@ -24,14 +24,21 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
     customPartTableColumns: string[] = ['position', 'name', 'color', 'size', 'quantity'];
     currentPart: ICustomSatellitePart | undefined;
 
+    loggedInUser: UserIdentity | undefined;
     tracking: ISatellite[] | undefined;
+    following: IUser[] | undefined;
     canEdit = false;
 
     waiting = false;
 
+    loggedInUserSub: Subscription | undefined;
     trackingSub: Subscription | undefined;
+    followingSub: Subscription | undefined;
     userSub: Subscription | undefined;
     satelliteSub: Subscription | undefined;
+
+    showTrackers = false;
+    trackers: IUser[] | undefined;
 
     constructor(
         private route: ActivatedRoute,
@@ -46,18 +53,23 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.trackingSub = this.relationsService.tracking$.subscribe((tracking) => {
-            this.tracking = tracking;
-        });
-
-        this.userSub = this.authService.user$.subscribe((user) => {
+        this.loggedInUserSub = this.authService.user$.subscribe((user) => {
             if (user) {
                 this.userId = user.id;
             }
+            this.loggedInUser = user;
         });
+        this.trackingSub = this.relationsService.tracking$.subscribe((tracking) => {
+            this.tracking = tracking;
+        });
+        this.followingSub = this.relationsService.following$.subscribe((following) => {
+            this.following = following;
+        });
+
         this.route.paramMap.subscribe((params) => {
             this.satellite = undefined;
             this.id = params.get('satelliteId');
+            this.username = params.get('username');
             if (this.id) {
                 this.getSatellite();
                 this.satelliteService.getRefreshRequired().subscribe(() => {
@@ -70,24 +82,24 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
     }
 
     private getSatellite() {
-        this.satelliteSub = this.satelliteService.getById(this.id).subscribe((satellite) => {
-            if (satellite) {
+        this.satelliteSub = this.satelliteService.getById(this.id).subscribe({
+            next: (satellite) => {
                 console.log(satellite);
-                this.satellite = satellite;
-                this.satellite.id = satellite._id;
-                this.username = (satellite.createdBy as any).username;
-                if ((satellite.createdBy as any)._id == this.userId) {
-                    this.canEdit = true;
+                if (satellite) {
+                    this.satellite = satellite;
+                    this.username = satellite.createdBy;
+                    if (this.username == this.loggedInUser?.username) this.canEdit = true;
+                    if (this.satellite.orbit) this.addOrbitScene();
+                    if (this.satellite.satelliteParts && this.satellite.satelliteParts.length > 0) {
+                        this.currentPart = this.satellite.satelliteParts[0];
+                    }
+                } else {
+                    this.router.navigate([`/profile/${this.username}/`]);
                 }
-                if (this.satellite.orbit) {
-                    this.addOrbitScene();
-                }
-                if (this.satellite.satelliteParts && this.satellite.satelliteParts.length > 0) {
-                    this.currentPart = this.satellite.satelliteParts[0];
-                }
-            } else {
+            },
+            error: (err) => {
                 this.router.navigate([`/profile/${this.username}/`]);
-            }
+            },
         });
     }
 
@@ -125,16 +137,21 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
     }
 
     removeSatellite() {
+        let position = {};
+        if (window.innerWidth > 780) {
+            position = { left: 'calc(50% - 70px)' };
+        }
         const dialogRef = this.dialog.open(DeleteDialogComponent, {
             data: { message: 'Are you sure you want to delete this satellite?' },
-            position: { left: 'calc(50% - 70px)' },
+            position,
         });
         dialogRef.afterClosed().subscribe((ok) => {
-            console.log(ok);
             if (ok == 'ok') {
                 this.satelliteService.delete(this.id!).subscribe((result) => {
-                    console.log(result);
                     if (result) {
+                        this.relationsService
+                            .getTracking()
+                            .subscribe((tracking) => this.relationsService.tracking$.next(tracking));
                         this.snackBar.success('Satellite successfully deleted');
                         this.router.navigate([`/profile/${this.username}/`]);
                     } else {
@@ -146,15 +163,17 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
     }
 
     removeOrbit() {
+        let position = {};
+        if (window.innerWidth > 780) {
+            position = { left: 'calc(50% - 70px)' };
+        }
         const dialogRef = this.dialog.open(DeleteDialogComponent, {
             data: { message: 'Are you sure you want to delete this orbit?' },
-            position: { left: 'calc(50% - 70px)' },
+            position,
         });
         dialogRef.afterClosed().subscribe((ok) => {
-            console.log(ok);
             if (ok == 'ok') {
                 this.satelliteService.deleteOrbit(this.id!).subscribe((result) => {
-                    console.log(result);
                     if (result) {
                         this.snackBar.success('Orbit successfully deleted');
                     } else {

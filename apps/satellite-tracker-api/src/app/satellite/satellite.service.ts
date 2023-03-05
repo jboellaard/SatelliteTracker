@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { SatelliteDto, UpdateSatelliteDto } from './dto/satellite.dto';
-import { APIResult, Id, ISatellite, ISatellitePart } from 'shared/domain';
+import { APIResult, Id, ISatellite, ISatellitePart, IUser } from 'shared/domain';
 import { Satellite, SatellitePart } from './schemas/satellite.schema';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../user/schemas/user.schema';
@@ -22,7 +22,7 @@ export class SatelliteService {
         private readonly neo4jService: Neo4jService
     ) {}
 
-    async create(username: string, newSatellite: SatelliteDto): Promise<APIResult<ISatellite> | HttpException> {
+    async create(username: string, newSatellite: SatelliteDto): Promise<APIResult<ISatellite>> {
         const stSession = await this.connection.startSession();
         const neo4jSession = this.neo4jService.getWriteSession();
 
@@ -30,7 +30,7 @@ export class SatelliteService {
         const transaction = neo4jSession.beginTransaction();
         try {
             const newSatelliteModel = new this.satelliteModel(newSatellite);
-            const satellite = (await newSatelliteModel.save({ session: stSession })).toObject() as ISatellite;
+            let satellite = await newSatelliteModel.save({ session: stSession });
             try {
                 transaction.run(SatelliteNeoQueries.addSatellite, {
                     satelliteName: newSatellite.satelliteName,
@@ -50,62 +50,92 @@ export class SatelliteService {
 
             await transaction.commit();
             await stSession.commitTransaction();
-            return { status: HttpStatus.CREATED, result: satellite };
+
+            let result = {
+                ...satellite.toObject(),
+                createdBy: username,
+                id: satellite._id.toString(),
+                _id: undefined,
+            };
+            return { status: HttpStatus.CREATED, result };
         } catch (error) {
             this.logger.error(error);
             await stSession.abortTransaction();
             this.logger.error('Rolled back transaction for creating satellite');
-            if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
-            return new HttpException('Could not create satellite', HttpStatus.INTERNAL_SERVER_ERROR);
+            if (error instanceof Error) throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+            throw new HttpException('Could not create satellite', HttpStatus.INTERNAL_SERVER_ERROR);
         } finally {
             await Promise.all([stSession.endSession(), neo4jSession.close()]);
         }
     }
 
     async findAll(): Promise<APIResult<ISatellite[]>> {
-        const satellites = (await this.satelliteModel
+        let satellites = await this.satelliteModel
             .find()
             .populate('createdBy', 'username')
-            .populate('satelliteParts.satellitePart')) as ISatellite[];
-        return { status: HttpStatus.OK, result: satellites };
+            .populate('satelliteParts.satellitePart');
+        let result = satellites.map((satellite) => {
+            return {
+                ...satellite.toObject(),
+                id: satellite._id.toString(),
+                _id: undefined,
+                createdBy: (satellite.createdBy as any).username,
+            };
+        });
+        return { status: HttpStatus.OK, result };
     }
 
-    async findOne(id: Id): Promise<APIResult<ISatellite> | HttpException> {
-        const satellite = (await this.satelliteModel
+    async findOne(id: Id): Promise<APIResult<ISatellite>> {
+        let satellite = await this.satelliteModel
             .findById(id)
             .populate('createdBy', 'username')
             .populate('satelliteParts.satellitePart')
             .populate({
                 path: 'satelliteParts.satellitePart',
                 populate: { path: 'dependsOn', model: 'SatellitePart', select: 'partName' },
-            })) as ISatellite;
+            });
         if (satellite) {
-            return { status: HttpStatus.OK, result: satellite };
+            let result = {
+                ...satellite.toObject(),
+                _id: undefined,
+                id: satellite._id.toString(),
+                createdBy: (satellite.createdBy as any).username,
+            };
+
+            return { status: HttpStatus.OK, result };
         } else {
-            return new HttpException('Satellite not found', HttpStatus.NOT_FOUND);
+            throw new HttpException('Satellite not found', HttpStatus.NOT_FOUND);
         }
     }
 
     async getSatellitesOfUserWithId(id: Id): Promise<APIResult<ISatellite[]>> {
-        const satellites = (await this.satelliteModel
-            .find({ createdBy: id })
-            .populate('satelliteParts.satellitePart')) as ISatellite[];
-        return { status: HttpStatus.OK, result: satellites };
+        let satellites = await this.satelliteModel.find({ createdBy: id }).populate('satelliteParts.satellitePart');
+        let result = satellites.map((satellite) => {
+            return {
+                ...satellite.toObject(),
+                id: satellite._id.toString(),
+                _id: undefined,
+            };
+        });
+        return { status: HttpStatus.OK, result };
     }
 
     async getSatellitesOfUserWithUsername(username: string): Promise<APIResult<ISatellite[]>> {
         const user = await this.userModel.findOne({ username });
-        const satellites = (await this.satelliteModel
+        let satellites = await this.satelliteModel
             .find({ createdBy: user._id })
-            .populate('satelliteParts.satellitePart')) as ISatellite[];
-        return { status: HttpStatus.OK, result: satellites };
+            .populate('satelliteParts.satellitePart');
+        let result = satellites.map((satellite) => {
+            return {
+                ...satellite.toObject(),
+                id: satellite._id.toString(),
+                _id: undefined,
+            };
+        });
+        return { status: HttpStatus.OK, result };
     }
 
-    async update(
-        userId: Id,
-        id: Id,
-        updateSatelliteDto: UpdateSatelliteDto
-    ): Promise<APIResult<ISatellite> | HttpException> {
+    async update(userId: Id, id: Id, updateSatelliteDto: UpdateSatelliteDto): Promise<APIResult<ISatellite>> {
         const satellite = await this.satelliteModel.findById(id);
         if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
@@ -132,30 +162,34 @@ export class SatelliteService {
                     throw new Error('Could not update satellite');
                 }
 
-                const updatedSatellite = (
-                    await this.satelliteModel.findByIdAndUpdate(
-                        id,
-                        { ...updateSatelliteDto },
-                        { session: stSession, new: true }
-                    )
-                ).toObject() as ISatellite;
+                let updatedSatellite = await this.satelliteModel.findByIdAndUpdate(
+                    id,
+                    { ...updateSatelliteDto },
+                    { session: stSession, new: true }
+                );
 
                 await transaction.commit();
                 await stSession.commitTransaction();
-                return { status: HttpStatus.OK, result: updatedSatellite };
+
+                let result = {
+                    ...updatedSatellite.toObject(),
+                    id: updatedSatellite._id.toString(),
+                    _id: undefined,
+                };
+                return { status: HttpStatus.OK, result };
             } catch (error) {
                 await stSession.abortTransaction();
-                if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
-                return new HttpException('Could not update satellite', HttpStatus.INTERNAL_SERVER_ERROR);
+                if (error instanceof Error) throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+                throw new HttpException('Could not update satellite', HttpStatus.INTERNAL_SERVER_ERROR);
             } finally {
                 await Promise.all([stSession.endSession(), neo4jSession.close()]);
             }
         } else {
-            return new HttpException('You are not authorized to update this satellite', HttpStatus.UNAUTHORIZED);
+            throw new HttpException('You are not authorized to update this satellite', HttpStatus.UNAUTHORIZED);
         }
     }
 
-    async remove(userId: Id, id: Id): Promise<APIResult<any> | HttpException> {
+    async remove(userId: Id, id: Id): Promise<APIResult<any>> {
         const satellite = await this.satelliteModel.findById(id);
         if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
@@ -181,11 +215,17 @@ export class SatelliteService {
                 }
                 await transaction.commit();
                 await stSession.commitTransaction();
-                return { status: HttpStatus.OK, result: satellite };
+
+                let result = {
+                    ...satellite?.toObject(),
+                    id: satellite?._id.toString(),
+                    _id: undefined,
+                };
+                return { status: HttpStatus.OK, result };
             } catch (error) {
                 await stSession.abortTransaction();
-                if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
-                return new HttpException('Could not delete satellite', HttpStatus.INTERNAL_SERVER_ERROR);
+                if (error instanceof Error) throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+                throw new HttpException('Could not delete satellite', HttpStatus.INTERNAL_SERVER_ERROR);
             } finally {
                 await Promise.all([stSession.endSession(), neo4jSession.close()]);
             }
@@ -195,24 +235,39 @@ export class SatelliteService {
     }
 
     async getAllSatelliteParts(): Promise<APIResult<ISatellitePart[]>> {
-        const satelliteParts = (await this.satellitePartModel.find().populate('dependsOn')) as ISatellitePart[];
-        return { status: HttpStatus.OK, result: satelliteParts };
+        let satelliteParts = await this.satellitePartModel.find().populate('dependsOn');
+        let result = satelliteParts.map((satellitePart) => {
+            return {
+                ...satellitePart.toObject(),
+                id: satellitePart._id.toString(),
+                _id: undefined,
+            };
+        });
+
+        return { status: HttpStatus.OK, result };
     }
 
     async getSatellitePart(id: Id): Promise<APIResult<ISatellitePart>> {
-        const satellitePart = (await this.satellitePartModel.findById(id)).toObject() as ISatellitePart;
-        return { status: HttpStatus.OK, result: satellitePart };
+        const satellitePart = await this.satellitePartModel.findById(id);
+        let result = {
+            ...satellitePart.toObject(),
+            id: satellitePart._id.toString(),
+            _id: undefined,
+        };
+        return { status: HttpStatus.OK, result };
     }
 
-    async createOrbit(userId: Id, id: Id, orbit: OrbitDto): Promise<APIResult<ISatellite> | HttpException> {
+    async createOrbit(userId: Id, id: Id, orbit: OrbitDto): Promise<APIResult<ISatellite>> {
         const satellite = await this.satelliteModel.findById(id);
         if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
             stSession.startTransaction();
             try {
-                const updatedSatellite = (
-                    await this.satelliteModel.findByIdAndUpdate(id, { orbit: orbit }, { session: stSession, new: true })
-                ).toObject() as ISatellite;
+                const updatedSatellite = await this.satelliteModel.findByIdAndUpdate(
+                    id,
+                    { orbit: orbit },
+                    { session: stSession, new: true }
+                );
                 if (orbit.dateTimeOfLaunch) {
                     const neo4jSession = this.neo4jService.getWriteSession();
                     const transaction = neo4jSession.beginTransaction();
@@ -231,23 +286,29 @@ export class SatelliteService {
                 }
 
                 await stSession.commitTransaction();
-                return { status: HttpStatus.OK, result: updatedSatellite };
+
+                let result = {
+                    ...updatedSatellite.toObject(),
+                    id: updatedSatellite._id.toString(),
+                    _id: undefined,
+                };
+                return { status: HttpStatus.OK, result };
             } catch (error) {
                 await stSession.abortTransaction();
-                if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
-                return new HttpException('Could not create orbit', HttpStatus.INTERNAL_SERVER_ERROR);
+                if (error instanceof Error) throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+                throw new HttpException('Could not create orbit', HttpStatus.INTERNAL_SERVER_ERROR);
             } finally {
                 await stSession.endSession();
             }
         } else {
-            return new HttpException(
+            throw new HttpException(
                 'You are not authorized to create an orbit for this satellite',
                 HttpStatus.UNAUTHORIZED
             );
         }
     }
 
-    async updateOrbit(userId: Id, id: Id, orbit: UpdateOrbitDto): Promise<APIResult<ISatellite> | HttpException> {
+    async updateOrbit(userId: Id, id: Id, orbit: UpdateOrbitDto): Promise<APIResult<ISatellite>> {
         const satellite = await this.satelliteModel.findById(id);
         if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
@@ -258,13 +319,11 @@ export class SatelliteService {
                     $valuesToUpdate['orbit.' + key] = value;
                 }
 
-                const updatedSatellite = (
-                    await this.satelliteModel.findByIdAndUpdate(
-                        id,
-                        { $set: $valuesToUpdate },
-                        { session: stSession, new: true }
-                    )
-                ).toObject() as ISatellite;
+                const updatedSatellite = await this.satelliteModel.findByIdAndUpdate(
+                    id,
+                    { $set: $valuesToUpdate },
+                    { session: stSession, new: true }
+                );
                 if (orbit.dateTimeOfLaunch) {
                     const neo4jSession = this.neo4jService.getWriteSession();
                     const transaction = neo4jSession.beginTransaction();
@@ -283,32 +342,35 @@ export class SatelliteService {
                 }
 
                 await stSession.commitTransaction();
-                return { status: HttpStatus.OK, result: updatedSatellite };
+                let result = {
+                    ...updatedSatellite.toObject(),
+                    id: updatedSatellite._id.toString(),
+                    _id: undefined,
+                };
+                return { status: HttpStatus.OK, result };
             } catch (error) {
                 await stSession.abortTransaction();
-                if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
-                return new HttpException('Could not update orbit', HttpStatus.INTERNAL_SERVER_ERROR);
+                if (error instanceof Error) throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+                throw new HttpException('Could not update orbit', HttpStatus.INTERNAL_SERVER_ERROR);
             } finally {
                 await stSession.endSession();
             }
         } else {
-            return new HttpException('You are not authorized to update this orbit', HttpStatus.UNAUTHORIZED);
+            throw new HttpException('You are not authorized to update this orbit', HttpStatus.UNAUTHORIZED);
         }
     }
 
-    async removeOrbit(userId: Id, id: Id): Promise<APIResult<ISatellite> | HttpException> {
+    async removeOrbit(userId: Id, id: Id): Promise<APIResult<ISatellite>> {
         const satellite = await this.satelliteModel.findById(id);
         if (satellite?.createdBy?.toString() == userId) {
             const stSession = await this.connection.startSession();
             stSession.startTransaction();
             try {
-                const updatedSatellite = (
-                    await this.satelliteModel.findByIdAndUpdate(
-                        id,
-                        { $unset: { orbit: 1 } },
-                        { session: stSession, new: true }
-                    )
-                ).toObject() as ISatellite;
+                const updatedSatellite = await this.satelliteModel.findByIdAndUpdate(
+                    id,
+                    { $unset: { orbit: 1 } },
+                    { session: stSession, new: true }
+                );
                 const neo4jSession = this.neo4jService.getWriteSession();
                 const transaction = neo4jSession.beginTransaction();
                 try {
@@ -324,20 +386,46 @@ export class SatelliteService {
                 await neo4jSession.close();
 
                 await stSession.commitTransaction();
-                return { status: HttpStatus.OK, result: updatedSatellite };
+                let result = {
+                    ...updatedSatellite.toObject(),
+                    id: updatedSatellite._id.toString(),
+                    _id: undefined,
+                };
+                return { status: HttpStatus.OK, result };
             } catch (error) {
                 await stSession.abortTransaction();
-                if (error instanceof Error) return new HttpException(error.message, HttpStatus.BAD_REQUEST);
-                return new HttpException('Could not remove orbit', HttpStatus.INTERNAL_SERVER_ERROR);
+                if (error instanceof Error) throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
+                throw new HttpException('Could not remove orbit', HttpStatus.INTERNAL_SERVER_ERROR);
             } finally {
                 await stSession.endSession();
             }
         } else {
-            return new HttpException('You are not authorized to remove this orbit', HttpStatus.UNAUTHORIZED);
+            throw new HttpException('You are not authorized to remove this orbit', HttpStatus.UNAUTHORIZED);
         }
     }
 
-    async trackSatellite(username: string, id: Id): Promise<APIResult<{ message: string }> | HttpException> {
+    async getTrackers(id: Id): Promise<APIResult<IUser[]>> {
+        const satellite = await this.satelliteModel.findById(id).populate('createdBy');
+        if (satellite) {
+            try {
+                const result = await this.neo4jService.read(SatelliteNeoQueries.getTrackers, {
+                    satelliteName: satellite.satelliteName,
+                    creator: eval(satellite.createdBy).username,
+                });
+                const trackers = result.records.map((record) => {
+                    return { username: record.get('tracker').properties.username };
+                });
+                return { status: HttpStatus.OK, result: trackers };
+            } catch (error) {
+                if (error instanceof Error) throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new HttpException('Could not get trackers', HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        } else {
+            throw new HttpException('Could not find satellite', HttpStatus.NOT_FOUND);
+        }
+    }
+
+    async trackSatellite(username: string, id: Id): Promise<APIResult<{ message: string }>> {
         const satellite = await this.satelliteModel.findById(id).populate('createdBy');
         if (satellite) {
             const createdBy = eval(satellite.createdBy);
@@ -348,18 +436,18 @@ export class SatelliteService {
                     satelliteName: satellite.satelliteName,
                 });
                 if (result.summary.counters.updates().relationshipsCreated == 0)
-                    return new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
+                    throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
                 return { status: HttpStatus.OK, result: { message: 'Satellite tracked.' } };
             } catch (error) {
-                if (error instanceof Error) return new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-                return new HttpException('Could not track satellite', HttpStatus.INTERNAL_SERVER_ERROR);
+                if (error instanceof Error) throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new HttpException('Could not track satellite', HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return new HttpException('Could not find satellite', HttpStatus.NOT_FOUND);
+            throw new HttpException('Could not find satellite', HttpStatus.NOT_FOUND);
         }
     }
 
-    async untrackSatellite(username: string, id: Id): Promise<APIResult<{ message: string }> | HttpException> {
+    async untrackSatellite(username: string, id: Id): Promise<APIResult<{ message: string }>> {
         const satellite = await this.satelliteModel.findById(id).populate('createdBy');
         if (satellite) {
             const createdBy = eval(satellite.createdBy);
@@ -370,14 +458,14 @@ export class SatelliteService {
                     satelliteName: satellite.satelliteName,
                 });
                 if (result.summary.counters.updates().relationshipsDeleted == 0)
-                    return new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
+                    throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
                 return { status: HttpStatus.OK, result: { message: 'No longer tracking satellite' } };
             } catch (error) {
-                if (error instanceof Error) return new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
-                return new HttpException('Could not track satellite', HttpStatus.INTERNAL_SERVER_ERROR);
+                if (error instanceof Error) throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new HttpException('Could not track satellite', HttpStatus.INTERNAL_SERVER_ERROR);
             }
         } else {
-            return new HttpException('Could not find satellite', HttpStatus.NOT_FOUND);
+            throw new HttpException('Could not find satellite', HttpStatus.NOT_FOUND);
         }
     }
 }

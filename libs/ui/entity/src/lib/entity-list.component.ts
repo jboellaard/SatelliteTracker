@@ -34,7 +34,6 @@ export class BaseListComponent<T extends IEntity> implements OnDestroy {
     //                 })
     //             )
     //             .subscribe((response) => {
-    //                 console.log(response.results);
     //                 this.items = response.results;
     //             })
     //     );
@@ -44,7 +43,6 @@ export class BaseListComponent<T extends IEntity> implements OnDestroy {
     //   this.modalService
     //     .open(ModalConfirmYesNoComponent)
     //     .result.then((result) => {
-    //       console.log('from modal:', result)
     //       this.itemService
     //         .delete(itemId, this.httpOptions)
     //         .pipe(

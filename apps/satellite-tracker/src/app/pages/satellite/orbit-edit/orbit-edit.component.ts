@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, HostListener, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -102,6 +102,10 @@ export class OrbitEditComponent implements OnInit {
                 this.satellite.sizeOfBase
             );
             this.changeOrbitSize();
+            if (this.orbitService.realSize) {
+                this.orbitService.realSize = false;
+                this.orbitService.toggleSize();
+            }
             document
                 .querySelector('input#semimajoraxis')!
                 .setAttribute('max', this.orbitService.maxSMAEarth.toFixed(0));
@@ -182,24 +186,27 @@ export class OrbitEditComponent implements OnInit {
     }
 
     onSubmit() {
-        console.log('Submitting the form');
         if (this.satellite.orbit?.dateTimeOfLaunch) {
             this.satellite.orbit!.dateTimeOfLaunch = new Date(this.satellite.orbit!.dateTimeOfLaunch!);
             this.satellite.orbit?.dateTimeOfLaunch.setHours(this.time.hour, this.time.minute);
         }
+        let position = {};
+        if (window.innerWidth > 780) {
+            position = { left: 'calc(50% - 70px)' };
+        }
         if (this.componentExists) {
             const dialogRef = this.dialog.open(AddEditDialogComponent, {
                 data: { message: 'Are you sure you want to update this orbit?' },
-                position: { left: 'calc(50% - 70px)' },
+                position,
             });
             dialogRef.afterClosed().subscribe((ok: string) => {
                 if (ok == 'ok') {
                     this.satelliteService
-                        .updateOrbit(this.satellite._id!, this.satellite.orbit!)
+                        .updateOrbit(this.satellite.id!, this.satellite.orbit!)
                         .subscribe((satellite) => {
                             if (satellite) {
                                 this.snackBar.success('Orbit updated successfully');
-                                this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
+                                this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?.id]);
                             } else {
                                 this.snackBar.error('Orbit could not be updated');
                             }
@@ -209,20 +216,18 @@ export class OrbitEditComponent implements OnInit {
         } else {
             const dialogRef = this.dialog.open(AddEditDialogComponent, {
                 data: { message: 'Are you sure you want to create this orbit?' },
-                position: { left: 'calc(50% - 70px)' },
+                position,
             });
             dialogRef.afterClosed().subscribe((ok: string) => {
                 if (ok == 'ok') {
-                    this.satelliteService
-                        .addOrbit(this.satellite._id!, this.satellite.orbit!)
-                        .subscribe((satellite) => {
-                            if (satellite) {
-                                this.snackBar.success('Orbit created successfully');
-                                this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?._id]);
-                            } else {
-                                this.snackBar.error('Orbit could not be created');
-                            }
-                        });
+                    this.satelliteService.addOrbit(this.satellite.id!, this.satellite.orbit!).subscribe((satellite) => {
+                        if (satellite) {
+                            this.snackBar.success('Orbit created successfully');
+                            this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?.id]);
+                        } else {
+                            this.snackBar.error('Orbit could not be created');
+                        }
+                    });
                 }
             });
         }

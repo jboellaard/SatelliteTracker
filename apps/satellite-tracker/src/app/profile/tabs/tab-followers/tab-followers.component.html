@@ -32,11 +32,13 @@
     </div>
 
     <ng-template #none>
-        <div *ngIf="canEdit">
-            <p>You don't have any followers yet.</p>
-        </div>
-        <div *ngIf="!canEdit">
-            <p>This user does not have any followers yet.</p>
+        <div class="none-message">
+            <div *ngIf="canEdit">
+                <p>You don't have any followers yet.</p>
+            </div>
+            <div *ngIf="!canEdit">
+                <p>This user does not have any followers yet.</p>
+            </div>
         </div>
     </ng-template>
 </div>

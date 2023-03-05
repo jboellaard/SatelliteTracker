@@ -11,6 +11,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AddEditDialogComponent } from '../../../utils/add-edit-dialog/add-edit-dialog.component';
 import { MatTable } from '@angular/material/table';
 import { AddPartDialogComponent } from './add-part-dialog/add-part-dialog.component';
+import { RelationsService } from '../../../profile/relations.service';
 
 @Component({
     selector: 'app-satellite-edit',
@@ -54,6 +55,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         private router: Router,
         private satelliteService: SatelliteService,
         public orbitService: OrbitService,
+        private relationsService: RelationsService,
         public dialog: MatDialog,
         public snackBar: SnackBarService
     ) {}
@@ -71,7 +73,6 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                 this.satelliteSub = this.satelliteService.getById(this.id).subscribe((satellite) => {
                     if (satellite) {
                         this.satellite = { ...satellite };
-                        this.satellite.id = this.satellite._id;
                         if (!this.satellite.satelliteParts) this.satellite.satelliteParts = [];
                         if (this.satellite.purpose && this.purposes.indexOf(this.satellite.purpose) == -1) {
                             this.purposes.push(this.satellite.purpose);
@@ -89,8 +90,12 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     }
 
     openPurposeDialog() {
+        let position = {};
+        if (window.innerWidth > 780) {
+            position = { left: '50%' };
+        }
         const dialogRef = this.dialog.open(AddPurposeDialogComponent, {
-            position: { left: '50%' },
+            position,
         });
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
@@ -100,7 +105,6 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     }
 
     drop(event: CdkDragDrop<ICustomSatellitePart[]>) {
-        console.log(event.item.data);
         this.dragDisabled = true;
 
         const previousIndex = this.satellite.satelliteParts?.findIndex((part) => part == event.item.data);
@@ -115,9 +119,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
 
     removePart(part: ICustomSatellitePart) {
         const index = this.satellite.satelliteParts?.findIndex((satellitePart) => satellitePart == part);
-        console.log(index);
         if (index != undefined) {
-            console.log(index);
             this.satellite.satelliteParts?.splice(index, 1);
         }
         this.table?.renderRows();
@@ -183,16 +185,23 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     }
 
     private create() {
+        let position = {};
+        if (window.innerWidth > 780) {
+            position = { left: 'calc(50% - 70px)' };
+        }
         const dialogref = this.dialog.open(AddEditDialogComponent, {
             data: { message: 'Are you sure you want to create this satellite?' },
-            position: { left: 'calc(50% - 70px)' },
+            position,
         });
         dialogref.afterClosed().subscribe((ok) => {
             if (ok == 'ok') {
                 this.satelliteService.create(this.satellite).subscribe((satellite) => {
                     if (satellite) {
+                        this.relationsService
+                            .getTracking()
+                            .subscribe((tracking) => this.relationsService.tracking$.next(tracking));
                         this.snackBar.success('Satellite created successfully');
-                        this.router.navigate(['/users/' + this.username + '/satellites/' + satellite._id]);
+                        this.router.navigate(['/users/' + this.username + '/satellites/' + satellite.id]);
                     } else {
                         this.snackBar.error('Satellite could not be created');
                     }
@@ -202,17 +211,21 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     }
 
     private update() {
+        let position = {};
+        if (window.innerWidth > 780) {
+            position = { left: 'calc(50% - 70px)' };
+        }
         this.satellite.orbit = undefined;
         const dialogRef = this.dialog.open(AddEditDialogComponent, {
             data: { message: 'Are you sure you want to update this satellite?' },
-            position: { left: 'calc(50% - 70px)' },
+            position,
         });
         dialogRef.afterClosed().subscribe((ok) => {
             if (ok == 'ok') {
                 this.satelliteService.update(this.satellite).subscribe((satellite) => {
                     if (satellite) {
                         this.snackBar.success('Satellite updated successfully');
-                        this.router.navigate(['/users/' + this.username + '/satellites/' + satellite._id]);
+                        this.router.navigate(['/users/' + this.username + '/satellites/' + satellite.id]);
                     } else {
                         this.snackBar.error('Satellite could not be updated');
                     }

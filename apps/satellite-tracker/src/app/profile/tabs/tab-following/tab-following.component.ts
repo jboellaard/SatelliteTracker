@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { IUserInfo, IUser, UserIdentity } from 'shared/domain';
-import { AuthService } from '../../auth/auth.service';
-import { ProfileService } from '../profile.service';
-import { RelationsService } from '../relations.service';
+import { IUser, IUserInfo, UserIdentity } from 'shared/domain';
+import { AuthService } from '../../../auth/auth.service';
+import { ProfileService } from '../../profile.service';
+import { RelationsService } from '../../relations.service';
 
 @Component({
-    selector: 'app-tab-followers',
-    templateUrl: './tab-followers.component.html',
+    selector: 'app-tab-following',
+    templateUrl: './tab-following.component.html',
     styleUrls: ['../tab.component.scss'],
 })
-export class TabFollowersComponent {
+export class TabFollowingComponent {
     users: IUserInfo[] | undefined;
     canEdit = false;
     user: IUser | undefined;
@@ -42,7 +42,7 @@ export class TabFollowersComponent {
 
         this.userSub = this.profileService.currentUser$.subscribe((user) => {
             this.user = user;
-            this.getFollowers();
+            this.getFollowing();
         });
         this.editSub = this.profileService.canEdit$.subscribe((canEdit) => {
             this.canEdit = canEdit;
@@ -67,9 +67,9 @@ export class TabFollowersComponent {
         });
     }
 
-    private getFollowers() {
+    private getFollowing() {
         if (this.user?.username) {
-            this.userFollowingSub = this.profileService.getFollowers(this.user.username).subscribe((users) => {
+            this.userFollowingSub = this.profileService.getFollowing(this.user.username).subscribe((users) => {
                 if (users) this.users = users;
             });
         }

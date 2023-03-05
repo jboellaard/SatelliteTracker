@@ -7,12 +7,13 @@ import {
     HttpErrorResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, switchMap, throwError } from 'rxjs';
+import { catchError, Observable, switchMap, tap, throwError } from 'rxjs';
+import { SnackBarService } from '../utils/snack-bar.service';
 import { AuthService } from './auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-    constructor(private authService: AuthService) {}
+    constructor(private authService: AuthService, private snackBar: SnackBarService) {}
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         let authReq = req;
@@ -31,6 +32,14 @@ export class AuthInterceptor implements HttpInterceptor {
                 ) {
                     return this.handle401Error(authReq, next);
                 }
+                if ((error instanceof HttpErrorResponse && error.status === 0) || error.status === 500) {
+                    this.snackBar.error('Server error. Please try again later.');
+                    return throwError(() => new Error(error.error.message));
+                }
+                if (error instanceof HttpErrorResponse && error.status === 404) {
+                    this.snackBar.error('Resource not found.');
+                    return throwError(() => new Error(error.error.message));
+                }
                 return next.handle(authReq);
             })
         );
@@ -39,7 +48,6 @@ export class AuthInterceptor implements HttpInterceptor {
     private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return this.authService.refreshToken().pipe(
             switchMap((res) => {
-                console.log(res);
                 if (res) {
                     if (res.result.accessToken) {
                         return next.handle(

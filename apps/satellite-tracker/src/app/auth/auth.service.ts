@@ -52,7 +52,6 @@ export class AuthService {
     login(credentials: UserCredentials) {
         return this.http.post<any>(`${environment.API_URL}login`, { ...credentials }, { headers: this.headers }).pipe(
             switchMap((res) => {
-                console.log(res);
                 if (res.result.accessToken) {
                     localStorage.setItem('access_token', res.result.accessToken);
                     localStorage.setItem('refresh_token', res.result.refreshToken);
@@ -78,9 +77,7 @@ export class AuthService {
 
     register(user: UserRegistration) {
         return this.http.post<any>(`${environment.API_URL}register`, { ...user }, { headers: this.headers }).pipe(
-            tap((res) => console.log(res)),
             switchMap((res) => {
-                console.log(res);
                 if (res.status === 201) {
                     return this.login({ username: user.username, password: user.password });
                 } else {
@@ -90,7 +87,7 @@ export class AuthService {
                 }
             }),
             catchError((err) => {
-                console.log('register error', err);
+                console.log('Registration error', err);
                 this.snackBar.error('Registration failed');
                 return of(undefined);
             })
@@ -143,7 +140,6 @@ export class AuthService {
             })
             .pipe(
                 tap((res) => {
-                    console.log(res);
                     if (res.result.accessToken) {
                         localStorage.setItem('access_token', res.result.accessToken);
                         localStorage.setItem('refresh_token', res.result.refreshToken);
@@ -156,7 +152,7 @@ export class AuthService {
                     return of(undefined);
                 }),
                 catchError((err) => {
-                    console.log('refresh error', err);
+                    console.log('Refresh token error', err);
                     return of(undefined);
                 })
             );

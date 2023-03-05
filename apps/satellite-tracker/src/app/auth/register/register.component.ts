@@ -42,14 +42,11 @@ export class RegisterComponent implements OnInit {
             });
         } else {
             this.snackBarService.info('Geolocation is not supported by this browser.');
-            console.log('Geolocation is not supported by this browser.');
         }
     }
 
     onSubmit(): void {
-        console.log(this.registerForm.value);
         if (this.registerForm.valid) {
-            console.log(this.registerForm.value);
             let user = this.registerForm.value as UserRegistration;
             if (
                 (this.registerForm.value.latitude && this.registerForm.value.longitude) ||
@@ -67,7 +64,6 @@ export class RegisterComponent implements OnInit {
                 };
             }
             this.authService.register(user).subscribe((res) => {
-                console.log(res);
                 if (res.username) {
                     this.router.navigate(['/']);
                 } else {

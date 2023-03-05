@@ -31,7 +31,6 @@ export class UserEditComponent implements OnInit {
     ngOnInit(): void {
         this.subscriptionParams = this.route.paramMap
             .pipe(
-                tap(console.log),
                 switchMap((params: ParamMap) => {
                     if (!params.get('username')) {
                         return of({
@@ -60,7 +59,6 @@ export class UserEditComponent implements OnInit {
                 .pipe(
                     catchError((error) => {
                         console.log(error);
-                        // this.alertService.error(error.message);
                         return of(false);
                     })
                 )

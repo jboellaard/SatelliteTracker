@@ -104,11 +104,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
             this.waiting = true;
             this.profileService.followUser(this.user.username).subscribe((user) => {
                 this.waiting = false;
-                if (user) {
-                    this.snackBar.success('You are now following this user');
-                } else {
-                    this.snackBar.error('Could not follow this user');
-                }
             });
         }
     }
@@ -118,11 +113,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
             this.waiting = true;
             this.profileService.unfollowUser(this.user.username).subscribe((user) => {
                 this.waiting = false;
-                if (user) {
-                    this.snackBar.success('You are no longer following this user');
-                } else {
-                    this.snackBar.error('Could not unfollow this user');
-                }
             });
         }
     }

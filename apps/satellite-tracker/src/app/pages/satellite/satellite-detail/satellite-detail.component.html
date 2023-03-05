@@ -5,13 +5,21 @@
             {{ satellite.satelliteName }}
         </h1>
         <div class="buttons">
-            <button *ngIf="isTracking()" mat-flat-button color="primary" (click)="untrack()">Untrack</button>
-            <button *ngIf="!isTracking()" mat-flat-button color="primary" (click)="track()">Track</button>
-            <button *ngIf="canEdit" mat-flat-button class="muted-button" routerLink="edit">
-                <mat-icon>edit</mat-icon> Edit
+            <button
+                routerLink="trackers"
+                mat-icon-button
+                color="accent"
+                style="width: 38px; height: 38px; padding: 7px; margin-left: 10px"
+            >
+                <mat-icon>radar</mat-icon>
             </button>
-            <button *ngIf="canEdit" mat-flat-button color="warn" (click)="removeSatellite()">
-                <mat-icon>delete</mat-icon> Remove
+            <button *ngIf="isTracking()" mat-stroked-button (click)="untrack()">Untrack</button>
+            <button *ngIf="!isTracking()" mat-stroked-button (click)="track()">Track</button>
+            <button *ngIf="canEdit" mat-stroked-button color="primary" class="primary-button" routerLink="edit">
+                <mat-icon>edit</mat-icon><span class="button-text">Edit</span>
+            </button>
+            <button *ngIf="canEdit" mat-stroked-button color="warn" (click)="removeSatellite()">
+                <mat-icon>delete</mat-icon> <span class="button-text">Remove</span>
             </button>
         </div>
     </div>
@@ -21,6 +29,7 @@
         </p>
     </div>
     <mat-divider style="margin: 10px 0px"></mat-divider>
+
     <h2>Information</h2>
     <div>
         <p>
@@ -44,10 +53,12 @@
         <div>
             <p><span class="info-label">Mass: </span> {{ satellite.mass }} kg</p>
             <p *ngIf="satellite.shapeOfBase == 'Sphere'">
-                <span class="info-label">Diameter of base: </span> {{ satellite.sizeOfBase }} meters
+                <span class="info-label">Diameter of base: </span> {{ satellite.sizeOfBase }}
+                {{ satellite.sizeOfBase == 1 ? 'meter' : 'meters' }}
             </p>
             <p *ngIf="satellite.shapeOfBase == 'Cube'">
-                <span class="info-label">Length of sides: </span> {{ satellite.sizeOfBase }} meters
+                <span class="info-label">Length of sides: </span> {{ satellite.sizeOfBase }}
+                {{ satellite.sizeOfBase == 1 ? 'meter' : 'meters' }}
             </p>
         </div>
     </div>
@@ -56,16 +67,16 @@
         <h2>Orbit</h2>
         <div *ngIf="canEdit">
             <div *ngIf="satellite.orbit; else noOrbit" class="buttons">
-                <button mat-flat-button class="muted-button" routerLink="orbit">
-                    <mat-icon>edit</mat-icon> Edit orbit
+                <button mat-stroked-button color="primary" class="primary-button" routerLink="orbit">
+                    <mat-icon>edit</mat-icon> <span class="button-text">Edit orbit</span>
                 </button>
-                <button mat-flat-button color="warn" (click)="removeOrbit()">
-                    <mat-icon>delete</mat-icon> Remove orbit
+                <button mat-stroked-button color="warn" (click)="removeOrbit()">
+                    <mat-icon>delete</mat-icon> <span class="button-text">Remove orbit</span>
                 </button>
             </div>
             <ng-template #noOrbit>
                 <div class="buttons">
-                    <button mat-flat-button class="muted-button" routerLink="orbit">
+                    <button mat-stroked-button color="accent" routerLink="orbit">
                         <mat-icon>add</mat-icon> Add orbit
                     </button>
                 </div>

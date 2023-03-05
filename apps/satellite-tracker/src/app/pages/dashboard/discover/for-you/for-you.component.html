@@ -1,10 +1,15 @@
 <ng-container *ngIf="contentLoad || waiting">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 </ng-container>
+<div class="empty" *ngIf="!contentLoad && following && following.length == 0">
+    <p>You are not following anyone yet. Follow people to get recommendations.</p>
+</div>
 <div *ngIf="!contentLoad" class="cards-wrapper">
     <mat-divider class="divider"></mat-divider>
     <div>
-        <h3 class="title">Creators followed by people you follow</h3>
+        <h3 class="title" #tooltip="matTooltip" matTooltip="Followed by people you follow and who they follow">
+            Recommended creators
+        </h3>
         <div class="creators" *ngIf="creators && creators.length > 0; else noCreators">
             <mat-card *ngFor="let creator of creators">
                 <mat-card-content>
@@ -39,7 +44,9 @@
         <mat-divider class="divider"></mat-divider>
     </div>
     <div>
-        <h3 class="title">Satellites similar to satellites you track</h3>
+        <h3 class="title" #tooltip="matTooltip" matTooltip="Based on your following and who they follow">
+            Recommended satellites
+        </h3>
         <div class="satellites" *ngIf="satellites && satellites.length > 0; else noSatellites">
             <mat-card *ngFor="let satellite of satellites">
                 <mat-card-content>

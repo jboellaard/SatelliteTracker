@@ -4,6 +4,9 @@ import { Subscription } from 'rxjs';
 import { AdminUserInfo, IUser, UserIdentity } from 'shared/domain';
 import { UserService } from '../user.service';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { MatDialog } from '@angular/material/dialog';
+import { SnackBarService } from '../../../utils/snack-bar.service';
+import { DeleteDialogComponent } from '../../../utils/delete-dialog/delete-dialog.component';
 
 @Component({
     selector: 'app-user-list',
@@ -11,12 +14,16 @@ import { BreakpointObserver } from '@angular/cdk/layout';
     styleUrls: ['./user-list.component.scss', '../user.component.scss'],
 })
 export class UserListComponent implements OnInit, OnDestroy {
-    // users: Observable<User[]> | undefined;
     usersArray: AdminUserInfo[] = [];
     displayedColumns: string[] = ['name', 'email', 'roles', 'createdAt', 'buttons'];
     userSub!: Subscription;
 
-    constructor(private userService: UserService, private breakpointObserver: BreakpointObserver) {}
+    constructor(
+        private userService: UserService,
+        private breakpointObserver: BreakpointObserver,
+        private dialog: MatDialog,
+        private snackBar: SnackBarService
+    ) {}
 
     ngOnInit(): void {
         this.getUsers();
@@ -51,15 +58,25 @@ export class UserListComponent implements OnInit, OnDestroy {
         });
     }
 
-    addUser(user: IUser) {
-        this.userService.create(user);
-    }
-
     removeUser(username: string) {
-        // this.userService.delete(username).subscribe(() => this.router.navigate(['/user-overview'])); // TODO: implement reload required
-        // this.sub = this.userService.getAllIdentities().subscribe((users) => {
-        //     if (users) this.usersArray = users.sort((a, b) => (a.createdAt! < b.createdAt! ? 1 : -1));
-        // });
+        const dialogRef = this.dialog.open(DeleteDialogComponent, {
+            data: {
+                message:
+                    'Are you sure you want to delete this user and their satellites? \
+                    This action cannot be reversed!',
+            },
+        });
+        dialogRef.afterClosed().subscribe((ok) => {
+            if (ok == 'ok') {
+                this.userService.delete(username).subscribe((result) => {
+                    if (result) {
+                        this.snackBar.success('User successfully deleted');
+                    } else {
+                        this.snackBar.error('Something went wrong, please try again later');
+                    }
+                });
+            }
+        });
     }
 
     ngOnDestroy() {

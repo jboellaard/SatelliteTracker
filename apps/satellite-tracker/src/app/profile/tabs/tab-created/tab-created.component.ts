@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { Id, ISatellite, IUser } from 'shared/domain';
-import { SatelliteService } from '../../pages/satellite/satellite.service';
-import { DeleteDialogComponent } from '../../utils/delete-dialog/delete-dialog.component';
-import { SnackBarService } from '../../utils/snack-bar.service';
-import { ProfileService } from '../profile.service';
-import { RelationsService } from '../relations.service';
+import { SatelliteService } from '../../../pages/satellite/satellite.service';
+import { DeleteDialogComponent } from '../../../utils/delete-dialog/delete-dialog.component';
+import { SnackBarService } from '../../../utils/snack-bar.service';
+import { ProfileService } from '../../profile.service';
+import { RelationsService } from '../../relations.service';
 
 @Component({
     selector: 'app-tab-created',
@@ -64,9 +64,6 @@ export class TabCreatedComponent implements OnInit {
                 .getSatellitesOfUserWithUsername(this.user.username)
                 .subscribe((satellites) => {
                     if (satellites) this.satellites = satellites;
-                    this.satellites?.forEach((satellite) => {
-                        satellite.id = satellite._id;
-                    });
                 });
         }
     }
@@ -86,8 +83,13 @@ export class TabCreatedComponent implements OnInit {
     }
 
     deleteSatellite(satelliteId: Id) {
+        let position = {};
+        if (window.innerWidth > 780) {
+            position = { left: 'calc(50% - 70px)' };
+        }
         const dialogRef = this.dialog.open(DeleteDialogComponent, {
             data: { message: 'Are you sure you want to delete this satellite?' },
+            position,
         });
         dialogRef.afterClosed().subscribe((ok) => {
             if (ok == 'ok') {

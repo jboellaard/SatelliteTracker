@@ -13,9 +13,6 @@ export class DashboardService {
     getSatelliteFeed() {
         return this.http.get<APIResponse<any[]>>(`${environment.API_URL}feed/tracked-satellites`).pipe(
             map((response: any) => {
-                response.result.forEach((satellite: any) => {
-                    satellite.id = satellite._id;
-                });
                 return response.result;
             })
         );
@@ -24,9 +21,6 @@ export class DashboardService {
     getFollowingFeed() {
         return this.http.get<APIResponse<any[]>>(`${environment.API_URL}feed/following`).pipe(
             map((response: any) => {
-                response.result.forEach((satellite: any) => {
-                    satellite.id = satellite._id;
-                });
                 return response.result;
             })
         );
@@ -43,9 +37,6 @@ export class DashboardService {
     getSatelliteRecommendations() {
         return this.http.get<APIResponse<any[]>>(`${environment.API_URL}recommendations/to-track`).pipe(
             map((response: any) => {
-                response.result.forEach((satellite: any) => {
-                    satellite.id = satellite._id;
-                });
                 return response.result;
             })
         );
@@ -70,9 +61,6 @@ export class DashboardService {
     getPopularSatellites() {
         return this.http.get<APIResponse<any[]>>(`${environment.API_URL}recommendations/popular-satellites`).pipe(
             map((response: any) => {
-                response.result.forEach((satellite: any) => {
-                    satellite.id = satellite._id;
-                });
                 return response.result;
             })
         );
@@ -81,9 +69,6 @@ export class DashboardService {
     getRecentlyCreatedSatellites() {
         return this.http.get<APIResponse<any[]>>(`${environment.API_URL}recommendations/new-satellites`).pipe(
             map((response: any) => {
-                response.result.forEach((satellite: any) => {
-                    satellite.id = satellite._id;
-                });
                 return response.result;
             })
         );

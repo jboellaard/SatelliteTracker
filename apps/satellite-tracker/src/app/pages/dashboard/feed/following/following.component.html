@@ -1,53 +1,58 @@
 <div *ngIf="followingFeed; else loading">
-    <ul class="list-group timeline" style="cursor: default">
-        <li *ngFor="let feedItem of followingFeed" style="margin: 20px">
-            <mat-card class="timeline-body">
-                <mat-card-header style="display: flex; justify-content: start">
-                    <mat-card-title>
-                        <mat-icon *ngIf="feedItem.type == 'followed'">person_add</mat-icon>
-                        <mat-icon *ngIf="feedItem.type == 'created'">satellite_alt</mat-icon>
-                        <mat-icon *ngIf="feedItem.type == 'tracked'">radar</mat-icon>
-                    </mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                    <p>
-                        <ng-template [ngIf]="feedItem.type == 'created'">
-                            <a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> created
-                            <a routerLink="/users/{{ feedItem.username }}/satellites/{{ feedItem.satelliteId }}">{{
-                                feedItem.satelliteName
-                            }}</a></ng-template
-                        >
+    <div *ngIf="followingFeed.length > 0; else noFeed">
+        <ul class="list-group timeline" style="cursor: default">
+            <li *ngFor="let feedItem of followingFeed" style="margin: 20px">
+                <mat-card class="timeline-body">
+                    <mat-card-header style="display: flex; justify-content: start">
+                        <mat-card-title>
+                            <mat-icon *ngIf="feedItem.type == 'followed'">person_add</mat-icon>
+                            <mat-icon *ngIf="feedItem.type == 'created'">satellite_alt</mat-icon>
+                            <mat-icon *ngIf="feedItem.type == 'tracked'">radar</mat-icon>
+                        </mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <p>
+                            <ng-template [ngIf]="feedItem.type == 'created'">
+                                <a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> created
+                                <a routerLink="/users/{{ feedItem.username }}/satellites/{{ feedItem.satelliteId }}">{{
+                                    feedItem.satelliteName
+                                }}</a></ng-template
+                            >
 
-                        <ng-template [ngIf]="feedItem.type == 'followed'"
-                            ><a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> started
-                            following
-                            <a routerLink="/profile/{{ feedItem.followed }}">{{ feedItem.followed }}</a></ng-template
-                        >
-                        <ng-template [ngIf]="feedItem.type == 'tracked'"
-                            ><a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> started
-                            tracking the satellite
-                            <a routerLink="/users/{{ feedItem.createdBy }}/satellites/{{ feedItem.satelliteId }}">{{
-                                feedItem.satelliteName
-                            }}</a></ng-template
-                        >
-                    </p>
-                </mat-card-content>
-                <!-- <mat-card-actions>
-                    <button mat-button>LIKE</button>
-                    <button mat-button>SHARE</button>
-                </mat-card-actions> -->
-            </mat-card>
-            <div class="timeline-icon">
-                <p>&nbsp;</p>
-            </div>
-            <div class="timeline-time">
-                <span class="date"
-                    >{{ feedItem.date | date : 'MMMM d y' }} <br />
-                    at {{ feedItem.date | date : 'H:mm:ss' }}</span
-                >
-            </div>
-        </li>
-    </ul>
+                            <ng-template [ngIf]="feedItem.type == 'followed'"
+                                ><a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> started
+                                following
+                                <a routerLink="/profile/{{ feedItem.followed }}">{{
+                                    feedItem.followed
+                                }}</a></ng-template
+                            >
+                            <ng-template [ngIf]="feedItem.type == 'tracked'"
+                                ><a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> started
+                                tracking the satellite
+                                <a routerLink="/users/{{ feedItem.createdBy }}/satellites/{{ feedItem.satelliteId }}">{{
+                                    feedItem.satelliteName
+                                }}</a></ng-template
+                            >
+                        </p>
+                    </mat-card-content>
+                </mat-card>
+                <div class="timeline-icon">
+                    <p>&nbsp;</p>
+                </div>
+                <div class="timeline-time">
+                    <span class="date"
+                        >{{ feedItem.date | date : 'MMMM d y' }} <br />
+                        at {{ feedItem.date | date : 'H:mm:ss' }}</span
+                    >
+                </div>
+            </li>
+        </ul>
+    </div>
+    <ng-template #noFeed>
+        <div class="empty">
+            <p>No feed to show, try checking out new creators in discover!</p>
+        </div>
+    </ng-template>
 </div>
 
 <ng-template #loading>

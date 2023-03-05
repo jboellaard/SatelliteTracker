@@ -54,7 +54,6 @@ export class User {
 export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.pre('findOneAndDelete', function (next) {
     const userId = this.getQuery()['_id'];
-    console.log('userId', userId);
     if (userId) mongoose.model('Satellite', SatelliteSchema).deleteMany({ createdBy: userId }, next);
     next();
 });

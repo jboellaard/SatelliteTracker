@@ -71,7 +71,7 @@ describe('AuthController', () => {
 
             register = jest.spyOn(authService, 'registerUser').mockImplementation(async (credentials) => {
                 if (credentials.username === 'invalid') {
-                    return new HttpException('Could not create user', HttpStatus.BAD_REQUEST);
+                    throw new HttpException('Could not create user', HttpStatus.BAD_REQUEST);
                 } else {
                     return {
                         _id: example_id,
@@ -91,13 +91,12 @@ describe('AuthController', () => {
 
         it('should return the new user', async () => {
             const result = await authController.register(mockResponse, credentials);
-            console.log(result);
             expect(result).toHaveProperty('_id', example_id);
         });
 
         it('should return an exception if register returns exception', async () => {
             register.mockImplementation(async () => {
-                return new HttpException('Could not create user', HttpStatus.BAD_REQUEST);
+                throw new HttpException('Could not create user', HttpStatus.BAD_REQUEST);
             });
             const result = await authController.register(mockResponse, credentials);
             expect(register).toReturnWith(new HttpException('Could not create user', HttpStatus.BAD_REQUEST));
@@ -127,7 +126,7 @@ describe('AuthController', () => {
                         token: 'token12345',
                     };
                 }
-                return new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
+                throw new HttpException('Invalid credentials', HttpStatus.BAD_REQUEST);
             });
         });
 

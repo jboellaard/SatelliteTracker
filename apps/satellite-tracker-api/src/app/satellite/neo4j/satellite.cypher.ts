@@ -3,7 +3,8 @@ export const SatelliteNeoQueries = {
     addSatellite:
         'MATCH (u:User {username: $username }) \
         CREATE (satellite:Satellite {satelliteName: $satelliteName, createdBy: $username }) \
-        MERGE (u)-[:CREATED {createdAt: datetime()}]->(satellite)  RETURN satellite',
+        MERGE (u)-[:CREATED {createdAt: datetime()}]->(satellite) \
+        MERGE (u)-[:TRACKS {since: datetime()}]->(satellite) RETURN satellite',
     // params: satelliteName
     deleteSatelliteByName: 'MATCH (satellite:Satellite {satelliteName: $satelliteName}) DETACH DELETE satellite',
     // params: satelliteName
@@ -22,6 +23,8 @@ export const SatelliteNeoQueries = {
     untrackSatellite:
         'MATCH (a:User {username: $username})-[track:TRACKS]->(b:Satellite {createdBy: $creator, satelliteName: $satelliteName}) DELETE track',
     getTrackedSatellites: 'MATCH (a:User {username: $username})-[track:TRACKS]->(satellite:Satellite) RETURN satellite', //add createdAt
+    getTrackers:
+        'MATCH (tracker:User)-[track:TRACKS]->(satellite:Satellite {createdBy: $creator, satelliteName: $satelliteName}) RETURN tracker',
     getMostRecentlyCreated:
         'MATCH (user:User)-[create:CREATED]->(satellite:Satellite) WHERE user.username IN $list RETURN user, satellite, create ORDER BY create.createdAt DESC SKIP toInteger($skip) LIMIT toInteger($limit)',
     // params: list, skip, limit

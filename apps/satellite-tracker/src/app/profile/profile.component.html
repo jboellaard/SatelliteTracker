@@ -26,11 +26,11 @@
             </ng-template>
         </div>
         <p>{{ user.profileDescription }}</p>
-        <div *ngIf="canEdit">
+        <div *ngIf="canEdit && user.location">
             <mat-icon style="margin-right: 10px; margin-bottom: -4px">location_on</mat-icon>
             [
-            {{ user.location?.coordinates?.latitude?.toFixed(5) }},
-            {{ user.location?.coordinates?.longitude?.toFixed(5) }} ]
+            {{ user.location.coordinates?.latitude?.toFixed(5) }},
+            {{ user.location.coordinates?.longitude?.toFixed(5) }} ]
         </div>
     </div>
 

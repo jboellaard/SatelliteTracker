@@ -42,9 +42,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
         if (this.user?.username) {
             this.satellitesSub = this.profileService.getMySatellites(this.user?.username).subscribe((satellites) => {
                 this.satellites = satellites;
-                this.satellites?.forEach((satellite) => {
-                    satellite.id = satellite._id;
-                });
             });
         }
     }

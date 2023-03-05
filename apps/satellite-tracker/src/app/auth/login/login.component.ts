@@ -23,15 +23,12 @@ export class LoginComponent implements OnInit {
 
         if (localStorage.getItem('token')) {
             localStorage.removeItem('token');
-            // console.log('User already logged in');
-            // this.router.navigate(['/']);
         }
     }
 
     onSubmit(): void {
         if (this.loginForm.valid) {
             this.authService.login(this.loginForm.value).subscribe((res) => {
-                console.log(res);
                 if (res.username) {
                     this.router.navigate(['/']);
                 } else {

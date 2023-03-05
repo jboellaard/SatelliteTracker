@@ -1,21 +1,9 @@
-import {
-    Controller,
-    Get,
-    Post,
-    Body,
-    Request,
-    Patch,
-    Param,
-    Delete,
-    Logger,
-    UseGuards,
-    HttpException,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Request, Patch, Param, Delete, Logger, UseGuards } from '@nestjs/common';
 import { SatelliteService } from './satellite.service';
 import { SatelliteDto, UpdateSatelliteDto } from './dto/satellite.dto';
 import { AccessJwtAuthGuard } from '../auth/guards/access-jwt-auth.guard';
 import { OrbitDto, UpdateOrbitDto } from './dto/orbit.dto';
-import { APIResult, ISatellite, ISatellitePart } from 'shared/domain';
+import { APIResult, ISatellite, ISatellitePart, IUser } from 'shared/domain';
 
 @Controller('satellites')
 export class SatelliteController {
@@ -24,10 +12,7 @@ export class SatelliteController {
 
     @UseGuards(AccessJwtAuthGuard)
     @Post()
-    async create(
-        @Request() req: any,
-        @Body() newSatellite: SatelliteDto
-    ): Promise<APIResult<ISatellite> | HttpException> {
+    async create(@Request() req: any, @Body() newSatellite: SatelliteDto): Promise<APIResult<ISatellite>> {
         this.logger.log('POST satellites called');
         newSatellite.createdBy = req.user.userId;
         return await this.satelliteService.create(req.user.username, newSatellite);
@@ -52,7 +37,7 @@ export class SatelliteController {
     }
 
     @Get(':id')
-    async findOne(@Param('id') id: string): Promise<APIResult<ISatellite> | HttpException> {
+    async findOne(@Param('id') id: string): Promise<APIResult<ISatellite>> {
         this.logger.log('GET satellites/:id called');
         return await this.satelliteService.findOne(id);
     }
@@ -63,14 +48,14 @@ export class SatelliteController {
         @Request() req: any,
         @Param('id') id: string,
         @Body() updateSatelliteDto: UpdateSatelliteDto
-    ): Promise<APIResult<ISatellite> | HttpException> {
+    ): Promise<APIResult<ISatellite>> {
         this.logger.log('PATCH satellites/:id called');
         return await this.satelliteService.update(req.user.userId, id, updateSatelliteDto);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Delete(':id')
-    async remove(@Request() req: any, @Param('id') id: string): Promise<APIResult<ISatellite> | HttpException> {
+    async remove(@Request() req: any, @Param('id') id: string): Promise<APIResult<ISatellite>> {
         this.logger.log('DELETE satellites/:id called');
         return await this.satelliteService.remove(req.user.userId, id);
     }
@@ -81,7 +66,7 @@ export class SatelliteController {
         @Request() req: any,
         @Param('id') id: string,
         @Body() orbit: OrbitDto
-    ): Promise<APIResult<ISatellite> | HttpException> {
+    ): Promise<APIResult<ISatellite>> {
         this.logger.log('POST satellites/:id/orbit called');
         return await this.satelliteService.createOrbit(req.user.userId, id, orbit);
     }
@@ -92,34 +77,34 @@ export class SatelliteController {
         @Request() req: any,
         @Param('id') id: string,
         @Body() orbit: UpdateOrbitDto
-    ): Promise<APIResult<ISatellite> | HttpException> {
+    ): Promise<APIResult<ISatellite>> {
         this.logger.log('PATCH satellites/:id/orbit called');
         return await this.satelliteService.updateOrbit(req.user.userId, id, orbit);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Delete(':id/orbit')
-    async removeOrbit(@Request() req: any, @Param('id') id: string): Promise<APIResult<ISatellite> | HttpException> {
+    async removeOrbit(@Request() req: any, @Param('id') id: string): Promise<APIResult<ISatellite>> {
         this.logger.log('DELETE satellites/:id/orbit called');
         return await this.satelliteService.removeOrbit(req.user.userId, id);
     }
 
+    @Get(':id/track')
+    async getTrackers(@Param('id') id: string): Promise<APIResult<IUser[]>> {
+        this.logger.log('GET satellites/:id/track called');
+        return await this.satelliteService.getTrackers(id);
+    }
+
     @UseGuards(AccessJwtAuthGuard)
     @Post(':id/track')
-    async trackSatellite(
-        @Request() req: any,
-        @Param('id') id: string
-    ): Promise<APIResult<{ message: string }> | HttpException> {
+    async trackSatellite(@Request() req: any, @Param('id') id: string): Promise<APIResult<{ message: string }>> {
         this.logger.log('POST satellites/:id/track called');
         return await this.satelliteService.trackSatellite(req.user.username, id);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Delete(':id/track')
-    async untrackSatellite(
-        @Request() req: any,
-        @Param('id') id: string
-    ): Promise<APIResult<{ message: string }> | HttpException> {
+    async untrackSatellite(@Request() req: any, @Param('id') id: string): Promise<APIResult<{ message: string }>> {
         this.logger.log('DELETE satellites/:id/track called');
         return await this.satelliteService.untrackSatellite(req.user.username, id);
     }

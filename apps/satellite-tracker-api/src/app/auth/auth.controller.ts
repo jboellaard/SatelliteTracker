@@ -1,16 +1,4 @@
-import {
-    Controller,
-    Post,
-    Body,
-    Request,
-    UseGuards,
-    Get,
-    Delete,
-    Param,
-    Patch,
-    Logger,
-    HttpException,
-} from '@nestjs/common';
+import { Controller, Post, Body, Request, UseGuards, Get, Delete, Param, Patch, Logger } from '@nestjs/common';
 import { UserRegistration, Token, UserCredentials, APIResult, IUser, UserIdentity, AdminUserInfo } from 'shared/domain';
 import { UpdateUserDto } from '../user/dto/update-user.dto';
 import { UserService } from '../user/user.service';
@@ -26,27 +14,27 @@ export class AuthController {
     constructor(private readonly authService: AuthService, private readonly userService: UserService) {}
 
     @Post('register')
-    async register(@Body() credentials: UserRegistration): Promise<APIResult<IUser> | HttpException> {
+    async register(@Body() credentials: UserRegistration): Promise<APIResult<IUser>> {
         this.logger.log('POST register called');
         return await this.authService.registerUser(credentials);
     }
 
     @Post('login')
-    async login(@Body() credentials: UserCredentials): Promise<APIResult<Token> | HttpException> {
+    async login(@Body() credentials: UserCredentials): Promise<APIResult<Token>> {
         this.logger.log('POST login called');
         return await this.authService.generateToken(credentials.username, credentials.password);
     }
 
     @UseGuards(RefreshJwtAuthGuard)
     @Get('token')
-    async token(@Request() req: any): Promise<APIResult<Token> | HttpException> {
+    async token(@Request() req: any): Promise<APIResult<Token>> {
         this.logger.log('POST token called');
         return await this.authService.refreshToken(req.user.username);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Get('self')
-    async getSelf(@Request() req: any): Promise<APIResult<UserIdentity> | HttpException> {
+    async getSelf(@Request() req: any): Promise<APIResult<UserIdentity>> {
         this.logger.log('GET self called');
         return await this.authService.getIdentity(req.user.username);
     }
@@ -56,31 +44,28 @@ export class AuthController {
     async patchSelf(
         @Request() req: any,
         @Body() updatedCredentials: UserRegistration
-    ): Promise<APIResult<{ user: UserIdentity; token: Token }> | HttpException> {
+    ): Promise<APIResult<{ user: UserIdentity; token: Token }>> {
         this.logger.log('PATCH self called');
         return await this.authService.updateIdentity(req.user.username, updatedCredentials);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Get('self/info')
-    async getProfileInfo(@Request() req: any): Promise<APIResult<IUser> | HttpException> {
+    async getProfileInfo(@Request() req: any): Promise<APIResult<IUser>> {
         this.logger.log('GET self/info called');
         return await this.userService.getSelf(req.user.username);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Patch('self/info')
-    async patchInfo(
-        @Request() req: any,
-        @Body() updatedUser: UpdateUserDto
-    ): Promise<APIResult<IUser> | HttpException> {
+    async patchInfo(@Request() req: any, @Body() updatedUser: UpdateUserDto): Promise<APIResult<IUser>> {
         this.logger.log('PATCH self/info called');
         return await this.userService.update(req.user.userId, updatedUser);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Delete('self')
-    async deleteSelf(@Request() req: any): Promise<APIResult<IUser> | HttpException> {
+    async deleteSelf(@Request() req: any): Promise<APIResult<IUser>> {
         this.logger.log('DELETE self called');
         return await this.authService.delete(req.user.username);
     }
@@ -88,7 +73,7 @@ export class AuthController {
     @UseGuards(AccessJwtAuthGuard, RolesGuard)
     @Roles('admin')
     @Get('users')
-    async getAll(): Promise<APIResult<IUser[]> | HttpException> {
+    async getAll(): Promise<APIResult<IUser[]>> {
         this.logger.log('GET users called');
         return await this.userService.findAll();
     }
@@ -96,7 +81,7 @@ export class AuthController {
     @UseGuards(AccessJwtAuthGuard, RolesGuard)
     @Roles('admin')
     @Get('identities')
-    async getAllIdentities(): Promise<APIResult<AdminUserInfo[]> | HttpException> {
+    async getAllIdentities(): Promise<APIResult<AdminUserInfo[]>> {
         this.logger.log('GET identities called');
         return await this.authService.getAllIdentities();
     }
@@ -107,7 +92,7 @@ export class AuthController {
     async patchByUsername(
         @Param('username') username: string,
         @Body() updatedUser: UpdateUserDto
-    ): Promise<APIResult<IUser> | HttpException> {
+    ): Promise<APIResult<IUser>> {
         this.logger.log(`PATCH users/${username} called`);
         return await this.userService.update(username, updatedUser);
     }
@@ -118,7 +103,7 @@ export class AuthController {
     async patchIdentityByUsername(
         @Param('username') username: string,
         @Body() updatedIdentity: UserRegistration
-    ): Promise<APIResult<{ user: UserIdentity; token: Token }> | HttpException> {
+    ): Promise<APIResult<{ user: UserIdentity; token: Token }>> {
         this.logger.log(`PATCH users/${username}/identity called`);
         return await this.authService.updateIdentity(username, updatedIdentity);
     }
@@ -126,7 +111,7 @@ export class AuthController {
     @UseGuards(AccessJwtAuthGuard, RolesGuard)
     @Roles('admin')
     @Delete('users/:username')
-    async deleteByUsername(@Param('username') username: string): Promise<APIResult<IUser> | HttpException> {
+    async deleteByUsername(@Param('username') username: string): Promise<APIResult<IUser>> {
         this.logger.log(`DELETE users/${username} called`);
         return await this.authService.delete(username);
     }

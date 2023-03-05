@@ -47,16 +47,11 @@ export class PopularComponent implements OnInit, OnDestroy {
             this.tracking = tracking;
         });
         this.creatorSub = this.dashboardService.getPopularCreators().subscribe((creators) => {
-            console.log(creators);
             this.creators = creators;
             this.contentLoad = false;
         });
         this.satelliteSub = this.dashboardService.getPopularSatellites().subscribe((satellites) => {
-            console.log(satellites);
             this.satellites = satellites;
-            this.satellites?.forEach((satellite) => {
-                satellite.createdBy = (satellite.createdBy as any).username;
-            });
             this.contentLoad = false;
         });
     }

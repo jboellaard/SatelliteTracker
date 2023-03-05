@@ -1,44 +1,51 @@
 <div *ngIf="trackingFeed; else loading">
-    <ul class="list-group timeline" style="cursor: default">
-        <li *ngFor="let feedItem of trackingFeed" style="margin: 20px">
-            <mat-card class="timeline-body">
-                <mat-card-header style="display: flex; justify-content: start">
-                    <mat-card-title>
-                        <mat-icon *ngIf="feedItem.changed == 'satellite'">satellite_alt</mat-icon>
-                        <mat-icon *ngIf="feedItem.changed == 'orbit'">rocket_launch</mat-icon>
-                    </mat-card-title>
-                </mat-card-header>
-                <mat-card-content>
-                    <p>
-                        <ng-template [ngIf]="feedItem.type == 'created'">
-                            <a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> created
-                            <ng-template [ngIf]="feedItem.changed == 'orbit'">an orbit for </ng-template>
-                            <a routerLink="/users/{{ feedItem.username }}/satellites/{{ feedItem.satelliteId }}">{{
-                                feedItem.satelliteName
-                            }}</a></ng-template
-                        >
+    <div *ngIf="trackingFeed.length > 0; else noFeed">
+        <ul class="list-group timeline" style="cursor: default">
+            <li *ngFor="let feedItem of trackingFeed" style="margin: 20px">
+                <mat-card class="timeline-body">
+                    <mat-card-header style="display: flex; justify-content: start">
+                        <mat-card-title>
+                            <mat-icon *ngIf="feedItem.changed == 'satellite'">satellite_alt</mat-icon>
+                            <mat-icon *ngIf="feedItem.changed == 'orbit'">rocket_launch</mat-icon>
+                        </mat-card-title>
+                    </mat-card-header>
+                    <mat-card-content>
+                        <p>
+                            <ng-template [ngIf]="feedItem.type == 'created'">
+                                <a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> created
+                                <ng-template [ngIf]="feedItem.changed == 'orbit'">an orbit for </ng-template>
+                                <a routerLink="/users/{{ feedItem.username }}/satellites/{{ feedItem.satelliteId }}">{{
+                                    feedItem.satelliteName
+                                }}</a></ng-template
+                            >
 
-                        <ng-template [ngIf]="feedItem.type == 'updated'"
-                            ><a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> updated
-                            <ng-template [ngIf]="feedItem.changed == 'orbit'">the orbit for </ng-template>
-                            <a routerLink="/users/{{ feedItem.username }}/satellites/{{ feedItem.satelliteId }}">{{
-                                feedItem.satelliteName
-                            }}</a></ng-template
-                        >
-                    </p>
-                </mat-card-content>
-            </mat-card>
-            <div class="timeline-icon">
-                <p>&nbsp;</p>
-            </div>
-            <div class="timeline-time">
-                <span class="date"
-                    >{{ feedItem.date | date : 'MMMM d y' }} <br />
-                    at {{ feedItem.date | date : 'H:mm:ss' }}</span
-                >
-            </div>
-        </li>
-    </ul>
+                            <ng-template [ngIf]="feedItem.type == 'updated'"
+                                ><a routerLink="/profile/{{ feedItem.username }}">{{ feedItem.username }}</a> updated
+                                <ng-template [ngIf]="feedItem.changed == 'orbit'">the orbit for </ng-template>
+                                <a routerLink="/users/{{ feedItem.username }}/satellites/{{ feedItem.satelliteId }}">{{
+                                    feedItem.satelliteName
+                                }}</a></ng-template
+                            >
+                        </p>
+                    </mat-card-content>
+                </mat-card>
+                <div class="timeline-icon">
+                    <p>&nbsp;</p>
+                </div>
+                <div class="timeline-time">
+                    <span class="date"
+                        >{{ feedItem.date | date : 'MMMM d y' }} <br />
+                        at {{ feedItem.date | date : 'H:mm:ss' }}</span
+                    >
+                </div>
+            </li>
+        </ul>
+    </div>
+    <ng-template #noFeed>
+        <div class="empty">
+            <p>No feed to show, try checking out new satellites in discover!</p>
+        </div>
+    </ng-template>
 </div>
 
 <ng-template #loading>

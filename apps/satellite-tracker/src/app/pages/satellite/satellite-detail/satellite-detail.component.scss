@@ -9,10 +9,16 @@
 
 .header .buttons {
     justify-self: end;
+    display: flex;
+    align-items: flex-end;
 }
 
 .buttons button {
-    margin-left: 10px;
+    align-self: flex-start;
+}
+
+.primary-button {
+    color: #7986cb;
 }
 
 .circle,
@@ -141,6 +147,14 @@ table tr.table-row {
         width: 100%;
         overflow: auto;
     }
+
+    .button-text {
+        display: none;
+    }
+
+    .buttons button mat-icon {
+        margin-inline: 0px;
+    }
 }
 
 @media only screen and (min-width: 930px) {
@@ -164,5 +178,65 @@ table tr.table-row {
     mat-cell:nth-child(3),
     mat-header-cell:nth-child(3) {
         min-width: 100px;
+    }
+}
+
+mat-row {
+    cursor: pointer;
+}
+
+#trackers-wrapper {
+    h2 {
+        margin-bottom: 30px;
+        display: flex;
+    }
+
+    h2 a {
+        display: flex;
+    }
+
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        margin: 20px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #424242;
+    }
+
+    .header {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    a {
+        text-decoration: none;
+        color: #fff;
+    }
+
+    a:hover {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+
+    .back-button a:hover mat-icon {
+        color: #8b99e4;
+    }
+
+    mat-icon {
+        margin-right: 10px;
+        align-self: center;
+    }
+
+    h3 {
+        display: flex;
+        font-size: 15px;
+        margin-bottom: 6px;
+    }
+
+    .button-container {
+        display: flex;
+        gap: 6px;
     }
 }

@@ -30,9 +30,7 @@
                     />
                     <mat-error *ngIf="name.invalid && name.touched" class="invalid-feedback">
                         <mat-error *ngIf="name.errors!['required']">Name is required</mat-error>
-                        <mat-error *ngIf="name.errors!['minlength']"
-                            >Username must be at least 1 character long.</mat-error
-                        >
+                        <mat-error *ngIf="name.errors!['minlength']">Name must be at least 1 character long.</mat-error>
                     </mat-error>
                 </mat-form-field>
 
