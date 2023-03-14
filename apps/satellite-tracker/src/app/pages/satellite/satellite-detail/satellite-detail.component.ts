@@ -84,7 +84,6 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
     private getSatellite() {
         this.satelliteSub = this.satelliteService.getById(this.id).subscribe({
             next: (satellite) => {
-                console.log(satellite);
                 if (satellite) {
                     this.satellite = satellite;
                     this.username = satellite.createdBy;

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document, Schema as MongooseSchema } from 'mongoose';
-import { Satellite, SatelliteSchema } from '../../satellite/schemas/satellite.schema';
+import { Document, Schema as MongooseSchema } from 'mongoose';
+import { Satellite } from '../../satellite/schemas/satellite.schema';
 
 export type UserDocument = User & Document;
 
@@ -19,8 +19,6 @@ export class PointCoordinates {
     })
     coordinates?: { longitude: number; latitude: number };
 }
-
-// export const LocationSchema = SchemaFactory.createForClass(LocationCoordinates);
 
 @Schema({ timestamps: true })
 export class User {
@@ -52,8 +50,3 @@ export class User {
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
-UserSchema.pre('findOneAndDelete', function (next) {
-    const userId = this.getQuery()['_id'];
-    if (userId) mongoose.model('Satellite', SatelliteSchema).deleteMany({ createdBy: userId }, next);
-    next();
-});

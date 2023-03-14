@@ -22,8 +22,11 @@ export class Identity {
     hash?: string;
 
     @Prop({
-        required: false,
-        unique: true,
+        trim: true,
+        index: {
+            unique: true,
+            partialFilterExpression: { emailAddress: { $type: 'string' } },
+        },
     })
     emailAddress?: string;
 

@@ -19,7 +19,7 @@ export class UserService {
     ) {}
 
     async findAll(): Promise<APIResult<IUser[]>> {
-        const users = await this.userModel.find();
+        const users = await this.userModel.find().exec();
         users.forEach((user) => {
             user.id = user._id.toString();
         });
@@ -48,7 +48,8 @@ export class UserService {
         tracking.forEach(async (satellite) => {
             const satelliteInfo = await this.satelliteModel
                 .find({ satelliteName: satellite.satelliteName })
-                .populate('createdBy', 'username');
+                .populate('createdBy', 'username')
+                .exec();
             satelliteInfo.forEach((satellite) => {
                 if ((satellite.createdBy as any).username == username) {
                     satellite.id = satellite._id.toString();
@@ -62,24 +63,22 @@ export class UserService {
     }
 
     async findOne(username: string): Promise<APIResult<IUser>> {
-        const user = (
-            await this.userModel.findOne({ username }).select('-location').populate('satellites')
-        ).toObject() as IUser; // .populate('satellites.satelliteParts.satellitePart'))
+        const user = await this.userModel.findOne({ username }).select('-location').populate('satellites').exec(); // .populate('satellites.satelliteParts.satellitePart'))
         if (!user) {
             throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
 
-        const userWithRelations = await this.getRelations(user);
+        const userWithRelations = await this.getRelations(user.toObject());
         return { status: HttpStatus.OK, result: userWithRelations };
     }
 
     async getSelf(username: string): Promise<APIResult<IUser>> {
-        const user = (await this.userModel.findOne({ username }).populate('satellites')).toObject() as IUser;
+        const user = await this.userModel.findOne({ username }).populate('satellites').exec();
         if (!user) {
             throw new HttpException('User not found', HttpStatus.NOT_FOUND);
         }
 
-        const userWithRelations = await this.getRelations(user);
+        const userWithRelations = await this.getRelations(user.toObject());
         return { status: HttpStatus.OK, result: userWithRelations };
     }
 
@@ -111,13 +110,14 @@ export class UserService {
                 });
             });
 
-        for (let i = 0; i < tracking.length; i++) {
+        for (const element of tracking) {
             const satelliteInfo = await this.satelliteModel
-                .find({ satelliteName: tracking[i].satelliteName })
-                .populate('createdBy', 'username');
-            for (let j = 0; j < satelliteInfo.length; j++) {
-                if ((satelliteInfo[j].createdBy as any).username == tracking[i].createdBy) {
-                    tracking[i].id = satelliteInfo[j]._id;
+                .find({ satelliteName: element.satelliteName })
+                .populate('createdBy', 'username')
+                .exec();
+            for (const info of satelliteInfo) {
+                if ((info.createdBy as any).username == element.createdBy) {
+                    element.id = info._id;
                 }
             }
         }
@@ -126,7 +126,7 @@ export class UserService {
     }
 
     async update(id: Id, updateUserDto: UpdateUserDto): Promise<APIResult<IUser>> {
-        const updatedUser = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true });
+        const updatedUser = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
         return { status: HttpStatus.OK, result: updatedUser };
     }
 

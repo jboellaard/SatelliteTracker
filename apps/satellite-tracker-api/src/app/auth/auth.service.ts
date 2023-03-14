@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { AdminUserInfo, APIResult, IUser, Token, UserIdentity, UserRegistration } from 'shared/domain';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { AuthNeoQueries } from './neo4j/auth.cypher';
+import { Satellite, SatelliteDocument } from '../satellite/schemas/satellite.schema';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +17,7 @@ export class AuthService {
     constructor(
         @InjectModel(Identity.name, `${process.env.MONGO_IDENTITYDB}`) private identityModel: Model<IdentityDocument>,
         @InjectModel(User.name, `${process.env.MONGO_DATABASE}`) private userModel: Model<UserDocument>,
+        @InjectModel(Satellite.name, `${process.env.MONGO_DATABASE}`) private satelliteModel: Model<SatelliteDocument>,
         @InjectConnection(`${process.env.MONGO_DATABASE}`) private stconnection: mongoose.Connection,
         @InjectConnection(`${process.env.MONGO_IDENTITYDB}`) private identityConnection: mongoose.Connection,
         private readonly neo4jService: Neo4jService,
@@ -31,12 +33,13 @@ export class AuthService {
         identitySession.startTransaction();
         const transaction = neo4jSession.beginTransaction();
         this.logger.log(`Started transaction for creating user with username ${credentials.username}`);
-
         try {
             const userAttributes = { username: credentials.username, ...credentials.profileInfo };
             const user = new this.userModel(userAttributes);
             const generatedHash = await hash(credentials.password, parseInt(`${process.env.SALT_ROUNDS}`, 10));
-            const identity = new this.identityModel({
+
+            if (credentials.emailAddress == null) credentials.emailAddress = undefined;
+            let identity = new this.identityModel({
                 username: credentials.username,
                 hash: generatedHash,
                 emailAddress: credentials.emailAddress,
@@ -49,7 +52,7 @@ export class AuthService {
             ]);
 
             try {
-                transaction.run(AuthNeoQueries.addUser, {
+                await transaction.run(AuthNeoQueries.addUser, {
                     username: credentials.username,
                 });
             } catch (error) {
@@ -177,11 +180,13 @@ export class AuthService {
                 stSession.startTransaction();
                 const transaction = neo4jSession.beginTransaction();
                 try {
-                    await this.userModel.findOneAndUpdate(
-                        { username: username },
-                        { username: updatedCredentials.username },
-                        { session: stSession }
-                    );
+                    await this.userModel
+                        .findOneAndUpdate(
+                            { username: username },
+                            { username: updatedCredentials.username },
+                            { session: stSession }
+                        )
+                        .exec();
                     transaction.run(AuthNeoQueries.updateUsername, {
                         username,
                         newUsername: updatedCredentials.username,
@@ -230,14 +235,16 @@ export class AuthService {
         this.logger.log(`Started transaction for deleting user with username ${username}`);
 
         try {
-            const user = await this.userModel.findOneAndDelete({ username: username }).session(stsession);
+            const user = await this.userModel.findOneAndDelete({ username: username }).session(stsession).exec();
+
             if (!user) {
                 throw new HttpException(`Could not find user with username ${username}`, HttpStatus.NOT_FOUND);
             }
+            await this.satelliteModel.deleteMany({ createdBy: user._id }).session(stsession).exec();
+            await this.identityModel.deleteOne({ username: username }).session(identitySession).exec();
 
-            await this.identityModel.deleteOne({ username: username }).session(identitySession);
             try {
-                transaction.run(AuthNeoQueries.removeUser, { username: username });
+                await transaction.run(AuthNeoQueries.removeUser, { username: username });
             } catch (error) {
                 await transaction.rollback();
                 throw error;

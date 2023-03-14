@@ -114,7 +114,7 @@ export class RecommendationsService {
             return {
                 ...(satellite.toObject() as ISatellite),
                 id: satellite._id.toString(),
-                _id: undefined,
+                _id: satellite._id.toString(),
                 createdBy: ((satellite.toObject() as ISatellite).createdBy as any).username,
                 trackerCount: satellites.find((sat) => sat.satelliteName === satellite.satelliteName).trackerCount,
             };
