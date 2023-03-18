@@ -146,38 +146,35 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         });
     }
 
-    checkDependencies() {
-        if (this.satellite.satelliteParts) {
-            for (const customPart of this.satellite.satelliteParts) {
-                if (customPart.satellitePart.dependsOn) {
-                    let noDependencies = true;
-                    const part = customPart.satellitePart;
-                    for (const element of part.dependsOn!) {
-                        if (
-                            this.satellite.satelliteParts.find(
-                                (customPart) => customPart.satellitePart.partName == element.partName
-                            )
-                        ) {
-                            noDependencies = false;
-                        }
+    constructDependencyError(customPart: ICustomSatellitePart) {
+        let dependencies = '';
+        for (let i = 0; i < customPart.satellitePart.dependsOn!.length; i++) {
+            if (i == customPart.satellitePart.dependsOn!.length - 1) {
+                dependencies += customPart.satellitePart.dependsOn![i].partName;
+            } else {
+                dependencies += customPart.satellitePart.dependsOn![i].partName + ', ';
+            }
+        }
+        this.satellitePartError =
+            'The part ' +
+            customPart.satellitePart.partName +
+            ' cannot function if the satellite does not have any of the following parts: ' +
+            dependencies +
+            ', please add at least one.';
+    }
+
+    checkDependencies(parts: ICustomSatellitePart[]): boolean {
+        for (const customPart of parts) {
+            if (customPart.satellitePart.dependsOn) {
+                let noDependencies = true;
+                for (const part of customPart.satellitePart.dependsOn) {
+                    if (parts.find((cp) => cp.satellitePart.partName == part.partName)) {
+                        noDependencies = false;
                     }
-                    if (noDependencies && part.dependsOn!.length > 0) {
-                        let dependencies = '';
-                        for (let i = 0; i < part.dependsOn!.length; i++) {
-                            if (i == part.dependsOn!.length - 1) {
-                                dependencies += part.dependsOn![i].partName;
-                            } else {
-                                dependencies += part.dependsOn![i].partName + ', ';
-                            }
-                        }
-                        this.satellitePartError =
-                            'The part ' +
-                            part.partName +
-                            ' cannot function if the satellite does not have any of the following parts: ' +
-                            dependencies +
-                            ', please add at least one.';
-                        return false;
-                    }
+                }
+                if (noDependencies && customPart.satellitePart.dependsOn.length > 0) {
+                    this.constructDependencyError(customPart);
+                    return false;
                 }
             }
         }
@@ -235,7 +232,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
     }
 
     onSubmit() {
-        if (!this.checkDependencies()) return;
+        if (this.satellite.satelliteParts && !this.checkDependencies(this.satellite.satelliteParts)) return;
         if (this.componentExists) {
             this.update();
         } else {

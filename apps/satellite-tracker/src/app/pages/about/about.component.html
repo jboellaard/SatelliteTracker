@@ -7,10 +7,10 @@
             </p>
             <h1>Satellite Tracker</h1>
             <p>
-                This application will allow users to create and launch satellites into an orbit. They can also track
-                satellites (their own but also satellites created by other users) and see if they are visible at their
-                location at a given time. Users can also follow other users and see when these users create or launch
-                satellites.
+                This application will allow users to create satellites and orbits for these satellites to follow. They
+                can also track satellites and follow users. Users will have a feed of users they follow and satellites
+                they track, to see the latest activities. Based on following and tracking, a user will receive
+                recommendations of satellites and users to follow.
             </p>
         </div>
         <mat-card style="min-width: 250px">
@@ -31,7 +31,7 @@
     <p>
         The entities used in this application are shown here. The type relates to the type as seen in the application,
         so it differs a bit from how the entities will be stored. E.g. location is a seperate model in the application,
-        but in the database it will be saved as GeoJSON.
+        but in the database it will be saved as GeoJSON. Shape is an enum with the values 'Sphere' and 'Cube'.
     </p>
 
     <div class="entities-wrapper">
@@ -39,66 +39,75 @@
             <h3>Satellite</h3>
             <ul>
                 <li>id: string</li>
-                <li>name: string</li>
-                <li>mass: number</li>
-                <li>radiusOfBase: number</li>
-                <li>colourOfBase: string</li>
-                <li>radiusOfParts: number</li>
+                <li>satelliteName: string</li>
+                <li>createdBy: User</li>
+                <li>description: string</li>
                 <li>purpose: string</li>
-                <li>satelliteParts: satellitePart[]</li>
-                <li>orbit: orbit</li>
-                <li>launch: launch</li>
+                <li>mass: number</li>
+                <li>sizeOfBase: number</li>
+                <li>colorOfBase: string</li>
+                <li>shapeOfBase: Shape</li>
+                <li>satelliteParts: SatellitePart[]</li>
+                <li>orbit: Orbit</li>
+                <li>trackers: User[]</li>
                 <li>createdAt: date</li>
-                <li>lastUpdated: date</li>
-            </ul>
-        </div>
-        <div class="col">
-            <h3>Satellite Part</h3>
-            <ul>
-                <li>id: string</li>
-                <li>name: string</li>
-                <li>function: string</li>
-                <li>material: string</li>
-                <li>colour: string</li>
-                <li>amount: number</li>
-                <li>createdAt: date</li>
-                <li>lastUpdated: date</li>
+                <li>updatedAt: date</li>
             </ul>
         </div>
         <div class="col">
             <h3>Orbit</h3>
             <ul>
-                <li>id: string</li>
-                <li>type: string</li>
                 <li>inclination: number</li>
                 <li>semiMajorAxis: number</li>
                 <li>period: number</li>
                 <li>eccentricity: number</li>
+                <li>longitudeOfAscendingNode: number</li>
+                <li>argumentOfPerigee: number</li>
+                <li>dateTimeOfLaunch: date</li>
                 <li>createdAt: date</li>
-                <li>lastUpdated: date</li>
-            </ul>
-        </div>
-        <div class="col">
-            <h3>Launch</h3>
-            <ul>
-                <li>id: string</li>
-                <li>launchDate: date</li>
-                <li>launchSite: location</li>
-                <li>succeeded: boolean</li>
-                <li>createdAt: date</li>
-                <li>lastUpdated: date</li>
+                <li>updatedAt: date</li>
             </ul>
         </div>
         <div class="col">
             <h3>User</h3>
             <ul>
-                <li>id: string</li>
-                <li>userName: string</li>
+                <li>username: string</li>
+                <li>profileDescription: string</li>
+                <li>location: Location</li>
+                <li>followers: User[]</li>
+                <li>following: User[]</li>
+                <li>tracking: Satellite[]</li>
+                <li>createdAt: date</li>
+                <li>updatedAt: date</li>
+            </ul>
+        </div>
+        <div class="col">
+            <h3>Identity</h3>
+            <ul>
+                <li>username: string</li>
                 <li>email: string</li>
                 <li>password: string</li>
-                <li>location: location</li>
-                <li>createdAt: date</li>
-                <li>lastUpdated: date</li>
+                <li>roles: string[]</li>
+                <li>user: User</li>
+            </ul>
+        </div>
+        <div class="col">
+            <h3>SatellitePart</h3>
+            <ul>
+                <li>id: string</li>
+                <li>partName: string</li>
+                <li>description: string</li>
+                <li>function: string</li>
+                <li>material: string</li>
+            </ul>
+        </div>
+        <div class="col">
+            <h3>CustomSatellitePart</h3>
+            <ul>
+                <li>satellitePart: SatellitePart</li>
+                <li>color: string</li>
+                <li>size: number</li>
+                <li>quantity: number</li>
             </ul>
         </div>
         <div class="col">
@@ -110,9 +119,9 @@
         </div>
     </div>
 
-    <p>
+    <p style="margin-top: 10px">
         Using these entities, we can construct the following entity relationship diagram, showing how they will be
-        persisted.
+        persisted:
     </p>
 
     <img
@@ -123,10 +132,13 @@
 
     <h2>User stories</h2>
     <table mat-table [dataSource]="dataSourceUserStories" class="mat-elevation-z8">
+        <caption style="visibility: hidden">
+            User stories
+        </caption>
         <!-- Position Column -->
         <ng-container matColumnDef="No.">
             <th mat-header-cell *matHeaderCellDef>No.</th>
-            <td mat-cell *matCellDef="let element">{{ element.no }}</td>
+            <td mat-cell *matCellDef="let element; let i = index">{{ i + 1 }}</td>
         </ng-container>
 
         <!-- Name Column -->
@@ -136,12 +148,24 @@
         </ng-container>
 
         <!-- Weight Column -->
-        <ng-container matColumnDef="Clarification">
-            <th mat-header-cell *matHeaderCellDef>Clarification</th>
-            <td mat-cell *matCellDef="let element">{{ element.clarification }}</td>
+        <ng-container matColumnDef="Notes">
+            <th mat-header-cell *matHeaderCellDef>Notes</th>
+            <td mat-cell *matCellDef="let element">{{ element.notes }}</td>
         </ng-container>
 
         <tr mat-header-row *matHeaderRowDef="userStoryColumns"></tr>
         <tr mat-row *matRowDef="let row; columns: userStoryColumns"></tr>
     </table>
+
+    <h2>Future additions</h2>
+    <p>The following features are not implemented, but might be added in the future:</p>
+    <ul>
+        <li>Checking if satellites you follow are visible at your location at a given time on a map</li>
+        <li>Launches and launch events</li>
+        <li>Notifications for various activities</li>
+        <li>Searching users by username</li>
+        <li>Accurate position of the earth and satellite based on datetime at perigee</li>
+        <li>Taking weight of satellite into account when calculating orbit</li>
+        <li>Adding visuals of the satellite parts</li>
+    </ul>
 </div>

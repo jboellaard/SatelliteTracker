@@ -1,8 +1,7 @@
-import { BreakpointObserver } from '@angular/cdk/layout';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { IUser, Id, ISatellite, UserIdentity } from 'shared/domain';
+import { Subscription } from 'rxjs';
+import { IUser, Id, UserIdentity } from 'shared/domain';
 import { AuthService } from '../auth/auth.service';
 import { UserService } from '../pages/user/user.service';
 import { SnackBarService } from '../utils/snack-bar.service';

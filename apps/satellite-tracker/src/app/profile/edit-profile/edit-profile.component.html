@@ -35,13 +35,7 @@
                     </i>
                 </p>
             </div>
-            <div class="profile-button">
-                <div>
-                    <a routerLink="/profile/{{ user.username }}/edit" routerLinkActive="active">
-                        <button mat-raised-button><mat-icon>edit</mat-icon>Edit profile</button>
-                    </a>
-                </div>
-            </div>
+
             <mat-form-field class="form-group" appearance="fill">
                 <mat-label for="profileDescription">Profile description</mat-label>
                 <textarea
@@ -54,10 +48,49 @@
                 ></textarea>
             </mat-form-field>
             <div>
-                <mat-icon style="margin-right: 10px; margin-bottom: -4px">location_on</mat-icon>
-                [
-                {{ user.location?.coordinates?.latitude?.toFixed(5) }},
-                {{ user.location?.coordinates?.longitude?.toFixed(5) }} ]
+                <mat-form-field class="form-group" appearance="fill">
+                    <mat-label for="latitude">Latitude</mat-label>
+                    <input
+                        matInput
+                        type="number"
+                        name="latitude"
+                        [(ngModel)]="user.location!.coordinates!.latitude"
+                        #latitude="ngModel"
+                        min="-90"
+                        max="90"
+                        [ngClass]="{
+                            'is-invalid': latitude.invalid && latitude.touched
+                        }"
+                    />
+                    <mat-error *ngIf="latitude.invalid && latitude.touched" class="invalid-feedback">
+                        <mat-error *ngIf="latitude.errors!['min'] || latitude.errors!['max']"
+                            >Latitude must be between -90 and 90.</mat-error
+                        >
+                    </mat-error>
+                </mat-form-field>
+                <mat-form-field class="form-group" appearance="fill">
+                    <mat-label for="longitude">Longitude</mat-label>
+                    <input
+                        matInput
+                        type="number"
+                        name="longitude"
+                        [(ngModel)]="user.location!.coordinates!.longitude"
+                        #longitude="ngModel"
+                        min="-90"
+                        max="90"
+                        [ngClass]="{
+                            'is-invalid': longitude.invalid && longitude.touched
+                        }"
+                    />
+                    <mat-error *ngIf="longitude.invalid && longitude.touched" class="invalid-feedback">
+                        <mat-error *ngIf="longitude.errors!['min'] || longitude.errors!['max']"
+                            >Longitude must be between -180 and 180.</mat-error
+                        >
+                    </mat-error>
+                </mat-form-field>
+                <button mat-flat-button style="min-height: 56px" (click)="getLocation()">
+                    Use your device's location
+                </button>
             </div>
         </div>
         <div class="buttons">

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ICustomSatellitePart, Id, ISatellite, IUser, Shape, UserIdentity } from 'shared/domain';
 import { AuthService } from '../../../auth/auth.service';
@@ -19,7 +19,6 @@ import { SatelliteService } from '../satellite.service';
 export class SatelliteDetailComponent implements OnInit, OnDestroy {
     userId: Id | undefined;
     username: string | null | undefined;
-    id: Id | null | undefined;
     satellite: ISatellite | undefined;
     customPartTableColumns: string[] = ['position', 'name', 'color', 'size', 'quantity'];
     currentPart: ICustomSatellitePart | undefined;
@@ -68,21 +67,18 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
 
         this.route.paramMap.subscribe((params) => {
             this.satellite = undefined;
-            this.id = params.get('satelliteId');
+            let id = params.get('satelliteId');
             this.username = params.get('username');
-            if (this.id) {
-                this.getSatellite();
-                this.satelliteService.getRefreshRequired().subscribe(() => {
-                    this.getSatellite();
-                });
+            if (id) {
+                this.getSatellite(id);
             } else {
                 this.router.navigate([`/profile/${this.username}/`]);
             }
         });
     }
 
-    private getSatellite() {
-        this.satelliteSub = this.satelliteService.getById(this.id).subscribe({
+    private getSatellite(id: Id | null) {
+        this.satelliteSub = this.satelliteService.getById(id).subscribe({
             next: (satellite) => {
                 if (satellite) {
                     this.satellite = satellite;
@@ -146,7 +142,7 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
         });
         dialogRef.afterClosed().subscribe((ok) => {
             if (ok == 'ok') {
-                this.satelliteService.delete(this.id!).subscribe((result) => {
+                this.satelliteService.delete(this.satellite?.id).subscribe((result) => {
                     if (result) {
                         this.relationsService
                             .getTracking()
@@ -172,7 +168,7 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
         });
         dialogRef.afterClosed().subscribe((ok) => {
             if (ok == 'ok') {
-                this.satelliteService.deleteOrbit(this.id!).subscribe((result) => {
+                this.satelliteService.deleteOrbit(this.satellite?.id).subscribe((result) => {
                     if (result) {
                         this.snackBar.success('Orbit successfully deleted');
                     } else {

@@ -1,4 +1,4 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { IOrbit, Shape } from 'shared/domain';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
@@ -22,6 +22,10 @@ export class OrbitService {
     yLine = new THREE.Line(new THREE.BufferGeometry());
     zLine = new THREE.Line(new THREE.BufferGeometry());
     equatorialPlane = new THREE.Mesh();
+    perigeeLine = new THREE.Line(
+        new THREE.BufferGeometry(),
+        new THREE.LineBasicMaterial({ color: 0xa6e3ff, linewidth: 2 })
+    );
 
     camera = new THREE.PerspectiveCamera();
     fitCameraToOrbit: any;
@@ -32,8 +36,6 @@ export class OrbitService {
     realSize = true;
     showOrbit = true;
     zoom = 1;
-
-    constructor() {}
 
     createOrbitScene(
         container: Element,
@@ -77,11 +79,6 @@ export class OrbitService {
         this.createOrbit(orbit, scene);
         this.createGuideLines(scene);
 
-        // this.satelliteMesh = new THREE.Mesh(
-        //     new THREE.BoxGeometry(200 * this.scale, 200 * this.scale, 200 * this.scale),
-        //     new THREE.MeshPhongMaterial({ color: '#ffffff', shininess: 100 })
-        // );
-
         if (shape === Shape.Cube) {
             this.satelliteMesh = new THREE.Mesh(
                 new THREE.BoxGeometry(200 * this.scale, 200 * this.scale, 200 * this.scale),
@@ -104,18 +101,6 @@ export class OrbitService {
         scene.add(this.realSatelliteMesh);
         this.realSatelliteMesh.visible = this.realSize;
         this.toggleColor();
-
-        const perigeeLine = new THREE.Line(
-            new THREE.BufferGeometry(),
-            new THREE.LineBasicMaterial({ color: 0x5a5b5c })
-        );
-        scene.add(perigeeLine);
-
-        const perigee = new THREE.Mesh(
-            new THREE.SphereGeometry(100 * this.scale, 32, 32),
-            new THREE.MeshPhongMaterial({ color: 0x5a5b5c })
-        );
-        scene.add(perigee);
 
         this.fitCameraToOrbit = function (newOrbit: IOrbit, zoom = 1) {
             let cameraPos = newOrbit.semiMajorAxis * this.scale;
@@ -197,7 +182,7 @@ export class OrbitService {
             this.realSatelliteMesh.position.set(pos.x, pos.y, pos.z);
 
             const perigeePos = getPositionInOrbit(orbit, 0);
-            perigeeLine.geometry = new THREE.BufferGeometry().setFromPoints([perigeePos, center]);
+            this.perigeeLine.geometry = new THREE.BufferGeometry().setFromPoints([perigeePos, center]);
 
             earth.rotation.y += earthRotation;
 
@@ -269,6 +254,8 @@ export class OrbitService {
         this.equatorialPlane.rotation.x = Math.PI / 2;
         scene.add(this.equatorialPlane);
 
+        scene.add(this.perigeeLine);
+
         this.toggleGuideLines();
     }
 
@@ -330,6 +317,7 @@ export class OrbitService {
         this.yLine.visible = this.guidelines;
         this.zLine.visible = this.guidelines;
         this.equatorialPlane.visible = this.guidelines;
+        this.perigeeLine.visible = this.guidelines;
     }
 
     toggleSize() {

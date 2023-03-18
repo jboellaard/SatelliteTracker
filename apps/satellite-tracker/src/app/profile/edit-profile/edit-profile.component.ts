@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { IUser, UserIdentity } from 'shared/domain';
 import { AuthService } from '../../auth/auth.service';
+import { SnackBarService } from '../../utils/snack-bar.service';
 import { ProfileService } from '../profile.service';
 
 @Component({
@@ -16,7 +17,11 @@ export class EditProfileComponent implements OnInit, OnDestroy {
     user: IUser | undefined;
     profileInfoSub: Subscription | undefined;
 
-    constructor(private authService: AuthService, private profileService: ProfileService) {}
+    constructor(
+        private authService: AuthService,
+        private profileService: ProfileService,
+        private snackBar: SnackBarService
+    ) {}
 
     ngOnInit(): void {
         this.userSub = this.authService.user$.subscribe((loggedInUser) => {
@@ -29,6 +34,20 @@ export class EditProfileComponent implements OnInit, OnDestroy {
                 });
             }
         });
+    }
+
+    getLocation(): void {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((position) => {
+                if (this.user) {
+                    if (!this.user!.location) this.user!.location = { coordinates: { latitude: 0, longitude: 0 } };
+                    this.user.location.coordinates!.latitude = position.coords.latitude;
+                    this.user.location.coordinates!.longitude = position.coords.longitude;
+                }
+            });
+        } else {
+            this.snackBar.info('Geolocation is not supported by this browser.');
+        }
     }
 
     onSubmit(): void {}
