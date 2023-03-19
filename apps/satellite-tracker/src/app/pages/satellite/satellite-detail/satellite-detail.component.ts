@@ -170,6 +170,7 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
             if (ok == 'ok') {
                 this.satelliteService.deleteOrbit(this.satellite?.id).subscribe((result) => {
                     if (result) {
+                        this.satellite!.orbit = undefined;
                         this.snackBar.success('Orbit successfully deleted');
                     } else {
                         this.snackBar.error('Something went wrong, please try again later');

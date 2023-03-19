@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { IOrbit, Shape } from 'shared/domain';
+import { getPeriod, IOrbit, Shape } from 'shared/domain';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
@@ -37,13 +37,7 @@ export class OrbitService {
     showOrbit = true;
     zoom = 1;
 
-    createOrbitScene(
-        container: Element,
-        orbit: IOrbit,
-        color: string = '#ffffff',
-        shape: Shape = Shape.Cube,
-        size = 200000
-    ) {
+    createOrbitScene(container: Element, orbit: IOrbit, color = '#ffffff', shape = Shape.Cube, size = 200000) {
         size = size / 1000; // convert to km
         this.realMeshColor = new THREE.MeshPhongMaterial({ color: color, shininess: 100 });
 
@@ -97,9 +91,8 @@ export class OrbitService {
         }
 
         scene.add(this.satelliteMesh);
-        this.satelliteMesh.visible = !this.realSize;
         scene.add(this.realSatelliteMesh);
-        this.realSatelliteMesh.visible = this.realSize;
+        this.toggleSize();
         this.toggleColor();
 
         this.fitCameraToOrbit = function (newOrbit: IOrbit, zoom = 1) {
@@ -123,7 +116,7 @@ export class OrbitService {
 
         const scale = this.scale;
         let time = 0;
-        const earthRotation = 0.003;
+        const earthRotationSpeed = 0.003;
 
         const center = new THREE.Vector3(0, 0, 0);
         const xDirection = new THREE.Vector3(1, 0, 0);
@@ -171,10 +164,10 @@ export class OrbitService {
             if (!orbit.inclination) orbit.inclination = 0;
             if (!orbit.longitudeOfAscendingNode) orbit.longitudeOfAscendingNode = 0;
             if (!orbit.argumentOfPerigee) orbit.argumentOfPerigee = 0;
-            if (!orbit.period) orbit.period = 1;
+            if (!orbit.period) orbit.period = getPeriod(orbit.semiMajorAxis);
 
             time -=
-                ((earthRotation / orbit.period) *
+                ((earthRotationSpeed / orbit.period) *
                     (1 + 2 * orbit.eccentricity * Math.cos(time) + orbit.eccentricity ** 2)) /
                 (1 - orbit.eccentricity ** 2);
             const pos = getPositionInOrbit(orbit, time);
@@ -184,7 +177,7 @@ export class OrbitService {
             const perigeePos = getPositionInOrbit(orbit, 0);
             this.perigeeLine.geometry = new THREE.BufferGeometry().setFromPoints([perigeePos, center]);
 
-            earth.rotation.y += earthRotation;
+            earth.rotation.y += earthRotationSpeed;
 
             controls.update();
             this.renderer!.render(scene, camera);

@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
 import { Observable, map, Subject, tap, catchError, BehaviorSubject } from 'rxjs';
-import { ISatellite, APIResponse, IUserInfo, Id } from 'shared/domain';
+import { ISatellite, APIResponse, IUserInfo, Id, IUser } from 'shared/domain';
 import { environment } from '../../environments/environment';
 import { SnackBarService } from '../utils/snack-bar.service';
 import { RelationsService } from './relations.service';
@@ -22,6 +22,13 @@ export class ProfileService {
 
     getSelf(): Observable<IUserInfo | undefined> {
         return this.http.get<APIResponse<IUserInfo | undefined>>(this.url + 'self/info').pipe(
+            map((response) => response.result),
+            catchError(this.handleError)
+        );
+    }
+
+    updateSelf(user: IUser): Observable<IUser | undefined> {
+        return this.http.patch<APIResponse<IUser | undefined>>(this.url + 'self/info', user).pipe(
             map((response) => response.result),
             catchError(this.handleError)
         );

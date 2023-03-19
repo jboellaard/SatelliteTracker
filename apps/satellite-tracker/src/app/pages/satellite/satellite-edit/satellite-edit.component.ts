@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { ICustomSatellitePart, Id, IOrbit, ISatellite, ISatellitePart, Purpose, Shape } from 'shared/domain';
+import { ICustomSatellitePart, Id, ISatellite, ISatellitePart, Purpose, Shape } from 'shared/domain';
 import { SatelliteService } from '../satellite.service';
 import { OrbitService } from '../orbit-scene.service';
 import { AddPurposeDialogComponent } from './add-purpose-dialog/add-purpose-dialog.component';

@@ -1,7 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { IUser, UserIdentity } from 'shared/domain';
 import { AuthService } from '../../auth/auth.service';
+import { AddEditDialogComponent } from '../../utils/add-edit-dialog/add-edit-dialog.component';
 import { SnackBarService } from '../../utils/snack-bar.service';
 import { ProfileService } from '../profile.service';
 
@@ -20,7 +23,10 @@ export class EditProfileComponent implements OnInit, OnDestroy {
     constructor(
         private authService: AuthService,
         private profileService: ProfileService,
-        private snackBar: SnackBarService
+        private snackBar: SnackBarService,
+        private dialog: MatDialog,
+        private router: Router,
+        private route: ActivatedRoute
     ) {}
 
     ngOnInit(): void {
@@ -50,7 +56,25 @@ export class EditProfileComponent implements OnInit, OnDestroy {
         }
     }
 
-    onSubmit(): void {}
+    onSubmit(): void {
+        if (this.user) {
+            const dialogRef = this.dialog.open(AddEditDialogComponent, {
+                data: { message: 'Are you sure you want to update your information?' },
+            });
+            dialogRef.afterClosed().subscribe((ok) => {
+                if (ok == 'ok') {
+                    this.profileService.updateSelf(this.user!).subscribe((satellite) => {
+                        if (satellite) {
+                            this.snackBar.success('Profile updated successfully');
+                            this.router.navigate(['..'], { relativeTo: this.route });
+                        } else {
+                            this.snackBar.error('Profile could not be updated');
+                        }
+                    });
+                }
+            });
+        }
+    }
 
     ngOnDestroy(): void {
         if (this.userSub) this.userSub.unsubscribe();

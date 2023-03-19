@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'apps/satellite-tracker/src/environments/environment';
-import { map, Observable, tap } from 'rxjs';
+import { catchError, map, Observable, tap } from 'rxjs';
 import { APIResponse, Id, IOrbit, ISatellite, ISatellitePart, IUser } from 'shared/domain';
 import { EntityService } from 'ui/entity';
 
@@ -16,14 +16,18 @@ export class SatelliteService extends EntityService<ISatellite> {
     getSatellitesOfUserWithUsername(username: string): Observable<ISatellite[] | undefined> {
         return this.http
             .get<APIResponse<ISatellite[] | undefined>>(environment.API_URL + `users/${username}/satellites`)
-            .pipe(map((response: any) => response.result));
+            .pipe(
+                map((response: any) => response.result),
+                catchError(this.handleError)
+            );
     }
 
     getSatelliteParts(): Observable<ISatellitePart[]> {
         return this.http.get<APIResponse<ISatellitePart[]>>(environment.API_URL + 'satellites/parts').pipe(
             map((response: any) => {
                 return response.result;
-            })
+            }),
+            catchError(this.handleError)
         );
     }
 
@@ -34,7 +38,8 @@ export class SatelliteService extends EntityService<ISatellite> {
             }),
             map((response: any) => {
                 return response.result;
-            })
+            }),
+            catchError(this.handleError)
         );
     }
 
@@ -45,7 +50,8 @@ export class SatelliteService extends EntityService<ISatellite> {
             }),
             map((response: any) => {
                 return response.result;
-            })
+            }),
+            catchError(this.handleError)
         );
     }
 
@@ -56,7 +62,8 @@ export class SatelliteService extends EntityService<ISatellite> {
             }),
             map((response: any) => {
                 return response.result;
-            })
+            }),
+            catchError(this.handleError)
         );
     }
 
@@ -64,7 +71,8 @@ export class SatelliteService extends EntityService<ISatellite> {
         return this.http.get<APIResponse<IUser[]>>(`${environment.API_URL}satellites/${id}/track`).pipe(
             map((response: any) => {
                 return response.result;
-            })
+            }),
+            catchError(this.handleError)
         );
     }
 }

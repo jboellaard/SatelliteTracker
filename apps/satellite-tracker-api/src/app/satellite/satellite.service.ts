@@ -138,6 +138,8 @@ export class SatelliteService {
                 _id: satellite._id.toString(),
             };
         });
+        result.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
         return { status: HttpStatus.OK, result };
     }
 

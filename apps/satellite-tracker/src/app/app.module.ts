@@ -7,12 +7,9 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { SatelliteDetailComponent } from './pages/satellite/satellite-detail/satellite-detail.component';
 import { SatelliteEditComponent } from './pages/satellite/satellite-edit/satellite-edit.component';
 import { FooterComponent } from './shared/footer/footer.component';
-import { UserComponent } from './pages/user/user.component';
-import { UserEditComponent } from './pages/user/user-edit/user-edit.component';
 import { UserListComponent } from './pages/user/user-list/user-list.component';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { AboutComponent } from './pages/about/about.component';
@@ -97,12 +94,9 @@ const materialModules = [
 @NgModule({
     declarations: [
         AppComponent,
-        DashboardComponent,
         SatelliteDetailComponent,
         SatelliteEditComponent,
         FooterComponent,
-        UserComponent,
-        UserEditComponent,
         NavbarComponent,
         AboutComponent,
         UserListComponent,

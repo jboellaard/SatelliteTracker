@@ -60,6 +60,7 @@ export class AuthController {
     @Patch('self/info')
     async patchInfo(@Request() req: any, @Body() updatedUser: UpdateUserDto): Promise<APIResult<IUser>> {
         this.logger.log('PATCH self/info called');
+        console.log(updatedUser);
         return await this.userService.update(req.user.userId, updatedUser);
     }
 

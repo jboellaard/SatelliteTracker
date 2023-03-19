@@ -8,7 +8,7 @@
     <mat-divider class="divider"></mat-divider>
     <div>
         <h3 class="title" #tooltip="matTooltip" matTooltip="Followed by people you follow and who they follow">
-            Recommended creators
+            Recommended users
         </h3>
         <div class="creators" *ngIf="creators && creators.length > 0; else noCreators">
             <mat-card *ngFor="let creator of creators">

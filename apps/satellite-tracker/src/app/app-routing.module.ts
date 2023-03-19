@@ -1,33 +1,36 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { UserListComponent } from './pages/user/user-list/user-list.component';
-import { UserEditComponent } from './pages/user/user-edit/user-edit.component';
-import { SatelliteDetailComponent } from './pages/satellite/satellite-detail/satellite-detail.component';
-import { SatelliteEditComponent } from './pages/satellite/satellite-edit/satellite-edit.component';
+import { AuthGuard } from './auth/auth.guard';
+import { AdminAuthGuard } from './auth/admin-auth.guard';
+import { OwnerAuthGuard } from './auth/owner-auth.guard';
 
 import { AboutComponent } from './pages/about/about.component';
 import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
-import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.component';
-import { AuthGuard } from './auth/auth.guard';
-import { AdminAuthGuard } from './auth/admin-auth.guard';
-import { OwnerAuthGuard } from './auth/owner-auth.guard';
-import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
+import { UserListComponent } from './pages/user/user-list/user-list.component';
+
 import { ProfileComponent } from './profile/profile.component';
+import { EditProfileComponent } from './profile/edit-profile/edit-profile.component';
+import { TabCreatedComponent } from './profile/tabs/tab-created/tab-created.component';
+import { TabFollowingComponent } from './profile/tabs/tab-following/tab-following.component';
+import { TabFollowersComponent } from './profile/tabs/tab-followers/tab-followers.component';
+import { TabTrackingComponent } from './profile/tabs/tab-tracking/tab-tracking.component';
+
 import { DiscoverComponent } from './pages/dashboard/discover/discover.component';
 import { FeedComponent } from './pages/dashboard/feed/feed.component';
 import { FollowingComponent } from './pages/dashboard/feed/following/following.component';
 import { TrackingComponent } from './pages/dashboard/feed/tracking/tracking.component';
 import { ForYouComponent } from './pages/dashboard/discover/for-you/for-you.component';
 import { PopularComponent } from './pages/dashboard/discover/popular/popular.component';
-import { TabCreatedComponent } from './profile/tabs/tab-created/tab-created.component';
-import { TabFollowingComponent } from './profile/tabs/tab-following/tab-following.component';
-import { TabFollowersComponent } from './profile/tabs/tab-followers/tab-followers.component';
-import { TabTrackingComponent } from './profile/tabs/tab-tracking/tab-tracking.component';
 import { RecentComponent } from './pages/dashboard/discover/recent/recent.component';
-import { EditProfileComponent } from './profile/edit-profile/edit-profile.component';
+
+import { SatelliteDetailComponent } from './pages/satellite/satellite-detail/satellite-detail.component';
+import { SatelliteEditComponent } from './pages/satellite/satellite-edit/satellite-edit.component';
 import { SatelliteTrackersComponent } from './pages/satellite/satellite-detail/satellite-trackers/satellite-trackers.component';
+import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.component';
+
+import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
 
 const routes: Routes = [
     { path: 'home', pathMatch: 'full', redirectTo: 'feed' },
