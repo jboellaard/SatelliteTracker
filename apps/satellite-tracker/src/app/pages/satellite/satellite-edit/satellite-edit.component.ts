@@ -3,7 +3,6 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ICustomSatellitePart, Id, ISatellite, ISatellitePart, Purpose, Shape } from 'shared/domain';
 import { SatelliteService } from '../satellite.service';
-import { OrbitService } from '../orbit-scene.service';
 import { AddPurposeDialogComponent } from './add-purpose-dialog/add-purpose-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { SnackBarService } from '../../../utils/snack-bar.service';
@@ -54,10 +53,9 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private router: Router,
         private satelliteService: SatelliteService,
-        public orbitService: OrbitService,
         private relationsService: RelationsService,
-        public dialog: MatDialog,
-        public snackBar: SnackBarService
+        private dialog: MatDialog,
+        private snackBar: SnackBarService
     ) {}
 
     ngOnInit(): void {
@@ -66,7 +64,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
             this.allSatelliteParts = satelliteParts;
         });
         this.paramSub = this.route.paramMap.subscribe((params) => {
-            this.id = params.get('satelliteId')!;
+            this.id = params.get('satelliteId');
             this.username = params.get('username')!;
             if (this.id) {
                 this.componentExists = true;
@@ -81,12 +79,6 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
                 });
             }
         });
-    }
-
-    changeColorSatellite() {
-        if (this.satellite.orbit) {
-            this.orbitService.changeColorSatellite(this.satellite.colorOfBase);
-        }
     }
 
     openPurposeDialog() {

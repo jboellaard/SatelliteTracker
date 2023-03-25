@@ -7,7 +7,7 @@ import {
     HttpErrorResponse,
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { catchError, Observable, switchMap, tap, throwError } from 'rxjs';
+import { catchError, Observable, switchMap, throwError } from 'rxjs';
 import { SnackBarService } from '../utils/snack-bar.service';
 import { AuthService } from './auth.service';
 

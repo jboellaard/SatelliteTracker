@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { getPeriod, IOrbit, Shape } from 'shared/domain';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 @Injectable({
     providedIn: 'root',
@@ -31,12 +31,19 @@ export class OrbitService {
     fitCameraToOrbit: any;
     whiteMeshColor = new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 100 });
     realMeshColor = new THREE.MeshPhongMaterial({ color: 0xfffff, shininess: 100 });
-    guidelines = true;
+    guideLines = true;
     realColor = true;
     realSize = true;
     showOrbit = true;
     zoom = 1;
 
+    /**
+     * @param container - HTML element to render the scene in
+     * @param orbit
+     * @param color
+     * @param shape
+     * @param size - size of the satellite in meters
+     */
     createOrbitScene(container: Element, orbit: IOrbit, color = '#ffffff', shape = Shape.Cube, size = 200000) {
         size = size / 1000; // convert to km
         this.realMeshColor = new THREE.MeshPhongMaterial({ color: color, shininess: 100 });
@@ -164,7 +171,7 @@ export class OrbitService {
             if (!orbit.inclination) orbit.inclination = 0;
             if (!orbit.longitudeOfAscendingNode) orbit.longitudeOfAscendingNode = 0;
             if (!orbit.argumentOfPerigee) orbit.argumentOfPerigee = 0;
-            if (!orbit.period) orbit.period = getPeriod(orbit.semiMajorAxis);
+            if (!orbit.period) orbit.period = getPeriod(orbit.semiMajorAxis * 1000) / (60 * 60 * 24);
 
             time -=
                 ((earthRotationSpeed / orbit.period) *
@@ -306,11 +313,11 @@ export class OrbitService {
     }
 
     toggleGuideLines() {
-        this.xLine.visible = this.guidelines;
-        this.yLine.visible = this.guidelines;
-        this.zLine.visible = this.guidelines;
-        this.equatorialPlane.visible = this.guidelines;
-        this.perigeeLine.visible = this.guidelines;
+        this.xLine.visible = this.guideLines;
+        this.yLine.visible = this.guideLines;
+        this.zLine.visible = this.guideLines;
+        this.equatorialPlane.visible = this.guideLines;
+        this.perigeeLine.visible = this.guideLines;
     }
 
     toggleSize() {

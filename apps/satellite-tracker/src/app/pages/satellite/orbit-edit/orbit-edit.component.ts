@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
@@ -180,6 +180,12 @@ export class OrbitEditComponent implements OnInit {
             this.orbitService.changeEllipseRotation(this.satellite.orbit);
         }
     }
+
+    // changeColorSatellite() {
+    //     if (this.satellite.orbit) {
+    //         this.orbitService.changeColorSatellite(this.satellite.colorOfBase);
+    //     }
+    // }
 
     dateChanged(date: string): Date {
         return new Date(date);

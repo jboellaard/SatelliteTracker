@@ -46,14 +46,24 @@ export interface IOrbit {
     updatedAt?: Date;
 }
 
+/**
+ * @returns Gravitational constant in m^3 kg^-1 s^-2
+ * */
 export function getG() {
     return 6.6743 * Math.pow(10, -11);
 }
 
+/**
+ * @returns Mass of the earth in kg
+ */
 export function getMassEarth() {
     return 5.9722 * Math.pow(10, 24);
 }
 
+/**
+ * @param a - semi-major axis in meters
+ * @returns Period in seconds
+ * */
 export function getPeriod(a: number) {
     return 2 * Math.PI * Math.sqrt(Math.pow(a, 3) / (getG() * getMassEarth()));
 }

@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { ICustomSatellitePart, Id, ISatellite, IUser, Shape, UserIdentity } from 'shared/domain';
+import { ICustomSatellitePart, Id, ISatellite, IUser, UserIdentity } from 'shared/domain';
 import { AuthService } from '../../../auth/auth.service';
 import { ProfileService } from '../../../profile/profile.service';
 import { RelationsService } from '../../../profile/relations.service';
@@ -61,9 +61,9 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
         this.trackingSub = this.relationsService.tracking$.subscribe((tracking) => {
             this.tracking = tracking;
         });
-        this.followingSub = this.relationsService.following$.subscribe((following) => {
-            this.following = following;
-        });
+        // this.followingSub = this.relationsService.following$.subscribe((following) => {
+        //     this.following = following;
+        // });
 
         this.route.paramMap.subscribe((params) => {
             this.satellite = undefined;
@@ -78,23 +78,18 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
     }
 
     private getSatellite(id: Id | null) {
-        this.satelliteSub = this.satelliteService.getById(id).subscribe({
-            next: (satellite) => {
-                if (satellite) {
-                    this.satellite = satellite;
-                    this.username = satellite.createdBy;
-                    if (this.username == this.loggedInUser?.username) this.canEdit = true;
-                    if (this.satellite.orbit) this.addOrbitScene();
-                    if (this.satellite.satelliteParts && this.satellite.satelliteParts.length > 0) {
-                        this.currentPart = this.satellite.satelliteParts[0];
-                    }
-                } else {
-                    this.router.navigate([`/profile/${this.username}/`]);
+        this.satelliteSub = this.satelliteService.getById(id).subscribe((satellite) => {
+            if (satellite) {
+                this.satellite = satellite;
+                this.username = satellite.createdBy;
+                if (this.username == this.loggedInUser?.username) this.canEdit = true;
+                if (this.satellite.orbit) this.addOrbitScene();
+                if (this.satellite.satelliteParts && this.satellite.satelliteParts.length > 0) {
+                    this.currentPart = this.satellite.satelliteParts[0];
                 }
-            },
-            error: (err) => {
+            } else {
                 this.router.navigate([`/profile/${this.username}/`]);
-            },
+            }
         });
     }
 
@@ -143,7 +138,7 @@ export class SatelliteDetailComponent implements OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe((ok) => {
             if (ok == 'ok') {
                 this.satelliteService.delete(this.satellite?.id).subscribe((result) => {
-                    if (result) {
+                    if (result as ISatellite) {
                         this.relationsService
                             .getTracking()
                             .subscribe((tracking) => this.relationsService.tracking$.next(tracking));

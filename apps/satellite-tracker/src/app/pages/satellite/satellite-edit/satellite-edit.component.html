@@ -156,7 +156,6 @@
                             class="form-control"
                             [(ngModel)]="satellite!.colorOfBase"
                             #colorB="ngModel"
-                            (ngModelChange)="changeColorSatellite()"
                             [ngClass]="{
                                 'is-invalid': colorB.invalid && colorB.touched
                             }"

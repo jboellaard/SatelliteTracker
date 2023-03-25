@@ -1,9 +1,9 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { AuthGuard } from './auth/auth.guard';
-import { AdminAuthGuard } from './auth/admin-auth.guard';
-import { OwnerAuthGuard } from './auth/owner-auth.guard';
+import { AuthGuard } from './auth/guards/auth.guard';
+import { AdminAuthGuard } from './auth/guards/admin-auth.guard';
+import { OwnerAuthGuard } from './auth/guards/owner-auth.guard';
 
 import { AboutComponent } from './pages/about/about.component';
 import { LoginComponent } from './auth/login/login.component';

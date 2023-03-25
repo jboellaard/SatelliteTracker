@@ -42,7 +42,7 @@ export class CustomSatellitePart {
 }
 export const CustomSatellitePartSchema = SchemaFactory.createForClass(CustomSatellitePart);
 
-@Schema({ _id: false, timestamps: true, toJSON: { virtuals: true } })
+@Schema({ _id: false, timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } })
 export class Orbit {
     @Prop({ required: true })
     semiMajorAxis!: number;
@@ -72,7 +72,7 @@ OrbitSchema.virtual('period').get(function () {
     return getPeriod(this.semiMajorAxis * 1000) / (24 * 60 * 60);
 });
 
-@Schema({ timestamps: true })
+@Schema({ timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } })
 export class Satellite {
     @Prop({ required: true, type: MongooseSchema.Types.ObjectId, ref: 'User' })
     createdBy?: string;
