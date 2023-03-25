@@ -22,7 +22,7 @@ jobs:
                   npm ci
             - name: Run unit tests
               run: |
-                  nx run satellite-tracker:test
+                  npx nx run satellite-tracker:test
             # - name: Run e2e tests
             #   run: |
             #     npm run test:e2e:workflow
