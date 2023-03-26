@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Id, ISatellite, IUser } from 'shared/domain';
 import { ProfileService } from '../../profile.service';
-import { RelationsService } from '../../relations.service';
+import { RelationsService } from '../../../auth/relations.service';
 
 @Component({
     selector: 'app-tab-tracking',
@@ -31,8 +31,14 @@ export class TabTrackingComponent {
 
         this.userSub = this.profileService.currentUser$.subscribe((user) => {
             this.user = user;
-            this.getSatellites();
+            if (user && this.profileService.tracking$.value == undefined)
+                this.profileService.getTracking(user.username).subscribe();
         });
+
+        this.satelliteSub = this.profileService.tracking$.subscribe((tracking) => {
+            if (tracking) this.satellites = tracking;
+        });
+
         this.editSub = this.profileService.canEdit$.subscribe((canEdit) => {
             this.canEdit = canEdit;
         });
@@ -44,24 +50,16 @@ export class TabTrackingComponent {
 
     track(satelliteId: Id) {
         this.waiting = true;
-        this.profileService.trackSatellite(satelliteId).subscribe(() => {
+        this.relationsService.trackSatellite(satelliteId).subscribe(() => {
             this.waiting = false;
         });
     }
 
     untrack(satelliteId: Id) {
         this.waiting = true;
-        this.profileService.untrackSatellite(satelliteId).subscribe(() => {
+        this.relationsService.untrackSatellite(satelliteId).subscribe(() => {
             this.waiting = false;
         });
-    }
-
-    private getSatellites() {
-        if (this.user?.username) {
-            this.satelliteSub = this.profileService.getTracking(this.user.username).subscribe((satellites) => {
-                if (satellites) this.satellites = satellites;
-            });
-        }
     }
 
     ngOnDestroy(): void {

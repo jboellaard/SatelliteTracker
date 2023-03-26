@@ -1,8 +1,8 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, Observable, of, switchMap, tap } from 'rxjs';
-import { UserCredentials, UserIdentity, UserRegistration } from 'shared/domain';
+import { UserCredentials, UserIdentity, UserRegistration, Token } from 'shared/domain';
 import { environment } from 'apps/satellite-tracker/src/environments/environment';
 import { SnackBarService } from '../utils/snack-bar.service';
 
@@ -52,7 +52,7 @@ export class AuthService {
     login(credentials: UserCredentials) {
         return this.http.post<any>(`${environment.API_URL}login`, { ...credentials }, { headers: this.headers }).pipe(
             switchMap((res) => {
-                if (res.result.accessToken) {
+                if (res.result as Token) {
                     localStorage.setItem('access_token', res.result.accessToken);
                     localStorage.setItem('refresh_token', res.result.refreshToken);
                     this.saveUserToLocalStorage(res.result.user);
@@ -60,17 +60,16 @@ export class AuthService {
                     const expiresAt = this.getExpirationDate(res.result.refreshTokenExpiresIn);
                     localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
                     return of(res.result.user);
-                } else {
-                    if (res.status == 401)
-                        return of(
-                            "Invalid username or password, please try again or register if you don't have an account yet."
-                        );
-                    return of(res.message);
                 }
+                this.snackBar.error('Something went wrong, please try again later.');
+                return of(undefined);
             }),
-            catchError((err) => {
-                console.log('Error logging in:', err);
-                return of('Something went wrong, please try again later.');
+            catchError((error) => {
+                if (error.status == 401)
+                    return of(
+                        "Invalid username or password, please try again or register if you don't have an account yet."
+                    );
+                return this.handleError(error);
             })
         );
     }
@@ -80,16 +79,15 @@ export class AuthService {
             switchMap((res) => {
                 if (res.status === 201) {
                     return this.login({ username: user.username, password: user.password });
-                } else {
-                    if (res.message) this.snackBar.error(res.message);
-                    else this.snackBar.error('Registration failed');
-                    return of(undefined);
                 }
+                this.snackBar.error('Something went wrong, please try again later.');
+                return of(undefined);
             }),
             catchError((err) => {
-                console.log('Registration error', err);
-                this.snackBar.error('Registration failed');
-                return of(undefined);
+                if (err.status == 400 && err.error.message.includes('already exists')) {
+                    return of('This username is already taken, please choose a different username.');
+                }
+                return this.handleError(err);
             })
         );
     }
@@ -139,22 +137,33 @@ export class AuthService {
                 headers: { authorization: `Bearer ${refreshToken}` },
             })
             .pipe(
-                tap((res) => {
-                    if (res.result.accessToken) {
-                        localStorage.setItem('access_token', res.result.accessToken);
-                        localStorage.setItem('refresh_token', res.result.refreshToken);
-                        this.user$.next(res.result.user);
-                        const expiresAt = this.getExpirationDate(res.result.refreshTokenExpiresIn);
+                switchMap((response) => {
+                    if (response.result.accessToken) {
+                        localStorage.setItem('access_token', response.result.accessToken);
+                        localStorage.setItem('refresh_token', response.result.refreshToken);
+                        this.user$.next(response.result.user);
+                        const expiresAt = this.getExpirationDate(response.result.refreshTokenExpiresIn);
                         localStorage.setItem('expires_at', JSON.stringify(expiresAt.valueOf()));
-                        return of(res);
+                        return of(response);
                     }
                     this.snackBar.error('Something went wrong, please try again later');
                     return of(undefined);
-                }),
-                catchError((err) => {
-                    console.log('Refresh token error', err);
-                    return of(undefined);
                 })
             );
+    }
+
+    private handleError(error: HttpErrorResponse): Observable<any> {
+        let res = {
+            status: error.status,
+            message: 'Something went wrong, please try again later',
+        };
+        if (error.status === 400) res.message = 'This request is invalid';
+        else if (error.status === 403) res.message = `You are not authorized to perform this action`;
+        else if (error.status === 404) res.message = `Could not find this entity`;
+        if (error.status != 500 && error.status != 0) this.snackBar.error(res.message);
+
+        return new Observable((observer) => {
+            observer.error(res);
+        });
     }
 }

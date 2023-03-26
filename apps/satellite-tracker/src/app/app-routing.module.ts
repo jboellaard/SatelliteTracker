@@ -31,6 +31,7 @@ import { SatelliteTrackersComponent } from './pages/satellite/satellite-detail/s
 import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.component';
 
 import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
+import { SatelliteInfoComponent } from './pages/satellite/satellite-detail/satellite-info/satellite-info.component';
 
 const routes: Routes = [
     { path: 'home', pathMatch: 'full', redirectTo: 'feed' },
@@ -67,13 +68,12 @@ const routes: Routes = [
     },
     {
         path: 'users/:username/satellites/:satelliteId',
-        pathMatch: 'full',
         component: SatelliteDetailComponent,
-    },
-    {
-        path: 'users/:username/satellites/:satelliteId/trackers',
-        pathMatch: 'full',
-        component: SatelliteTrackersComponent,
+        children: [
+            { path: '', pathMatch: 'full', redirectTo: 'info' },
+            { path: 'info', pathMatch: 'full', component: SatelliteInfoComponent },
+            { path: 'trackers', pathMatch: 'full', component: SatelliteTrackersComponent },
+        ],
     },
     {
         path: 'users/:username/satellites/:satelliteId/edit',

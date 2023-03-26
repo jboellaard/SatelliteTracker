@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subscription } from 'rxjs';
-import { IUser, Id, UserIdentity } from 'shared/domain';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { IUser, Id, UserIdentity, ISatellite } from 'shared/domain';
 import { AuthService } from '../auth/auth.service';
 import { UserService } from '../pages/user/user.service';
 import { SnackBarService } from '../utils/snack-bar.service';
 import { ProfileService } from './profile.service';
-import { RelationsService } from './relations.service';
+import { RelationsService } from '../auth/relations.service';
 
 @Component({
     selector: 'app-profile',
@@ -57,6 +57,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
         });
         this.route.paramMap.subscribe((params) => {
             this.user = undefined;
+            this.profileService.created$.next(undefined);
+            this.profileService.tracking$.next(undefined);
+            this.profileService.following$.next(undefined);
+            this.profileService.followers$.next(undefined);
             this.username = params.get('username');
 
             if (this.username) {
@@ -101,7 +105,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     followUser() {
         if (this.user) {
             this.waiting = true;
-            this.profileService.followUser(this.user.username).subscribe((user) => {
+            this.relationsService.followUser(this.user.username).subscribe((user) => {
                 this.waiting = false;
             });
         }
@@ -110,13 +114,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
     unfollowUser() {
         if (this.user) {
             this.waiting = true;
-            this.profileService.unfollowUser(this.user.username).subscribe((user) => {
+            this.relationsService.unfollowUser(this.user.username).subscribe((user) => {
                 this.waiting = false;
             });
         }
     }
 
     ngOnDestroy(): void {
+        this.profileService.created$.next(undefined);
+        this.profileService.tracking$.next(undefined);
+        this.profileService.following$.next(undefined);
+        this.profileService.followers$.next(undefined);
         if (this.userSub) this.userSub.unsubscribe();
         if (this.followingSub) this.followingSub.unsubscribe();
     }

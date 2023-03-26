@@ -3,6 +3,7 @@ import { Observable, Subject } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { map, catchError, tap } from 'rxjs/operators';
 import { APIResponse, Id } from 'shared/domain';
+import { SnackBarServiceGeneric } from 'ui/utils';
 
 const httpOptions = {
     observe: 'body',
@@ -11,7 +12,12 @@ const httpOptions = {
 
 // Generic service for all entities
 export class EntityService<T extends IEntity> {
-    constructor(protected readonly http: HttpClient, public readonly url: string, public readonly endpoint: string) {}
+    constructor(
+        protected readonly http: HttpClient,
+        public readonly url: string,
+        public readonly endpoint: string,
+        public snackBar: SnackBarServiceGeneric
+    ) {}
 
     protected _refreshRequired = new Subject<void>();
 
@@ -24,7 +30,7 @@ export class EntityService<T extends IEntity> {
             .get<APIResponse<T[] | undefined>>(`${this.url}${this.endpoint}`, { ...options, ...httpOptions })
             .pipe(
                 map((response: any) => response.result),
-                catchError(this.handleError)
+                catchError((error) => this.handleError(error))
             );
     }
 
@@ -33,7 +39,7 @@ export class EntityService<T extends IEntity> {
             .get<APIResponse<T | undefined>>(`${this.url}${this.endpoint}/${id}`, { ...options, ...httpOptions })
             .pipe(
                 map((response: any) => response.result),
-                catchError(this.handleError)
+                catchError((error) => this.handleError(error))
             );
     }
 
@@ -45,7 +51,7 @@ export class EntityService<T extends IEntity> {
                     this._refreshRequired.next();
                 }),
                 map((response: any) => response.result),
-                catchError(this.handleError)
+                catchError((error) => this.handleError(error))
             );
     }
 
@@ -60,7 +66,7 @@ export class EntityService<T extends IEntity> {
                     this._refreshRequired.next();
                 }),
                 map((response: any) => response.result),
-                catchError(this.handleError)
+                catchError((error) => this.handleError(error))
             );
     }
 
@@ -72,19 +78,29 @@ export class EntityService<T extends IEntity> {
                     this._refreshRequired.next();
                 }),
                 map((response: any) => response.result),
-                catchError(this.handleError)
+                catchError((error) => this.handleError(error))
             );
     }
 
-    public handleError(error: HttpErrorResponse): Observable<any> {
+    protected handleError(error: HttpErrorResponse): Observable<any> {
         console.log(error);
 
-        const errorResponse = {
-            type: 'error',
-            message: error,
+        let res = {
+            status: error.status,
+            message: 'Something went wrong, please try again later',
         };
+        if (error.status === 400) {
+            if (error.error.message && error.error.message.includes('duplicate')) {
+                res.message = 'This entity already exists';
+            } else res.message = 'The request was invalid';
+        } else if (error.status === 403) res.message = `You are not authorized to edit this entity`;
+        else if (error.status === 404) res.message = `Could not find this entity`;
+        else if (error.status === 500) res.message = 'Something went wrong, please try again later';
+        else if (error.status === 0) res.message = 'The server is not responding, please try again later';
+        this.snackBar.error(res.message);
+
         return new Observable((observer) => {
-            observer.error(errorResponse);
+            observer.error(res);
         });
     }
 }

@@ -1,70 +1,60 @@
 {
-  "name": "satellite-tracker-api",
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/satellite-tracker-api/src",
-  "projectType": "application",
-  "targets": {
-    "build": {
-      "executor": "@nrwl/webpack:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
-      "options": {
-        "target": "node",
-        "compiler": "tsc",
-        "outputPath": "dist/apps/satellite-tracker-api",
-        "main": "apps/satellite-tracker-api/src/main.ts",
-        "tsConfig": "apps/satellite-tracker-api/tsconfig.app.json",
-        "assets": [
-          "apps/satellite-tracker-api/src/assets"
-        ]
-      },
-      "configurations": {
-        "production": {
-          "optimization": true,
-          "extractLicenses": true,
-          "inspect": false,
-          "fileReplacements": [
-            {
-              "replace": "apps/satellite-tracker-api/src/environments/environment.ts",
-              "with": "apps/satellite-tracker-api/src/environments/environment.prod.ts"
+    "name": "satellite-tracker-api",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "apps/satellite-tracker-api/src",
+    "projectType": "application",
+    "targets": {
+        "build": {
+            "executor": "@nrwl/webpack:webpack",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "target": "node",
+                "compiler": "tsc",
+                "outputPath": "dist/apps/satellite-tracker-api",
+                "main": "apps/satellite-tracker-api/src/main.ts",
+                "tsConfig": "apps/satellite-tracker-api/tsconfig.app.json",
+                "assets": ["apps/satellite-tracker-api/src/assets"]
+            },
+            "configurations": {
+                "production": {
+                    "optimization": true,
+                    "extractLicenses": true,
+                    "inspect": false,
+                    "fileReplacements": [
+                        {
+                            "replace": "apps/satellite-tracker-api/src/environments/environment.ts",
+                            "with": "apps/satellite-tracker-api/src/environments/environment.prod.ts"
+                        }
+                    ]
+                }
             }
-          ]
+        },
+        "serve": {
+            "executor": "@nrwl/js:node",
+            "options": {
+                "buildTarget": "satellite-tracker-api:build"
+            },
+            "configurations": {
+                "production": {
+                    "buildTarget": "satellite-tracker-api:build:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nrwl/linter:eslint",
+            "outputs": ["{options.outputFile}"],
+            "options": {
+                "lintFilePatterns": ["apps/satellite-tracker-api/**/*.ts"]
+            }
+        },
+        "test": {
+            "executor": "@nrwl/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+            "options": {
+                "jestConfig": "apps/satellite-tracker-api/jest.config.ts",
+                "passWithNoTests": true
+            }
         }
-      }
     },
-    "serve": {
-      "executor": "@nrwl/js:node",
-      "options": {
-        "buildTarget": "satellite-tracker-api:build"
-      },
-      "configurations": {
-        "production": {
-          "buildTarget": "satellite-tracker-api:build:production"
-        }
-      }
-    },
-    "lint": {
-      "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
-      "options": {
-        "lintFilePatterns": [
-          "apps/satellite-tracker-api/**/*.ts"
-        ]
-      }
-    },
-    "test": {
-      "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/{projectRoot}"
-      ],
-      "options": {
-        "jestConfig": "apps/satellite-tracker-api/jest.config.ts",
-        "passWithNoTests": true
-      }
-    }
-  },
-  "tags": []
+    "tags": []
 }

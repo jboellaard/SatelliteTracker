@@ -97,14 +97,14 @@ export class SatelliteController {
 
     @UseGuards(AccessJwtAuthGuard)
     @Post(':id/track')
-    async trackSatellite(@Request() req: any, @Param('id') id: string): Promise<APIResult<{ message: string }>> {
+    async trackSatellite(@Request() req: any, @Param('id') id: string): Promise<APIResult<ISatellite[]>> {
         this.logger.log('POST satellites/:id/track called');
         return await this.satelliteService.trackSatellite(req.user.username, id);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Delete(':id/track')
-    async untrackSatellite(@Request() req: any, @Param('id') id: string): Promise<APIResult<{ message: string }>> {
+    async untrackSatellite(@Request() req: any, @Param('id') id: string): Promise<APIResult<ISatellite[]>> {
         this.logger.log('DELETE satellites/:id/track called');
         return await this.satelliteService.untrackSatellite(req.user.username, id);
     }

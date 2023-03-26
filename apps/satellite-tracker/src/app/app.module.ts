@@ -64,6 +64,7 @@ import { RecentComponent } from './pages/dashboard/discover/recent/recent.compon
 import { BreadcrumbsComponent } from './profile/breadcrumbs/breadcrumbs.component';
 import { EditProfileComponent } from './profile/edit-profile/edit-profile.component';
 import { SatelliteTrackersComponent } from './pages/satellite/satellite-detail/satellite-trackers/satellite-trackers.component';
+import { SatelliteInfoComponent } from './pages/satellite/satellite-detail/satellite-info/satellite-info.component';
 
 const materialModules = [
     MatToolbarModule,
@@ -124,6 +125,7 @@ const materialModules = [
         BreadcrumbsComponent,
         EditProfileComponent,
         SatelliteTrackersComponent,
+        SatelliteInfoComponent,
     ],
     imports: [
         BrowserModule,

@@ -3,7 +3,7 @@ import { Subscription } from 'rxjs';
 import { IUser, IUserInfo, UserIdentity } from 'shared/domain';
 import { AuthService } from '../../../auth/auth.service';
 import { ProfileService } from '../../profile.service';
-import { RelationsService } from '../../relations.service';
+import { RelationsService } from '../../../auth/relations.service';
 
 @Component({
     selector: 'app-tab-following',
@@ -42,8 +42,14 @@ export class TabFollowingComponent {
 
         this.userSub = this.profileService.currentUser$.subscribe((user) => {
             this.user = user;
-            this.getFollowing();
+            if (user && this.profileService.following$.value == undefined)
+                this.profileService.getFollowing(user.username).subscribe();
         });
+
+        this.userFollowingSub = this.profileService.following$.subscribe((following) => {
+            if (following) this.users = following;
+        });
+
         this.editSub = this.profileService.canEdit$.subscribe((canEdit) => {
             this.canEdit = canEdit;
         });
@@ -55,24 +61,16 @@ export class TabFollowingComponent {
 
     follow(username: string) {
         this.waiting = true;
-        this.profileService.followUser(username).subscribe(() => {
+        this.relationsService.followUser(username).subscribe(() => {
             this.waiting = false;
         });
     }
 
     unfollow(username: string) {
         this.waiting = true;
-        this.profileService.unfollowUser(username).subscribe(() => {
+        this.relationsService.unfollowUser(username).subscribe(() => {
             this.waiting = false;
         });
-    }
-
-    private getFollowing() {
-        if (this.user?.username) {
-            this.userFollowingSub = this.profileService.getFollowing(this.user.username).subscribe((users) => {
-                if (users) this.users = users;
-            });
-        }
     }
 
     ngOnDestroy(): void {

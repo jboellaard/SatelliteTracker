@@ -40,7 +40,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
     private getMySatellites(): void {
         if (this.user?.username) {
-            this.satellitesSub = this.profileService.getMySatellites(this.user?.username).subscribe((satellites) => {
+            this.satellitesSub = this.profileService.getCreated(this.user?.username).subscribe((satellites) => {
                 this.satellites = satellites;
             });
         }

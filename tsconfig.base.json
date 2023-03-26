@@ -16,7 +16,8 @@
         "baseUrl": ".",
         "paths": {
             "shared/domain": ["libs/shared/domain/src/index.ts"],
-            "ui/entity": ["libs/ui/entity/src/index.ts"]
+            "ui/entity": ["libs/ui/entity/src/index.ts"],
+            "ui/utils": ["libs/ui/utils/src/index.ts"]
         }
     },
     "exclude": ["node_modules", "tmp"]

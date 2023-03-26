@@ -6,7 +6,7 @@ import { SatelliteService } from '../../../pages/satellite/satellite.service';
 import { DeleteDialogComponent } from '../../../utils/delete-dialog/delete-dialog.component';
 import { SnackBarService } from '../../../utils/snack-bar.service';
 import { ProfileService } from '../../profile.service';
-import { RelationsService } from '../../relations.service';
+import { RelationsService } from '../../../auth/relations.service';
 
 @Component({
     selector: 'app-tab-created',
@@ -40,15 +40,20 @@ export class TabCreatedComponent implements OnInit {
         });
 
         this.userSub = this.profileService.currentUser$.subscribe((user) => {
-            this.satellites = undefined;
             this.user = user;
-            this.getSatellites();
+            if (user && this.profileService.created$.value == undefined)
+                this.profileService.getCreated(user.username).subscribe();
         });
+
+        this.satelliteSub = this.profileService.created$.subscribe((created) => {
+            if (created) this.satellites = created;
+        });
+
         this.editSub = this.profileService.canEdit$.subscribe((canEdit) => {
             this.canEdit = canEdit;
-            if (canEdit) {
+            if (canEdit && this.user) {
                 this.satelliteService.getRefreshRequired().subscribe(() => {
-                    this.getSatellites();
+                    this.profileService.getCreated(this.user!.username).subscribe();
                 });
             }
         });
@@ -58,26 +63,16 @@ export class TabCreatedComponent implements OnInit {
         return this.tracking?.some((sat) => sat.id === satelliteId);
     }
 
-    private getSatellites() {
-        if (this.user?.username) {
-            this.satelliteSub = this.satelliteService
-                .getSatellitesOfUserWithUsername(this.user.username)
-                .subscribe((satellites) => {
-                    if (satellites) this.satellites = satellites;
-                });
-        }
-    }
-
     track(satelliteId: Id) {
         this.waiting = true;
-        this.profileService.trackSatellite(satelliteId).subscribe(() => {
+        this.relationsService.trackSatellite(satelliteId).subscribe(() => {
             this.waiting = false;
         });
     }
 
     untrack(satelliteId: Id) {
         this.waiting = true;
-        this.profileService.untrackSatellite(satelliteId).subscribe(() => {
+        this.relationsService.untrackSatellite(satelliteId).subscribe(() => {
             this.waiting = false;
         });
     }

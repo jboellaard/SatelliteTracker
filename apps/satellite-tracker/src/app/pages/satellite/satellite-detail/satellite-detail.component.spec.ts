@@ -1,27 +1,18 @@
-import { CdkDropList } from '@angular/cdk/drag-drop';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormsModule } from '@angular/forms';
-import { MatOptionModule } from '@angular/material/core';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { convertToParamMap, ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
-import { IOrbit, ISatellite, Shape } from 'shared/domain';
+import { ISatellite, Shape } from 'shared/domain';
 import { AuthService } from '../../../auth/auth.service';
 import { ProfileService } from '../../../profile/profile.service';
-import { RelationsService } from '../../../profile/relations.service';
+import { RelationsService } from '../../../auth/relations.service';
 import { SnackBarService } from '../../../utils/snack-bar.service';
-import { OrbitService } from '../orbit-scene.service';
 import { SatelliteService } from '../satellite.service';
-
 import { SatelliteDetailComponent } from './satellite-detail.component';
 
 describe('SatelliteDetailComponent', () => {
@@ -31,7 +22,6 @@ describe('SatelliteDetailComponent', () => {
     let mockActivatedRoute: any;
     let mockRouter: any;
     let mockSatelliteService: any;
-    let mockOrbitService: any;
     let mockRelationsService: any;
     let mockProfileService: any;
     let mockAuthService: any;
@@ -99,21 +89,15 @@ describe('SatelliteDetailComponent', () => {
         mockSatelliteService = {
             delete: jest.fn(() => of(satellite)),
             getById: jest.fn(() => of(satellite)),
-            deleteOrbit: jest.fn(() => of(satellite)),
-        };
-
-        mockOrbitService = {
-            guideLines: true,
-            showOrbit: true,
-            realColor: true,
-            realSize: true,
-            zoom: 1,
-            createOrbitScene: jest.fn(),
-            toggleGuideLines: jest.fn(),
-            toggleOrbit: jest.fn(),
-            toggleSize: jest.fn(),
-            toggleColor: jest.fn(),
-            changeZoom: jest.fn(),
+            currentSatellite$: {
+                next: jest.fn(),
+            },
+            canEdit$: {
+                next: jest.fn(),
+            },
+            trackersOfCurrentSatellite$: {
+                next: jest.fn(),
+            },
         };
 
         mockRelationsService = {
@@ -144,19 +128,15 @@ describe('SatelliteDetailComponent', () => {
         await TestBed.configureTestingModule({
             imports: [
                 BrowserAnimationsModule,
-                FormsModule,
                 MatDividerModule,
                 MatDialogModule,
                 MatSnackBarModule,
                 MatTooltipModule,
                 MatIconModule,
-                MatTableModule,
-                MatOptionModule,
             ],
             declarations: [SatelliteDetailComponent],
             providers: [
                 { provide: SatelliteService, useValue: mockSatelliteService },
-                { provide: OrbitService, useValue: mockOrbitService },
                 { provide: RelationsService, useValue: mockRelationsService },
                 { provide: AuthService, useValue: mockAuthService },
                 { provide: ProfileService, useValue: mockProfileService },
@@ -169,8 +149,6 @@ describe('SatelliteDetailComponent', () => {
 
         fixture = TestBed.createComponent(SatelliteDetailComponent);
         comp = fixture.componentInstance;
-        SatelliteDetailComponent.prototype.addOrbitScene = jest.fn();
-        // fixture.detectChanges();
     });
 
     it('should create', () => {
@@ -207,23 +185,14 @@ describe('SatelliteDetailComponent', () => {
     it('should not enable editing if the user is not the owner of the satellite', () => {
         comp.ngOnInit();
         expect(comp.canEdit).toEqual(false);
+        expect(mockSatelliteService.canEdit$.next).toHaveBeenCalledWith(false);
     });
 
     it('should enable editing if the user is the owner of the satellite', () => {
         mockAuthService.user$ = of({ id: creator.id, username: creator.username });
         comp.ngOnInit();
         expect(comp.canEdit).toEqual(true);
-    });
-
-    it('should call addOrbitScene if the satellite has an orbit', () => {
-        comp.ngOnInit();
-        expect(SatelliteDetailComponent.prototype.addOrbitScene).toHaveBeenCalled();
-    });
-
-    it('should not call addOrbitScene if the satellite does not have an orbit', () => {
-        mockSatelliteService.getById = jest.fn(() => of({ ...satellite, orbit: undefined }));
-        comp.ngOnInit();
-        expect(SatelliteDetailComponent.prototype.addOrbitScene).not.toHaveBeenCalled();
+        expect(mockSatelliteService.canEdit$.next).toHaveBeenCalledWith(true);
     });
 
     it('should track the satellite', () => {
@@ -268,36 +237,6 @@ describe('SatelliteDetailComponent', () => {
         comp.removeSatellite();
         expect(mockDialog.open).toHaveBeenCalled();
         expect(mockSatelliteService.delete).toHaveBeenCalledWith(satellite.id);
-        expect(mockSnackBarService.error).toHaveBeenCalled();
-    });
-
-    it('should delete the orbit', () => {
-        comp.ngOnInit();
-        comp.removeOrbit();
-        expect(mockDialog.open).toHaveBeenCalled();
-        expect(mockSatelliteService.deleteOrbit).toHaveBeenCalledWith(satellite.id);
-        expect(mockSnackBarService.success).toHaveBeenCalled();
-        expect(mockRouter.navigate).not.toHaveBeenCalled();
-    });
-
-    it('should not delete the orbit if the user cancels the dialog', () => {
-        mockDialog.open = jest.fn(() => ({
-            afterClosed: jest.fn(() => of('')),
-        }));
-
-        comp.ngOnInit();
-        comp.removeOrbit();
-        expect(mockDialog.open).toHaveBeenCalled();
-        expect(mockSatelliteService.deleteOrbit).not.toHaveBeenCalled();
-        expect(mockSnackBarService.success).not.toHaveBeenCalled();
-    });
-
-    it('should give an error if the orbit could not be deleted', () => {
-        mockSatelliteService.deleteOrbit = jest.fn(() => of(undefined));
-        comp.ngOnInit();
-        comp.removeOrbit();
-        expect(mockDialog.open).toHaveBeenCalled();
-        expect(mockSatelliteService.deleteOrbit).toHaveBeenCalledWith(satellite.id);
         expect(mockSnackBarService.error).toHaveBeenCalled();
     });
 });

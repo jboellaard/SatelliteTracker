@@ -32,33 +32,28 @@ export class AuthInterceptor implements HttpInterceptor {
                 ) {
                     return this.handle401Error(authReq, next);
                 }
-                if ((error instanceof HttpErrorResponse && error.status === 0) || error.status === 500) {
-                    this.snackBar.error('Server error. Please try again later.');
-                    return throwError(() => new Error(error.error.message));
+                if (error instanceof HttpErrorResponse && error.status === 500) {
+                    this.snackBar.error('Something went wrong, please try again later');
                 }
-                if (error instanceof HttpErrorResponse && error.status === 404) {
-                    this.snackBar.error('Resource not found.');
-                    return throwError(() => new Error(error.error.message));
+                if (error instanceof HttpErrorResponse && error.status === 0) {
+                    this.snackBar.error('The server is not responding, please try again later');
                 }
-                return next.handle(authReq);
+                return throwError(() => error);
             })
         );
     }
 
     private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return this.authService.refreshToken().pipe(
-            switchMap((res) => {
-                if (res) {
-                    if (res.result.accessToken) {
+            switchMap((response) => {
+                if (response) {
+                    if (response.result.accessToken) {
                         return next.handle(
-                            request.clone({ setHeaders: { Authorization: `Bearer ${res.result.accessToken}` } })
+                            request.clone({ setHeaders: { Authorization: `Bearer ${response.result.accessToken}` } })
                         );
-                    } else {
-                        return throwError(() => new Error('Could not refresh token'));
                     }
-                } else {
-                    return throwError(() => new Error('Could not refresh token'));
                 }
+                return throwError(() => new Error('Could not refresh token'));
             })
         );
     }

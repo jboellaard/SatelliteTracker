@@ -47,10 +47,7 @@ $SatelliteTracker-dark-theme: mat.define-dark-theme(
 
 .darkMode {
     @include mat.all-component-colors($SatelliteTracker-dark-theme);
-    // @include mat.all-component-colors(modify-background($SatelliteTracker-dark-theme, #010409));
 }
-
-/* You can add global styles to this file, and also import other style files */
 
 html,
 body {
@@ -63,7 +60,6 @@ body {
 
 table {
     margin-bottom: 20px;
-    // width: 100%;
 }
 
 .component-container {
@@ -178,10 +174,6 @@ app-root {
 .mdc-list-item--with-leading-icon.mdc-list-item--with-two-lines .mdc-list-item__primary-text::before {
     height: 26px !important;
 }
-
-// div.mat-mdc-dialog-surface.mdc-dialog__surface {
-//     background: #313131;
-// }
 
 .mat-mdc-table#parts-table {
     width: 100%;

@@ -1,9 +1,9 @@
 <div class="edit-container">
     <div *ngIf="componentExists && satellite">
-        <h1>Editing '{{ satellite.satelliteName }}' created by {{ username }}</h1>
+        <h1>Editing '{{ satellite.satelliteName }}'</h1>
     </div>
     <div *ngIf="!componentExists">
-        <h1>Creating new satellite for {{ username }}</h1>
+        <h1>Create a new satellite</h1>
     </div>
     <mat-divider style="margin-top: -10px; margin-bottom: 10px"></mat-divider>
 
@@ -24,13 +24,17 @@
                         #name="ngModel"
                         minlength="1"
                         required
+                        pattern="^(?!\s*$).+"
                         [ngClass]="{
                             'is-invalid': name.invalid && name.touched
                         }"
                     />
                     <mat-error *ngIf="name.invalid && name.touched" class="invalid-feedback">
-                        <mat-error *ngIf="name.errors!['required']">Name is required</mat-error>
-                        <mat-error *ngIf="name.errors!['minlength']">Name must be at least 1 character long.</mat-error>
+                        <ng-container *ngIf="name.errors!['required']">Name is required</ng-container>
+                        <ng-container *ngIf="name.errors!['minlength']"
+                            >Name must be at least 1 character long.</ng-container
+                        >
+                        <ng-container *ngIf="name.errors!['pattern']">Name cannot contain only whitespace</ng-container>
                     </mat-error>
                 </mat-form-field>
 
@@ -104,17 +108,11 @@
                                 'is-invalid': sizeOfBase.invalid && sizeOfBase.touched
                             }"
                         />
-                        <mat-error *ngIf="sizeOfBase.invalid && sizeOfBase.touched && sizeOfBase.errors!['required']"
-                            >Size of base is required</mat-error
-                        >
-                        <mat-error
-                            *ngIf="
-                                sizeOfBase.invalid &&
-                                sizeOfBase.touched &&
-                                !sizeOfBase.errors!['required'] &&
-                                sizeOfBase.errors!['min']
-                            "
-                            >Size of base must be at least 2 m.
+                        <mat-error *ngIf="sizeOfBase.invalid && sizeOfBase.touched" class="invalid-feedback">
+                            <ng-container *ngIf="sizeOfBase.errors!['required']">Size of base is required</ng-container>
+                            <ng-container *ngIf="sizeOfBase.errors!['min']"
+                                >Size of base must be at least 2 meters</ng-container
+                            >
                         </mat-error>
                     </mat-form-field>
                 </div>
@@ -136,13 +134,10 @@
                                 'is-invalid': mass.invalid && mass.touched
                             }"
                         />
-                        <mat-error *ngIf="mass.invalid && mass.touched && mass.errors!['required']"
-                            >Mass is required</mat-error
-                        >
-                        <mat-error
-                            *ngIf="mass.invalid && mass.touched && !mass.errors!['required'] && mass.errors!['min']"
-                            >Mass must be at least 1 kg.</mat-error
-                        >
+                        <mat-error *ngIf="mass.invalid && mass.touched" class="invalid-feedback">
+                            <ng-container *ngIf="mass.errors!['required']">Mass is required</ng-container>
+                            <ng-container *ngIf="mass.errors!['min']">Mass must be at least 1 kg</ng-container>
+                        </mat-error>
                     </mat-form-field>
 
                     <!-- colorOfBase -->

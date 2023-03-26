@@ -1,7 +1,5 @@
 .dialog-wrapper {
     display: flex;
-    // flex-direction: column;
-    // align-items: center;
     justify-content: space-between;
 }
 
@@ -19,7 +17,6 @@
 mat-expansion-panel {
     direction: ltr;
     border-bottom: 1px solid #969696;
-    // border-top: 1px solid #969696;
     background: #4a4a4a !important;
 }
 
@@ -30,14 +27,6 @@ mat-expansion-panel {
 mat-expansion-panel-header[aria-disabled='true'] {
     color: white !important;
 }
-
-// mat-expansion-panel {
-//     background: #363636 !important;
-// }
-
-// mat-expansion-panel[aria-disabled='true'] {
-//     background: #424242 !important;
-// }
 
 mat-icon {
     font-size: 14px;

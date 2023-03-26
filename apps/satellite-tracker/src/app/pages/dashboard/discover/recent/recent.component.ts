@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { AuthService } from 'apps/satellite-tracker/src/app/auth/auth.service';
 import { ProfileService } from 'apps/satellite-tracker/src/app/profile/profile.service';
-import { RelationsService } from 'apps/satellite-tracker/src/app/profile/relations.service';
+import { RelationsService } from 'apps/satellite-tracker/src/app/auth/relations.service';
 import { Subscription } from 'rxjs';
 import { ISatellite, UserIdentity, IUser, Id } from 'shared/domain';
 import { DashboardService } from '../../dashboard.service';
@@ -26,8 +26,7 @@ export class RecentComponent {
     constructor(
         private authService: AuthService,
         private relationsService: RelationsService,
-        private dashboardService: DashboardService,
-        private profileService: ProfileService
+        private dashboardService: DashboardService
     ) {}
 
     ngOnInit(): void {
@@ -50,14 +49,14 @@ export class RecentComponent {
 
     track(satelliteId: Id) {
         this.waiting = true;
-        this.profileService.trackSatellite(satelliteId).subscribe(() => {
+        this.relationsService.trackSatellite(satelliteId).subscribe(() => {
             this.waiting = false;
         });
     }
 
     untrack(satelliteId: Id) {
         this.waiting = true;
-        this.profileService.untrackSatellite(satelliteId).subscribe(() => {
+        this.relationsService.untrackSatellite(satelliteId).subscribe(() => {
             this.waiting = false;
         });
     }

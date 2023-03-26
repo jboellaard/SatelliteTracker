@@ -8,6 +8,7 @@ import mongoose, { Model } from 'mongoose';
 import { SatelliteNeoQueries } from './neo4j/satellite.cypher';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { OrbitDto, UpdateOrbitDto } from './dto/orbit.dto';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class SatelliteService {
@@ -19,7 +20,8 @@ export class SatelliteService {
         @InjectModel(SatellitePart.name, `${process.env.MONGO_DATABASE}`)
         private satellitePartModel: Model<SatellitePart>,
         @InjectConnection(`${process.env.MONGO_DATABASE}`) private connection: mongoose.Connection,
-        private readonly neo4jService: Neo4jService
+        private readonly neo4jService: Neo4jService,
+        private userService: UserService
     ) {}
 
     async create(username: string, newSatellite: SatelliteDto): Promise<APIResult<ISatellite>> {
@@ -426,7 +428,7 @@ export class SatelliteService {
         }
     }
 
-    async trackSatellite(username: string, id: Id): Promise<APIResult<{ message: string }>> {
+    async trackSatellite(username: string, id: Id): Promise<APIResult<ISatellite[]>> {
         const satellite = await this.satelliteModel.findById(id).populate('createdBy').exec();
         if (satellite) {
             const createdBy = eval(satellite.createdBy);
@@ -438,7 +440,7 @@ export class SatelliteService {
                 });
                 if (result.summary.counters.updates().relationshipsCreated == 0)
                     throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
-                return { status: HttpStatus.OK, result: { message: 'Satellite tracked.' } };
+                return this.userService.getUserTracking(username);
             } catch (error) {
                 if (error instanceof Error) throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
                 throw new HttpException('Could not track satellite', HttpStatus.INTERNAL_SERVER_ERROR);
@@ -448,7 +450,7 @@ export class SatelliteService {
         }
     }
 
-    async untrackSatellite(username: string, id: Id): Promise<APIResult<{ message: string }>> {
+    async untrackSatellite(username: string, id: Id): Promise<APIResult<ISatellite[]>> {
         const satellite = await this.satelliteModel.findById(id).populate('createdBy').exec();
         if (satellite) {
             const createdBy = eval(satellite.createdBy);
@@ -460,7 +462,7 @@ export class SatelliteService {
                 });
                 if (result.summary.counters.updates().relationshipsDeleted == 0)
                     throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
-                return { status: HttpStatus.OK, result: { message: 'No longer tracking satellite' } };
+                return this.userService.getUserTracking(username);
             } catch (error) {
                 if (error instanceof Error) throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR);
                 throw new HttpException('Could not track satellite', HttpStatus.INTERNAL_SERVER_ERROR);

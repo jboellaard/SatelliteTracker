@@ -10,7 +10,7 @@ import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { AddEditDialogComponent } from '../../../utils/add-edit-dialog/add-edit-dialog.component';
 import { MatTable } from '@angular/material/table';
 import { AddPartDialogComponent } from './add-part-dialog/add-part-dialog.component';
-import { RelationsService } from '../../../profile/relations.service';
+import { RelationsService } from '../../../auth/relations.service';
 
 @Component({
     selector: 'app-satellite-edit',
@@ -186,9 +186,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
             if (ok == 'ok') {
                 this.satelliteService.create(this.satellite).subscribe((satellite) => {
                     if (satellite) {
-                        this.relationsService
-                            .getTracking()
-                            .subscribe((tracking) => this.relationsService.tracking$.next(tracking));
+                        this.relationsService.getTracking().subscribe();
                         this.snackBar.success('Satellite created successfully');
                         this.router.navigate(['/users/' + this.username + '/satellites/' + satellite.id]);
                     } else {

@@ -1,7 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-import { AdminUserInfo, IUser, UserIdentity } from 'shared/domain';
+import { AdminUserInfo } from 'shared/domain';
 import { UserService } from '../user.service';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatDialog } from '@angular/material/dialog';

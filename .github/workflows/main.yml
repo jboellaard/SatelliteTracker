@@ -20,14 +20,14 @@ jobs:
             - name: Install npm dependencies
               run: |
                   npm ci
-            - name: Run unit tests
+            - name: Run satellite-tracker unit tests
               run: |
                   npx nx run satellite-tracker:test
-            # - name: Run e2e tests
-            #   run: |
-            #     npm run test:e2e:workflow
+            - name: Run satellite-tracker e2e tests
+              run: |
+                  npx nx run satellite-tracker-e2e:e2e
 
-            - name: 'Deploy to Angular application to Netlify'
+            - name: 'Deploy to satellite-tracker to Netlify'
               uses: jsmrcaga/action-netlify-deploy@v2.0.0
               with:
                   NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
@@ -39,7 +39,7 @@ jobs:
             - name: Install Railway
               run: npm i -g @railway/cli
 
-            - name: Deploy Nest application to Railway
+            - name: Deploy satellite-tracker-api to Railway
               run: railway up
               env:
                   RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

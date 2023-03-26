@@ -85,7 +85,7 @@ export class OrbitEditComponent implements OnInit {
                     }
                 });
             } else {
-                this.snackBar.error('Could not find a satellite with this id');
+                this.snackBar.error('Not a valid route');
                 this.router.navigate(['../'], { relativeTo: this.route });
             }
         });
@@ -181,11 +181,11 @@ export class OrbitEditComponent implements OnInit {
         }
     }
 
-    // changeColorSatellite() {
-    //     if (this.satellite.orbit) {
-    //         this.orbitService.changeColorSatellite(this.satellite.colorOfBase);
-    //     }
-    // }
+    changeColorSatellite() {
+        if (this.satellite.orbit) {
+            this.orbitService.changeColorSatellite(this.satellite.colorOfBase);
+        }
+    }
 
     dateChanged(date: string): Date {
         return new Date(date);

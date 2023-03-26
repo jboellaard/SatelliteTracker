@@ -1,7 +1,7 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IUser, UserRegistration } from 'shared/domain';
+import { UserRegistration } from 'shared/domain';
 import { SnackBarService } from '../../utils/snack-bar.service';
 import { AuthService } from '../auth.service';
 
@@ -23,7 +23,11 @@ export class RegisterComponent implements OnInit {
 
     ngOnInit(): void {
         this.registerForm = this.formBuilder.group({
-            username: new FormControl(null, [Validators.required, Validators.minLength(3)]),
+            username: new FormControl(null, [
+                Validators.required,
+                Validators.minLength(3),
+                Validators.pattern(/^[a-zA-Z0-9_]+$/),
+            ]),
             password: new FormControl(null, [Validators.required, Validators.minLength(3)]),
             emailAddress: new FormControl(null, [Validators.email]),
             latitude: new FormControl(null, [Validators.min(-90), Validators.max(90)]),

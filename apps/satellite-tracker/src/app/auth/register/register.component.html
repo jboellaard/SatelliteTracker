@@ -31,6 +31,13 @@
                         <ng-container *ngIf="registerForm.get('username')?.hasError('minlength')"
                             >Username must be at least 3 chars long.</ng-container
                         >
+                        <ng-container
+                            *ngIf="
+                                !registerForm.get('username')?.hasError('minlength') &&
+                                registerForm.get('username')?.hasError('pattern')
+                            "
+                            >Username can only have letters, numbers and underscores.</ng-container
+                        >
                     </mat-error>
                 </mat-form-field>
 

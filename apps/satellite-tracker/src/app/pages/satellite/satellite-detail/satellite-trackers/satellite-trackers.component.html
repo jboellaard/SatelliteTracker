@@ -1,80 +1,48 @@
-<div class="component-container" *ngIf="satellite; else loadingMessage">
-    <div *ngIf="waiting"><mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar></div>
-    <div class="header">
-        <h1 style="margin-bottom: 0">
-            {{ satellite.satelliteName }}
-        </h1>
-        <div class="buttons">
-            <button
-                (click)="getTrackers()"
-                mat-icon-button
-                color="accent"
-                style="width: 38px; height: 38px; padding: 7px; margin-left: 10px"
-            >
-                <mat-icon>radar</mat-icon>
-            </button>
-            <button *ngIf="isTracking()" mat-stroked-button (click)="untrack()">Untrack</button>
-            <button *ngIf="!isTracking()" mat-stroked-button (click)="track()">Track</button>
-            <button *ngIf="canEdit" mat-stroked-button color="primary" class="primary-button" routerLink="edit">
-                <mat-icon>edit</mat-icon><span class="button-text">Edit</span>
-            </button>
-            <button *ngIf="canEdit" mat-stroked-button color="warn" (click)="removeSatellite()">
-                <mat-icon>delete</mat-icon> <span class="button-text">Remove</span>
-            </button>
-        </div>
+<div
+    [ngStyle]="{ visibility: !satellite || !trackers || waiting ? 'visible' : 'hidden' }"
+    style="margin: -10px 0px 6px 0px"
+>
+    <mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar>
+</div>
+<div id="trackers-wrapper">
+    <div class="back-button">
+        <h2>
+            <a routerLink=".." #tooltip="matTooltip" matTooltip="Back to info"> <mat-icon>arrow_back</mat-icon> </a>
+            <span>Trackers</span>
+        </h2>
     </div>
-    <div class="text-muted">
-        <p style="width: 100%; display: flex; justify-content: space-between">
-            <span>{{ satellite.description }}</span>
-        </p>
-    </div>
-    <mat-divider style="margin: 10px 0px"></mat-divider>
-
-    <div id="trackers-wrapper">
-        <div class="back-button">
-            <h2>
-                <a routerLink=".."> <mat-icon>arrow_back</mat-icon> </a>
-                <span>Trackers</span>
-            </h2>
-        </div>
-        <div *ngIf="!waiting">
-            <div *ngIf="trackers!.length > 0; else none">
-                <div class="wrapper" *ngFor="let user of trackers">
-                    <div class="header">
-                        <a [routerLink]="'/profile/' + user.username"
-                            ><h3>
-                                <mat-icon>person</mat-icon><span>{{ user.username }}</span>
-                            </h3></a
+    <div *ngIf="satellite && trackers; else loadingMessage">
+        <div *ngIf="trackers!.length > 0; else none">
+            <div class="wrapper" *ngFor="let user of trackers">
+                <div class="header">
+                    <a [routerLink]="'/profile/' + user.username"
+                        ><h3>
+                            <mat-icon>person</mat-icon><span>{{ user.username }}</span>
+                        </h3></a
+                    >
+                    <div class="button-container">
+                        <button
+                            *ngIf="following && user.username != loggedInUser?.username && !isFollowing(user.username)"
+                            mat-stroked-button
+                            (click)="follow(user.username)"
                         >
-                        <div class="button-container">
-                            <button
-                                *ngIf="
-                                    following && user.username != loggedInUser?.username && !isFollowing(user.username)
-                                "
-                                mat-stroked-button
-                                (click)="follow(user.username)"
-                            >
-                                Follow
-                            </button>
-                            <button
-                                *ngIf="user.username != loggedInUser?.username && isFollowing(user.username)"
-                                mat-stroked-button
-                                (click)="unfollow(user.username)"
-                            >
-                                Unfollow
-                            </button>
-                        </div>
+                            Follow
+                        </button>
+                        <button
+                            *ngIf="user.username != loggedInUser?.username && isFollowing(user.username)"
+                            mat-stroked-button
+                            (click)="unfollow(user.username)"
+                        >
+                            Unfollow
+                        </button>
                     </div>
                 </div>
             </div>
-
-            <ng-template #none>
-                <p>No one is tracking this satellite yet.</p>
-            </ng-template>
         </div>
+
+        <ng-template #none>
+            <p>No one is tracking this satellite yet.</p>
+        </ng-template>
     </div>
 </div>
-<ng-template #loadingMessage>
-    <mat-progress-bar color="primary" mode="indeterminate"></mat-progress-bar>
-    <div style="padding: 20px">Retrieving satellite...</div></ng-template
->
+<ng-template #loadingMessage> <div style="padding: 20px">Getting trackers...</div></ng-template>

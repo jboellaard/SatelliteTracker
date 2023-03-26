@@ -17,7 +17,7 @@ import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { ISatellite, ISatellitePart, Shape } from 'shared/domain';
-import { RelationsService } from '../../../profile/relations.service';
+import { RelationsService } from '../../../auth/relations.service';
 import { SnackBarService } from '../../../utils/snack-bar.service';
 import { SatelliteService } from '../satellite.service';
 import { SatelliteEditComponent } from './satellite-edit.component';
@@ -139,7 +139,6 @@ describe('SatelliteEditComponent', () => {
 
         fixture = TestBed.createComponent(SatelliteEditComponent);
         comp = fixture.componentInstance;
-        // fixture.detectChanges();
     });
 
     afterEach(() => {
