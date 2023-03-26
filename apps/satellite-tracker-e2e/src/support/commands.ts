@@ -6,6 +6,7 @@
 // For more comprehensive examples of custom
 // commands please read more here:
 // https://on.cypress.io/custom-commands
+
 // ***********************************************
 const constants = require('../fixtures/constants.ts');
 
@@ -21,6 +22,9 @@ declare namespace Cypress {
         getAllSatelliteParts(): void;
         createSatellite(satellite: any): void;
         getSatelliteById(id: string): void;
+        getProfileOfUserWithUsername(username: string): void;
+        followUser(username: string): void;
+        unfollowUser(username: string): void;
     }
 }
 //
@@ -54,9 +58,9 @@ Cypress.Commands.add('login', (username, password) => {
             headers: { 'access-control-allow-origin': '*', 'Content-Type': 'application/json' },
         }
     ).as('login');
+    cy.getSatellites(username);
     cy.getFollowing(username);
     cy.getTracking(username);
-    cy.getSatellites(username);
     cy.getFollowingFeed(username);
 
     cy.visit('/login');
@@ -65,8 +69,6 @@ Cypress.Commands.add('login', (username, password) => {
     cy.wait('@login').then(() => {
         cy.wrap(localStorage.getItem('access_token')).should('eq', 'an_access_token');
     });
-    cy.wait('@getFollowing');
-    cy.wait('@getTracking');
     cy.wait('@getSatellites');
     cy.wait('@getFollowingFeed');
 
@@ -146,14 +148,7 @@ Cypress.Commands.add('getAllSatelliteParts', () => {
         {
             statusCode: 200,
             body: {
-                result: [
-                    {
-                        id: '1',
-                        partName: 'example name',
-                        description: 'example description',
-                        function: 'example function',
-                    },
-                ],
+                result: constants.satelliteParts,
             },
             headers: { 'access-control-allow-origin': '*', 'Content-Type': 'application/json' },
         }
@@ -161,6 +156,12 @@ Cypress.Commands.add('getAllSatelliteParts', () => {
 });
 
 Cypress.Commands.add('createSatellite', (satellite) => {
+    console.log(satellite);
+    if (satellite.satelliteName == constants.satellites[0].satelliteName) {
+        satellite = constants.satellites[0];
+    } else if (satellite.satelliteName == constants.satellites[1].satelliteName) {
+        satellite = constants.satellites[1];
+    }
     cy.intercept(
         {
             method: 'POST',
@@ -169,7 +170,7 @@ Cypress.Commands.add('createSatellite', (satellite) => {
         {
             statusCode: 200,
             body: {
-                result: constants.satellite,
+                result: satellite,
             },
             headers: { 'access-control-allow-origin': '*', 'Content-Type': 'application/json' },
         }
@@ -185,11 +186,61 @@ Cypress.Commands.add('getSatelliteById', (id) => {
         {
             statusCode: 200,
             body: {
-                result: constants.satellite,
+                result: constants.satellites[+id - 1],
             },
             headers: { 'access-control-allow-origin': '*', 'Content-Type': 'application/json' },
         }
     ).as('getSatelliteById');
+});
+
+Cypress.Commands.add('getProfileOfUserWithUsername', (username) => {
+    cy.intercept(
+        {
+            method: 'GET',
+            url: `${Cypress.env('baseUrlApi')}users/${username}`,
+        },
+        {
+            statusCode: 200,
+            body: {
+                result: constants.users.find((user: any) => user.username == username),
+            },
+            headers: { 'access-control-allow-origin': '*', 'Content-Type': 'application/json' },
+        }
+    ).as('getProfileOfUserWithUsername');
+});
+
+Cypress.Commands.add('followUser', (username) => {
+    cy.intercept(
+        {
+            method: 'POST',
+            url: `${Cypress.env('baseUrlApi')}users/${username}/follow`,
+        },
+        {
+            statusCode: 200,
+            body: {
+                status: 200,
+                result: [{ username }],
+            },
+            headers: { 'access-control-allow-origin': '*', 'Content-Type': 'application/json' },
+        }
+    ).as('followUser');
+});
+
+Cypress.Commands.add('unfollowUser', (username) => {
+    cy.intercept(
+        {
+            method: 'DELETE',
+            url: `${Cypress.env('baseUrlApi')}users/${username}/follow`,
+        },
+        {
+            statusCode: 200,
+            body: {
+                status: 200,
+                result: [],
+            },
+            headers: { 'access-control-allow-origin': '*', 'Content-Type': 'application/json' },
+        }
+    ).as('unfollowUser');
 });
 
 //

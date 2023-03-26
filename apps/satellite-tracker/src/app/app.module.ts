@@ -65,6 +65,7 @@ import { BreadcrumbsComponent } from './profile/breadcrumbs/breadcrumbs.componen
 import { EditProfileComponent } from './profile/edit-profile/edit-profile.component';
 import { SatelliteTrackersComponent } from './pages/satellite/satellite-detail/satellite-trackers/satellite-trackers.component';
 import { SatelliteInfoComponent } from './pages/satellite/satellite-detail/satellite-info/satellite-info.component';
+import { RelationsService } from './auth/relations.service';
 
 const materialModules = [
     MatToolbarModule,

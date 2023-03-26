@@ -75,6 +75,7 @@ export class SatelliteService extends EntityService<ISatellite> {
     }
 
     protected override handleError(error: HttpErrorResponse): Observable<any> {
+        console.log(error);
         let res = {
             status: error.status,
             message: 'An error occurred, please try again later',

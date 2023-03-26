@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
 import { IUserInfo, ISatellite, UserIdentity, APIResponse, Id } from 'shared/domain';
 import { environment } from '../../environments/environment';
@@ -35,6 +35,7 @@ export class RelationsService {
     }
 
     getFollowing() {
+        if (!this.user?.username) return of(undefined);
         return this.http
             .get<APIResponse<IUserInfo[]>>(`${environment.API_URL}users/${this.user?.username}/following`)
             .pipe(
@@ -50,6 +51,7 @@ export class RelationsService {
     }
 
     getTracking() {
+        if (!this.user?.username) return of(undefined);
         return this.http
             .get<APIResponse<ISatellite[]>>(`${environment.API_URL}users/${this.user?.username}/tracking`)
             .pipe(
@@ -66,6 +68,7 @@ export class RelationsService {
             .post<APIResponse<IUserInfo[] | undefined>>(`${environment.API_URL}users/${username}/follow`, {})
             .pipe(
                 tap((res) => {
+                    console.log(res);
                     if (res.status == 200) {
                         this.snackBar.success('User followed successfully');
                         this.following$.next(res.result);
