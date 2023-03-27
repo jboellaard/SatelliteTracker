@@ -24,11 +24,11 @@ jobs:
               run: |
                   npx nx run satellite-tracker:test
             - name: Run satellite-tracker e2e tests
-              uses: cypress-io/github-action@v5.0.5
+              uses: cypress-io/github-action@v5.5.1
               with:
                   build: npx nx run satellite-tracker:build
                   start: npx nx run satellite-tracker:serve
-                  wait-on: 'http://localhost:4200/'
+                  wait-on: 'http://[::1]:4200/'
               # run: |
               #     npx nx run satellite-tracker-e2e:e2e
 
