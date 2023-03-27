@@ -51,7 +51,7 @@ export class RecommendationsService {
 
     async getSatelliteRecommendations(username: string): Promise<APIResult<ISatellite[]>> {
         let satelliteRecommendations = await this.neo4jService.read(
-            RecommendationsNeoQueries.getRecommendSatellitesFromFollowing,
+            RecommendationsNeoQueries.getRecommendedSatellitesFromFollowing,
             {
                 username,
                 count: 0,

@@ -24,8 +24,13 @@ jobs:
               run: |
                   npx nx run satellite-tracker:test
             - name: Run satellite-tracker e2e tests
-              run: |
-                  npx nx run satellite-tracker-e2e:e2e
+              uses: cypress-io/github-action@v5.0.5
+              with:
+                  build: npx nx run satellite-tracker:build
+                  start: npx nx run satellite-tracker:serve
+                  wait-on: 'http://localhost:4200/'
+              # run: |
+              #     npx nx run satellite-tracker-e2e:e2e
 
             - name: 'Deploy to satellite-tracker to Netlify'
               uses: jsmrcaga/action-netlify-deploy@v2.0.0
