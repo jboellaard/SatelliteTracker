@@ -1,5 +1,6 @@
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { environment } from 'apps/satellite-tracker/src/environments/environment';
 import { ICustomSatellitePart, IOrbit, ISatellite, ISatellitePart, APIResponse } from 'shared/domain';
 import { SatelliteService } from './satellite.service';
@@ -101,7 +102,7 @@ describe('SatelliteService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-            imports: [HttpClientTestingModule],
+            imports: [HttpClientTestingModule, MatSnackBarModule],
             providers: [SatelliteService],
         });
 

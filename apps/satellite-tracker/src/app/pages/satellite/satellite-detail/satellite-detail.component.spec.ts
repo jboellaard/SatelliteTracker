@@ -9,7 +9,6 @@ import { convertToParamMap, ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { ISatellite, Shape } from 'shared/domain';
 import { AuthService } from '../../../auth/auth.service';
-import { ProfileService } from '../../../profile/profile.service';
 import { RelationsService } from '../../../auth/relations.service';
 import { SnackBarService } from '../../../utils/snack-bar.service';
 import { SatelliteService } from '../satellite.service';
@@ -23,7 +22,6 @@ describe('SatelliteDetailComponent', () => {
     let mockRouter: any;
     let mockSatelliteService: any;
     let mockRelationsService: any;
-    let mockProfileService: any;
     let mockAuthService: any;
     let mockDialog: any;
     let mockSnackBarService: any;
@@ -103,9 +101,6 @@ describe('SatelliteDetailComponent', () => {
         mockRelationsService = {
             getTracking: jest.fn(() => of([satellite])),
             tracking$: of([satellite]),
-        };
-
-        mockProfileService = {
             trackSatellite: jest.fn(() => of({})),
             untrackSatellite: jest.fn(() => of({})),
         };
@@ -139,7 +134,6 @@ describe('SatelliteDetailComponent', () => {
                 { provide: SatelliteService, useValue: mockSatelliteService },
                 { provide: RelationsService, useValue: mockRelationsService },
                 { provide: AuthService, useValue: mockAuthService },
-                { provide: ProfileService, useValue: mockProfileService },
                 { provide: MatDialog, useValue: mockDialog },
                 { provide: SnackBarService, useValue: mockSnackBarService },
                 { provide: ActivatedRoute, useValue: mockActivatedRoute },
@@ -198,13 +192,13 @@ describe('SatelliteDetailComponent', () => {
     it('should track the satellite', () => {
         comp.ngOnInit();
         comp.track();
-        expect(mockProfileService.trackSatellite).toHaveBeenCalledWith(satellite.id);
+        expect(mockRelationsService.trackSatellite).toHaveBeenCalledWith(satellite.id);
     });
 
     it('should untrack the satellite', () => {
         comp.ngOnInit();
         comp.untrack();
-        expect(mockProfileService.untrackSatellite).toHaveBeenCalledWith(satellite.id);
+        expect(mockRelationsService.untrackSatellite).toHaveBeenCalledWith(satellite.id);
     });
 
     it('should delete the satellite', () => {
