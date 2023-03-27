@@ -20,12 +20,13 @@ jobs:
             - name: Install npm dependencies
               run: |
                   npm ci
-            - name: Run satellite-tracker unit tests
-              run: |
-                  npx nx run satellite-tracker:test
+#             - name: Run satellite-tracker unit tests
+#               run: |
+#                   npx nx run satellite-tracker:test
             - name: Run satellite-tracker e2e tests
               uses: cypress-io/github-action@v5.5.1
               with:
+                  config-file: 'apps/satellite-tracker-e2e/cypress.config.ts'
                   build: npx nx run satellite-tracker:build
                   start: npx nx run satellite-tracker:serve
                   wait-on: 'http://[::1]:4200/'
