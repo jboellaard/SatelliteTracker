@@ -26,10 +26,16 @@ jobs:
             - name: Run satellite-tracker e2e tests
               uses: cypress-io/github-action@v5.5.1
               with:
-                  config-file: 'apps/satellite-tracker-e2e/cypress.config.ts'
-                  build: npx nx run satellite-tracker:build
-                  start: npx nx run satellite-tracker:serve
-                  wait-on: 'http://[::1]:4200/'
+                  install: false
+                  start: |
+                        npx nx run satellite-tracker-e2e:e2e
+                  wait-on: http://[::1]:4200
+                  wait-on-timeout: 120
+#                   working-directory: apps/e2e
+#                   config-file: 'apps/satellite-tracker-e2e/cypress.config.ts'
+#                   build: npx nx run satellite-tracker:build
+#                   start: npx nx run satellite-tracker:serve
+#                   wait-on: 'http://[::1]:4200/'
               # run: |
               #     npx nx run satellite-tracker-e2e:e2e
 
