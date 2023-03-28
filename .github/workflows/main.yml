@@ -23,12 +23,14 @@ jobs:
             - name: Run satellite-tracker unit tests
               run: |
                   npx nx run satellite-tracker:test
+
             - name: Run satellite-tracker e2e tests
               uses: cypress-io/github-action@v5.5.1
               with:
                   project: ./apps/satellite-tracker-e2e
-                  build: npx nx run satellite-tracker:build
-                  start: npx nx run satellite-tracker:serve
+                  # build: npx nx run satellite-tracker:build
+                  # start: npx nx run satellite-tracker:serve
+                  start: npm run start
                   wait-on: http://[::1]:4200
                   wait-on-timeout: 120
 
