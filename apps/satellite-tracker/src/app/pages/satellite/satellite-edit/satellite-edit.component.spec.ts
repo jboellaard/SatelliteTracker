@@ -1,5 +1,4 @@
 import { CdkDropList } from '@angular/cdk/drag-drop';
-import { NgModule } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { MatOptionModule } from '@angular/material/core';
@@ -14,7 +13,6 @@ import { MatTableModule } from '@angular/material/table';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ActivatedRoute, convertToParamMap, Router } from '@angular/router';
-import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { ISatellite, ISatellitePart, Shape } from 'shared/domain';
 import { RelationsService } from '../../../auth/relations.service';

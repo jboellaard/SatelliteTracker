@@ -1,8 +1,8 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from 'apps/satellite-tracker/src/environments/environment';
+import { environment } from '../../../environments/environment';
 import { catchError, map, Observable } from 'rxjs';
-import { APIResponse, ISatellite } from 'shared/domain';
+import { APIResponse } from 'shared/domain';
 import { SnackBarService } from '../../utils/snack-bar.service';
 
 @Injectable({

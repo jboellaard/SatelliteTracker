@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { environment } from 'apps/satellite-tracker/src/environments/environment';
-import { AdminUserInfo, APIResponse, IUser, UserIdentity } from 'shared/domain';
-import { BehaviorSubject, catchError, map, Observable, tap } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { AdminUserInfo, APIResponse, IUser } from 'shared/domain';
+import { catchError, map, Observable } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { EntityService } from 'ui/entity';
 import { SnackBarService } from '../../utils/snack-bar.service';

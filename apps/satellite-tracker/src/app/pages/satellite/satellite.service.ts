@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from 'apps/satellite-tracker/src/environments/environment';
+import { environment } from '../../../environments/environment';
 import { BehaviorSubject, catchError, map, Observable, tap } from 'rxjs';
 import { APIResponse, Id, IOrbit, ISatellite, ISatellitePart, IUser } from 'shared/domain';
 import { EntityService } from 'ui/entity';

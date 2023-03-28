@@ -193,7 +193,7 @@ export class OrbitEditComponent implements OnInit {
 
     onSubmit() {
         if (this.satellite.orbit?.dateTimeOfLaunch) {
-            this.satellite.orbit!.dateTimeOfLaunch = new Date(this.satellite.orbit!.dateTimeOfLaunch!);
+            this.satellite.orbit.dateTimeOfLaunch = new Date(this.satellite.orbit.dateTimeOfLaunch);
             this.satellite.orbit?.dateTimeOfLaunch.setHours(this.time.hour, this.time.minute);
         }
         let position = {};
@@ -208,7 +208,7 @@ export class OrbitEditComponent implements OnInit {
             dialogRef.afterClosed().subscribe((ok: string) => {
                 if (ok == 'ok') {
                     this.satelliteService
-                        .updateOrbit(this.satellite.id!, this.satellite.orbit!)
+                        .updateOrbit(this.satellite.id, this.satellite.orbit!)
                         .subscribe((satellite) => {
                             if (satellite) {
                                 this.snackBar.success('Orbit updated successfully');
@@ -226,7 +226,7 @@ export class OrbitEditComponent implements OnInit {
             });
             dialogRef.afterClosed().subscribe((ok: string) => {
                 if (ok == 'ok') {
-                    this.satelliteService.addOrbit(this.satellite.id!, this.satellite.orbit!).subscribe((satellite) => {
+                    this.satelliteService.addOrbit(this.satellite.id, this.satellite.orbit!).subscribe((satellite) => {
                         if (satellite) {
                             this.snackBar.success('Orbit created successfully');
                             this.router.navigate(['/users/' + this.username + '/satellites/' + satellite?.id]);

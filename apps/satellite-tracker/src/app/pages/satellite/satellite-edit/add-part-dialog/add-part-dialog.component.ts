@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { SnackBarService } from 'apps/satellite-tracker/src/app/utils/snack-bar.service';
+import { SnackBarService } from '../../../../utils/snack-bar.service';
 import { ICustomSatellitePart, ISatellitePart } from 'shared/domain';
 
 @Component({

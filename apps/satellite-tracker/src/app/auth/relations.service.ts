@@ -1,9 +1,9 @@
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, catchError, map, Observable, of, tap } from 'rxjs';
 import { IUserInfo, ISatellite, UserIdentity, APIResponse, Id } from 'shared/domain';
 import { environment } from '../../environments/environment';
-import { ProfileService } from '../profile/profile.service';
+import { ProfileService } from '../pages/profile/profile.service';
 import { SnackBarService } from '../utils/snack-bar.service';
 import { AuthService } from './auth.service';
 

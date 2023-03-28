@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
-import { AuthService } from 'apps/satellite-tracker/src/app/auth/auth.service';
-import { ProfileService } from 'apps/satellite-tracker/src/app/profile/profile.service';
-import { RelationsService } from 'apps/satellite-tracker/src/app/auth/relations.service';
-// import { SnackBarService } from 'apps/satellite-tracker/src/app/utils/snack-bar.service';
+import { AuthService } from '../../../../auth/auth.service';
+import { RelationsService } from '../../../../auth/relations.service';
 import { Subscription } from 'rxjs';
 import { ISatellite, UserIdentity, IUser } from 'shared/domain';
 import { OrbitService } from '../../orbit-scene.service';

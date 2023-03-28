@@ -1,9 +1,9 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, Observable, of, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
 import { UserCredentials, UserIdentity, UserRegistration, Token } from 'shared/domain';
-import { environment } from 'apps/satellite-tracker/src/environments/environment';
+import { environment } from '../../environments/environment';
 import { SnackBarService } from '../utils/snack-bar.service';
 
 @Injectable({

@@ -46,7 +46,7 @@ export class EditProfileComponent implements OnInit, OnDestroy {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((position) => {
                 if (this.user) {
-                    if (!this.user!.location) this.user!.location = { coordinates: { latitude: 0, longitude: 0 } };
+                    if (!this.user.location) this.user.location = { coordinates: { latitude: 0, longitude: 0 } };
                     this.user.location.coordinates!.latitude = position.coords.latitude;
                     this.user.location.coordinates!.longitude = position.coords.longitude;
                 }

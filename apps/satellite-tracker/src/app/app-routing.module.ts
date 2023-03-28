@@ -10,7 +10,7 @@ import { LoginComponent } from './auth/login/login.component';
 import { RegisterComponent } from './auth/register/register.component';
 import { UserListComponent } from './pages/user/user-list/user-list.component';
 
-import { ProfileComponent } from './profile/profile.component';
+import { ProfileComponent } from './pages/profile/profile.component';
 import { EditProfileComponent } from './pages/profile/edit-profile/edit-profile.component';
 import { TabCreatedComponent } from './pages/profile/tabs/tab-created/tab-created.component';
 import { TabFollowingComponent } from './pages/profile/tabs/tab-following/tab-following.component';

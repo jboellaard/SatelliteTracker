@@ -53,7 +53,10 @@ export class UserListComponent implements OnInit, OnDestroy {
 
     private getUsers() {
         this.userSub = this.userService.getAllIdentities().subscribe((users) => {
-            if (users) this.usersArray = users.sort((a, b) => (a.createdAt! < b.createdAt! ? 1 : -1));
+            if (users) {
+                users.sort((a, b) => (a.createdAt! < b.createdAt! ? 1 : -1));
+                this.usersArray = users;
+            }
         });
     }
 
@@ -61,8 +64,7 @@ export class UserListComponent implements OnInit, OnDestroy {
         const dialogRef = this.dialog.open(DeleteDialogComponent, {
             data: {
                 message:
-                    'Are you sure you want to delete this user and their satellites? \
-                    This action cannot be reversed!',
+                    'Are you sure you want to delete this user and their satellites? \nThis action cannot be reversed!',
             },
         });
         dialogRef.afterClosed().subscribe((ok) => {

@@ -6,7 +6,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { SnackBarService } from 'apps/satellite-tracker/src/app/utils/snack-bar.service';
+import { SnackBarService } from '../../../../utils/snack-bar.service';
 import { BehaviorSubject, of } from 'rxjs';
 import { ISatellite, Shape } from 'shared/domain';
 import { OrbitService } from '../../orbit-scene.service';

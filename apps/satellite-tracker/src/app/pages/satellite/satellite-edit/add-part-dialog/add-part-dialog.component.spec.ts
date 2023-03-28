@@ -6,7 +6,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { BrowserAnimationsModule, NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { SnackBarService } from 'apps/satellite-tracker/src/app/utils/snack-bar.service';
+import { SnackBarService } from '../../../../utils/snack-bar.service';
 import { of } from 'rxjs';
 
 import { AddPartDialogComponent } from './add-part-dialog.component';

@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { DeleteDialogComponent } from 'apps/satellite-tracker/src/app/utils/delete-dialog/delete-dialog.component';
-import { SnackBarService } from 'apps/satellite-tracker/src/app/utils/snack-bar.service';
+import { DeleteDialogComponent } from '../../../../utils/delete-dialog/delete-dialog.component';
+import { SnackBarService } from '../../../../utils/snack-bar.service';
 import { Subscription } from 'rxjs';
-import { ISatellite, ICustomSatellitePart, IUser } from 'shared/domain';
+import { ISatellite, ICustomSatellitePart } from 'shared/domain';
 import { OrbitService } from '../../orbit-scene.service';
 import { SatelliteService } from '../../satellite.service';
 
