@@ -69,7 +69,7 @@ describe('User story: I can follow (and unfollow) other users and see their acti
         });
     });
 
-    it.only('should show a feed of the followed users activities', () => {
+    it('should show a feed of the followed users activities', () => {
         cy.getProfileOfUserWithUsername(users[1].username);
         cy.followUser(users[1].username);
         cy.intercept(
