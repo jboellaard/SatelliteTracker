@@ -10,11 +10,6 @@ jobs:
         steps:
             - name: Clone repository
               uses: actions/checkout@v3
-              
-            - name: Open Web Client Directory
-              working-directory: 'apps/satellite-tracker-e2e'
-              run: |
-                  ls -la
 
             - name: Set up Node.js version
               uses: actions/setup-node@v3
@@ -33,6 +28,8 @@ jobs:
               with:
 #                   install: false
 #                   working-directory: 'apps/satellite-tracker-e2e'
+                  project: ./apps/satellite-tracker-e2e
+                  
 #                   start: |
 #                         npx nx run e2e
 #                   wait-on: http://[::1]:4200
