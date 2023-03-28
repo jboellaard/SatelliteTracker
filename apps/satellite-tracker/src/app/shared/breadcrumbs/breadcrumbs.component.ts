@@ -2,8 +2,6 @@ import { Component } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { UserIdentity } from 'shared/domain';
 import { AuthService } from '../../auth/auth.service';
-import { SatelliteService } from '../../pages/satellite/satellite.service';
-import { ProfileService } from '../profile.service';
 
 @Component({
     selector: 'app-breadcrumbs',

@@ -3,9 +3,9 @@ import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { IUser, UserIdentity } from 'shared/domain';
-import { AuthService } from '../../auth/auth.service';
-import { AddEditDialogComponent } from '../../utils/add-edit-dialog/add-edit-dialog.component';
-import { SnackBarService } from '../../utils/snack-bar.service';
+import { AuthService } from '../../../auth/auth.service';
+import { AddEditDialogComponent } from '../../../utils/add-edit-dialog/add-edit-dialog.component';
+import { SnackBarService } from '../../../utils/snack-bar.service';
 import { ProfileService } from '../profile.service';
 
 @Component({

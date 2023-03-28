@@ -2,11 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 import { Id, ISatellite, IUser } from 'shared/domain';
-import { SatelliteService } from '../../../pages/satellite/satellite.service';
-import { DeleteDialogComponent } from '../../../utils/delete-dialog/delete-dialog.component';
-import { SnackBarService } from '../../../utils/snack-bar.service';
+import { SatelliteService } from '../../../satellite/satellite.service';
+import { DeleteDialogComponent } from '../../../../utils/delete-dialog/delete-dialog.component';
+import { SnackBarService } from '../../../../utils/snack-bar.service';
 import { ProfileService } from '../../profile.service';
-import { RelationsService } from '../../../auth/relations.service';
+import { RelationsService } from '../../../../auth/relations.service';
 
 @Component({
     selector: 'app-tab-created',

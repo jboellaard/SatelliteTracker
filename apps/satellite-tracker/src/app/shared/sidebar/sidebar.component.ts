@@ -1,10 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { UserIdentity, ISatellite } from 'shared/domain';
 import { AuthService } from '../../auth/auth.service';
 import { SatelliteService } from '../../pages/satellite/satellite.service';
-import { ProfileService } from '../profile.service';
+import { ProfileService } from '../../pages/profile/profile.service';
 
 @Component({
     selector: 'app-sidebar',

@@ -82,7 +82,9 @@
                         >Longitude must be between -180 and 180.</mat-error
                     >
                 </mat-form-field>
-                <button mat-flat-button (click)="getLocation()" style="width: 100%">Use your device's location</button>
+                <button mat-flat-button (click)="getLocation()" style="width: 100%" type="button">
+                    Use your device's location
+                </button>
             </div>
             <div class="buttons" style="display: flex; justify-content: space-between; margin-top: 20px">
                 <button mat-flat-button class="btn btn-warning" routerLink="..">Cancel</button>

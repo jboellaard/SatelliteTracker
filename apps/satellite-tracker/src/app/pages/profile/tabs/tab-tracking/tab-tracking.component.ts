@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { Id, ISatellite, IUser } from 'shared/domain';
 import { ProfileService } from '../../profile.service';
-import { RelationsService } from '../../../auth/relations.service';
+import { RelationsService } from '../../../../auth/relations.service';
 
 @Component({
     selector: 'app-tab-tracking',

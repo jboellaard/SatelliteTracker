@@ -1,16 +1,16 @@
 import { Component } from '@angular/core';
 import { Subscription } from 'rxjs';
-import { IUserInfo, IUser, UserIdentity } from 'shared/domain';
-import { AuthService } from '../../../auth/auth.service';
+import { IUser, IUserInfo, UserIdentity } from 'shared/domain';
+import { AuthService } from '../../../../auth/auth.service';
 import { ProfileService } from '../../profile.service';
-import { RelationsService } from '../../../auth/relations.service';
+import { RelationsService } from '../../../../auth/relations.service';
 
 @Component({
-    selector: 'app-tab-followers',
-    templateUrl: './tab-followers.component.html',
+    selector: 'app-tab-following',
+    templateUrl: './tab-following.component.html',
     styleUrls: ['../tab.component.scss'],
 })
-export class TabFollowersComponent {
+export class TabFollowingComponent {
     users: IUserInfo[] | undefined;
     canEdit = false;
     user: IUser | undefined;
@@ -23,7 +23,7 @@ export class TabFollowersComponent {
     followingSub: Subscription | undefined;
     userSub: Subscription | undefined;
     editSub: Subscription | undefined;
-    userFollowersSub: Subscription | undefined;
+    userFollowingSub: Subscription | undefined;
 
     constructor(
         private profileService: ProfileService,
@@ -42,12 +42,12 @@ export class TabFollowersComponent {
 
         this.userSub = this.profileService.currentUser$.subscribe((user) => {
             this.user = user;
-            if (user && this.profileService.followers$.value == undefined)
-                this.profileService.getFollowers(user.username).subscribe();
+            if (user && this.profileService.following$.value == undefined)
+                this.profileService.getFollowing(user.username).subscribe();
         });
 
-        this.userFollowersSub = this.profileService.followers$.subscribe((followers) => {
-            if (followers) this.users = followers;
+        this.userFollowingSub = this.profileService.following$.subscribe((following) => {
+            if (following) this.users = following;
         });
 
         this.editSub = this.profileService.canEdit$.subscribe((canEdit) => {
@@ -78,6 +78,6 @@ export class TabFollowersComponent {
         if (this.followingSub) this.followingSub.unsubscribe();
         if (this.userSub) this.userSub.unsubscribe();
         if (this.editSub) this.editSub.unsubscribe();
-        if (this.userFollowersSub) this.userFollowersSub.unsubscribe();
+        if (this.userFollowingSub) this.userFollowingSub.unsubscribe();
     }
 }

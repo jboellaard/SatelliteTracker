@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BehaviorSubject, Subscription } from 'rxjs';
-import { IUser, Id, UserIdentity, ISatellite } from 'shared/domain';
-import { AuthService } from '../auth/auth.service';
-import { UserService } from '../pages/user/user.service';
-import { SnackBarService } from '../utils/snack-bar.service';
+import { Subscription } from 'rxjs';
+import { IUser, Id, UserIdentity } from 'shared/domain';
+import { AuthService } from '../../auth/auth.service';
+import { UserService } from '../user/user.service';
+import { SnackBarService } from '../../utils/snack-bar.service';
 import { ProfileService } from './profile.service';
-import { RelationsService } from '../auth/relations.service';
+import { RelationsService } from '../../auth/relations.service';
 
 @Component({
     selector: 'app-profile',

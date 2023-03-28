@@ -1,4 +1,4 @@
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
@@ -6,14 +6,13 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 import { AppComponent } from './app.component';
-import { BreadcrumbsComponent } from './profile/breadcrumbs/breadcrumbs.component';
+import { BreadcrumbsComponent } from './shared/breadcrumbs/breadcrumbs.component';
 import { FooterComponent } from './shared/footer/footer.component';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 
 describe('AppComponent', () => {
     let mockAuthService: any;
     let mockRouter: any;
-    let httpMock: HttpTestingController;
 
     mockAuthService = {
         user$: jest.fn(() => of({ id: '1', username: 'username' })),
@@ -32,7 +31,6 @@ describe('AppComponent', () => {
                 { provide: 'Router', useValue: mockRouter },
             ],
         }).compileComponents();
-        httpMock = TestBed.inject(HttpTestingController);
     });
 
     it('should create the app', () => {

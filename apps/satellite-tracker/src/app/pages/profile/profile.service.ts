@@ -2,9 +2,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Inject, Injectable } from '@angular/core';
 import { Observable, map, tap, catchError, BehaviorSubject } from 'rxjs';
 import { ISatellite, APIResponse, IUserInfo, Id, IUser } from 'shared/domain';
-import { environment } from '../../environments/environment';
-import { SnackBarService } from '../utils/snack-bar.service';
-import { RelationsService } from '../auth/relations.service';
+import { environment } from '../../../environments/environment';
+import { SnackBarService } from '../../utils/snack-bar.service';
 
 @Injectable({
     providedIn: 'root',

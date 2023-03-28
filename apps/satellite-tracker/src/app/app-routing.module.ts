@@ -11,11 +11,11 @@ import { RegisterComponent } from './auth/register/register.component';
 import { UserListComponent } from './pages/user/user-list/user-list.component';
 
 import { ProfileComponent } from './profile/profile.component';
-import { EditProfileComponent } from './profile/edit-profile/edit-profile.component';
-import { TabCreatedComponent } from './profile/tabs/tab-created/tab-created.component';
-import { TabFollowingComponent } from './profile/tabs/tab-following/tab-following.component';
-import { TabFollowersComponent } from './profile/tabs/tab-followers/tab-followers.component';
-import { TabTrackingComponent } from './profile/tabs/tab-tracking/tab-tracking.component';
+import { EditProfileComponent } from './pages/profile/edit-profile/edit-profile.component';
+import { TabCreatedComponent } from './pages/profile/tabs/tab-created/tab-created.component';
+import { TabFollowingComponent } from './pages/profile/tabs/tab-following/tab-following.component';
+import { TabFollowersComponent } from './pages/profile/tabs/tab-followers/tab-followers.component';
+import { TabTrackingComponent } from './pages/profile/tabs/tab-tracking/tab-tracking.component';
 
 import { DiscoverComponent } from './pages/dashboard/discover/discover.component';
 import { FeedComponent } from './pages/dashboard/feed/feed.component';
