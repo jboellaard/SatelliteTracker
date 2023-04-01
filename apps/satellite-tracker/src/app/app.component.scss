@@ -6,9 +6,9 @@ app-footer {
 }
 
 .page-content-with-dashboard {
+    flex: 1 1 auto;
     display: grid;
     grid-template-columns: 270px 1fr;
-    flex: 1 1 auto;
 }
 
 #breadcrumbs {
@@ -24,6 +24,7 @@ app-footer {
 }
 
 .page-content {
+    flex: 1 1 auto;
     display: grid;
 }
 

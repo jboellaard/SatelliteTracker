@@ -26,14 +26,16 @@
             >
                 <mat-icon>radar</mat-icon>
             </button>
-            <button *ngIf="isTracking()" mat-stroked-button (click)="untrack()">Untrack</button>
-            <button *ngIf="!isTracking()" mat-stroked-button (click)="track()">Track</button>
-            <button *ngIf="canEdit" mat-stroked-button color="primary" class="primary-button" routerLink="edit">
-                <mat-icon>edit</mat-icon><span class="button-text">Edit</span>
-            </button>
-            <button *ngIf="canEdit" mat-stroked-button color="warn" (click)="removeSatellite()">
-                <mat-icon>delete</mat-icon> <span class="button-text">Remove</span>
-            </button>
+            <div *ngIf="loggedInUser">
+                <button *ngIf="isTracking()" mat-stroked-button (click)="untrack()">Untrack</button>
+                <button *ngIf="!isTracking()" mat-stroked-button (click)="track()">Track</button>
+                <button *ngIf="canEdit" mat-stroked-button color="primary" class="primary-button" routerLink="edit">
+                    <mat-icon>edit</mat-icon><span class="button-text">Edit</span>
+                </button>
+                <button *ngIf="canEdit" mat-stroked-button color="warn" (click)="removeSatellite()">
+                    <mat-icon>delete</mat-icon> <span class="button-text">Remove</span>
+                </button>
+            </div>
         </div>
     </div>
     <div class="text-muted">

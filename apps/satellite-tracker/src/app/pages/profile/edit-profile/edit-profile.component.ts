@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { IUser, IUserInfo, UserIdentity } from 'shared/domain';
 import { AuthService } from '../../../auth/auth.service';
 import { AddEditDialogComponent } from '../../../utils/add-edit-dialog/add-edit-dialog.component';
+import { DeleteDialogComponent } from '../../../utils/delete-dialog/delete-dialog.component';
 import { SnackBarService } from '../../../utils/snack-bar.service';
 import { ProfileService } from '../profile.service';
 
@@ -68,7 +69,7 @@ export class EditProfileComponent implements OnInit, OnDestroy {
     }
 
     deleteSelf(): void {
-        const dialogRef = this.dialog.open(AddEditDialogComponent, {
+        const dialogRef = this.dialog.open(DeleteDialogComponent, {
             data: { message: 'Are you sure you want to delete your account? This action is irreversible!' },
         });
         dialogRef.afterClosed().subscribe((ok) => {

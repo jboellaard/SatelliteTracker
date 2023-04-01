@@ -1,8 +1,8 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
-import { BehaviorSubject, catchError, Observable, of, switchMap } from 'rxjs';
-import { UserCredentials, UserIdentity, UserRegistration, Token } from 'shared/domain';
+import { BehaviorSubject, catchError, map, Observable, of, switchMap, tap } from 'rxjs';
+import { UserCredentials, UserIdentity, UserRegistration, Token, APIResponse, ISatellite } from 'shared/domain';
 import { environment } from '../../environments/environment';
 import { SnackBarService } from '../utils/snack-bar.service';
 
@@ -13,6 +13,7 @@ export class AuthService {
     private readonly headers = new HttpHeaders({ 'Content-Type': 'application/json' });
     private readonly CURRENT_USER = 'currentUser';
     user$ = new BehaviorSubject<UserIdentity | undefined>(undefined);
+    createdSatellites$ = new BehaviorSubject<ISatellite[] | undefined>(undefined);
 
     constructor(private http: HttpClient, private router: Router, private snackBar: SnackBarService) {
         this.getUserFromLocalStorage()
@@ -151,6 +152,24 @@ export class AuthService {
                     return of(undefined);
                 })
             );
+    }
+
+    getCreatedSatellites(): Observable<ISatellite[] | undefined> {
+        if (this.user$ && this.user$.value) {
+            return this.http
+                .get<APIResponse<ISatellite[] | undefined>>(
+                    `${environment.API_URL}users/${this.user$.value.username}/satellites`
+                )
+                .pipe(
+                    tap((response) => {
+                        if (response.result) this.createdSatellites$.next(response.result);
+                    }),
+                    map((response) => response.result),
+                    catchError((error) => this.handleError(error))
+                );
+        } else {
+            return of(undefined);
+        }
     }
 
     private handleError(error: HttpErrorResponse): Observable<any> {

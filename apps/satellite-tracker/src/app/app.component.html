@@ -1,5 +1,5 @@
 <app-navbar></app-navbar>
-<div id="breadcrumbs">
+<div *ngIf="user" id="breadcrumbs">
     <app-breadcrumbs></app-breadcrumbs>
 </div>
 <div [ngClass]="{ 'page-content-with-dashboard': user && !hideSidebar('about'), 'page-content': !user }">

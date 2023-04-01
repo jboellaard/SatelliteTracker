@@ -56,6 +56,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
             this.loggedInUserFollowing = following;
         });
         this.route.paramMap.subscribe((params) => {
+            console.log(this.user);
+            console.log(params);
             this.user = undefined;
             this.profileService.created$.next(undefined);
             this.profileService.tracking$.next(undefined);
@@ -67,10 +69,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
                 if (this.username === this.loggedInUser?.username) {
                     this.userSub = this.profileService.getSelf().subscribe((user) => {
                         if (user) {
+                            this.profileService.currentUser$.next(user);
                             this.user = user;
                             this.canEdit = true;
                             this.profileService.canEdit$.next(true);
-                            this.profileService.currentUser$.next(user);
                         } else {
                             this.snackBar.error('Could not find this user');
                             this.router.navigate(['/home']);
@@ -79,10 +81,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
                 } else {
                     this.userSub = this.userService.getByUsername(this.username).subscribe((user) => {
                         if (user) {
+                            this.profileService.currentUser$.next(user);
                             this.user = user;
                             this.canEdit = false;
                             this.profileService.canEdit$.next(false);
-                            this.profileService.currentUser$.next(user);
                         } else {
                             this.snackBar.error('Could not find this user');
                             this.router.navigate(['/home']);

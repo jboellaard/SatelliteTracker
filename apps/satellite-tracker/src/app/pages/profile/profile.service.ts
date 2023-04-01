@@ -44,6 +44,7 @@ export class ProfileService {
     getCreated(username: string): Observable<ISatellite[] | undefined> {
         return this.http.get<APIResponse<ISatellite[] | undefined>>(this.url + `users/${username}/satellites`).pipe(
             tap((response) => {
+                console.log(username);
                 if (response.result) this.created$.next(response.result);
             }),
             map((response) => response.result),

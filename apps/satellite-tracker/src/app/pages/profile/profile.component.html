@@ -11,7 +11,7 @@
                 </i>
             </p>
         </div>
-        <div class="profile-button">
+        <div *ngIf="loggedInUser" class="profile-button">
             <div *ngIf="canEdit; else follow">
                 <a routerLink="/profile/{{ user.username }}/edit" routerLinkActive="active">
                     <button mat-raised-button><mat-icon>edit</mat-icon>Edit profile</button>

@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 @Component({
     selector: 'app-footer',
     template: `<footer>
-        <p>&#169; 2023 - Satellite tracker</p>
+        <p>&#169; 2023 - Satellite Tracker</p>
         <button mat-button routerLink="/about" routerLinkActive="active" ariaCurrentWhenActive="page">About</button>
     </footer>`,
     styles: [

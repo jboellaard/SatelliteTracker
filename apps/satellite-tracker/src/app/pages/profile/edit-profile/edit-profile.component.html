@@ -5,7 +5,7 @@
                 <h1 style="display: flex; margin-bottom: 8px">
                     <mat-icon style="align-self: center; margin-right: 10px">portrait</mat-icon> {{ user.username }}
                 </h1>
-                <button mat-stroked-button color="warn" type="button" (click)="deleteSelf()">Delete account</button>
+                <button mat-flat-button color="warn" type="button" (click)="deleteSelf()">Delete account</button>
             </div>
             <div class="text-muted">
                 <p>
@@ -86,12 +86,27 @@
                         >Longitude must be between -180 and 180.</mat-error
                     >
                 </mat-form-field>
-                <button mat-flat-button (click)="getLocation()" style="width: 100%" type="button">
-                    Use your device's location
-                </button>
-                <button mat-flat-button (click)="removeLocation()" style="width: 100%" type="button" color="warn">
-                    Remove location
-                </button>
+                <div style="display: flex; justify-content: space-between; gap: 10px">
+                    <button
+                        class="bigger-button"
+                        mat-stroked-button
+                        (click)="getLocation()"
+                        style="width: 100%"
+                        type="button"
+                    >
+                        Use device's location
+                    </button>
+                    <button
+                        class="bigger-button"
+                        mat-stroked-button
+                        (click)="removeLocation()"
+                        style="width: 100%"
+                        type="button"
+                        color="warn"
+                    >
+                        Remove location
+                    </button>
+                </div>
             </div>
             <div class="buttons" style="display: flex; justify-content: space-between; margin-top: 20px">
                 <button mat-flat-button class="btn btn-warning" routerLink="..">Cancel</button>
