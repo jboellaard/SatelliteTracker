@@ -72,6 +72,7 @@ describe('User story: I can follow (and unfollow) other users and see their acti
     it('should show a feed of the followed users activities', () => {
         cy.getProfileOfUserWithUsername(users[1].username);
         cy.followUser(users[1].username);
+        cy.getFollowing(users[0].username);
         cy.intercept(
             {
                 method: 'GET',
@@ -121,7 +122,7 @@ describe('User story: I can follow (and unfollow) other users and see their acti
         cy.get('a').contains('Feed').click();
         cy.wait('@getFollowingFeed');
 
-        expect(cy.get('ul').find('li').should('have.length', 3));
+        cy.get('ul').find('li').should('have.length', 3);
         cy.get('li').each(($el) => {
             cy.wrap($el).contains(users[1].username).should('exist');
         });
