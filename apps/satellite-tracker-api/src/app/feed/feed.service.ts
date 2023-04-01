@@ -4,12 +4,7 @@ import { Model } from 'mongoose';
 import { APIResult, FeedItem, FeedItemType } from 'shared/domain';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { SatelliteNeoQueries } from '../satellite/neo4j/satellite.cypher';
-import {
-    Satellite,
-    SatelliteDocument,
-    SatellitePart,
-    SatellitePartDocument,
-} from '../satellite/schemas/satellite.schema';
+import { Satellite, SatelliteDocument } from '../satellite/schemas/satellite.schema';
 import { UserNeoQueries } from '../user/neo4j/user.cypher';
 import { User, UserDocument } from '../user/schemas/user.schema';
 
@@ -101,13 +96,25 @@ export class FeedService {
     }
 
     async getFollowingFeed(username: string): Promise<APIResult<FeedItem[]>> {
-        const usersFollowing = await this.neo4jService.read(UserNeoQueries.getFollowing, { username });
-
-        const mostRecentlyTracked = await this.neo4jService.read(SatelliteNeoQueries.getMostRecentlyTracked, {
+        const neoSession = this.neo4jService.getReadSession();
+        const usersFollowing = await neoSession.run(UserNeoQueries.getFollowing, { username });
+        const mostRecentlyTracked = await neoSession.run(SatelliteNeoQueries.getMostRecentlyTracked, {
             list: usersFollowing.records.map((record) => record.get('following').properties.username),
             skip: 0,
             limit: 10,
         });
+        const mostRecentlyCreated = await neoSession.run(SatelliteNeoQueries.getMostRecentlyCreated, {
+            list: usersFollowing.records.map((record) => record.get('following').properties.username),
+            skip: 0,
+            limit: 10,
+        });
+        const mostRecentlyFollowed = await neoSession.run(UserNeoQueries.getMostRecentlyFollowed, {
+            list: usersFollowing.records.map((record) => record.get('following').properties.username),
+            skip: 0,
+            limit: 10,
+        });
+        neoSession.close();
+
         let satellites = mostRecentlyTracked.records.map((record) => {
             return {
                 username: record.get('user').properties.username,
@@ -117,12 +124,6 @@ export class FeedService {
                 date: record.get('track').properties.since.toString(),
                 type: FeedItemType.tracked,
             };
-        });
-
-        const mostRecentlyCreated = await this.neo4jService.read(SatelliteNeoQueries.getMostRecentlyCreated, {
-            list: usersFollowing.records.map((record) => record.get('following').properties.username),
-            skip: 0,
-            limit: 10,
         });
         satellites = satellites.concat(
             mostRecentlyCreated.records.map((record) => {
@@ -137,22 +138,6 @@ export class FeedService {
             })
         );
 
-        for (const element of satellites) {
-            let user = await this.userModel.findOne({ username: element.createdBy }).exec();
-            let satellite = await this.satelliteModel
-                .findOne({
-                    satelliteName: element.satelliteName,
-                    createdBy: user._id,
-                })
-                .exec();
-            element.satelliteId = satellite._id;
-        }
-
-        const mostRecentlyFollowed = await this.neo4jService.read(UserNeoQueries.getMostRecentlyFollowed, {
-            list: usersFollowing.records.map((record) => record.get('following').properties.username),
-            skip: 0,
-            limit: 10,
-        });
         let users = mostRecentlyFollowed.records.map((record) => {
             return {
                 username: record.get('user').properties.username,
@@ -162,9 +147,23 @@ export class FeedService {
             };
         });
 
-        const feed = [...satellites, ...users]
+        let feed = [...satellites, ...users]
             .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
             .slice(0, 10);
+
+        for (const element of feed as any) {
+            if (element.satelliteName) {
+                let user = await this.userModel.findOne({ username: element.createdBy }).exec();
+                let satellite = await this.satelliteModel
+                    .findOne({
+                        satelliteName: element.satelliteName,
+                        createdBy: user._id,
+                    })
+                    .exec();
+                element.satelliteId = satellite._id;
+            }
+        }
+
         return { status: HttpStatus.OK, result: feed };
     }
 
