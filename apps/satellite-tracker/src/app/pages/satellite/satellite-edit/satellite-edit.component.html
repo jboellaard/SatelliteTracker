@@ -104,6 +104,7 @@
                             #sizeOfBase="ngModel"
                             required
                             min="2"
+                            max="500000000"
                             [ngClass]="{
                                 'is-invalid': sizeOfBase.invalid && sizeOfBase.touched
                             }"
@@ -112,6 +113,9 @@
                             <ng-container *ngIf="sizeOfBase.errors!['required']">Size of base is required</ng-container>
                             <ng-container *ngIf="sizeOfBase.errors!['min']"
                                 >Size of base must be at least 2 meters</ng-container
+                            >
+                            <ng-container *ngIf="sizeOfBase.errors!['max']"
+                                >Size of base cannot be more than 500.000.000 meters</ng-container
                             >
                         </mat-error>
                     </mat-form-field>

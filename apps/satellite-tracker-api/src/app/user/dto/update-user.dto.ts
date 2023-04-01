@@ -1,6 +1,7 @@
 import { ILocation } from 'shared/domain';
+import { PointCoordinates } from '../schemas/user.schema';
 
 export class UpdateUserDto {
-    location?: ILocation;
+    location?: PointCoordinates;
     profileDescription?: string;
 }

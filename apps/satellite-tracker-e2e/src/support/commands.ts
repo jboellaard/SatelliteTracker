@@ -156,7 +156,6 @@ Cypress.Commands.add('getAllSatelliteParts', () => {
 });
 
 Cypress.Commands.add('createSatellite', (satellite) => {
-    console.log(satellite);
     if (satellite.satelliteName == constants.satellites[0].satelliteName) {
         satellite = constants.satellites[0];
     } else if (satellite.satelliteName == constants.satellites[1].satelliteName) {

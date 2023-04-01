@@ -83,8 +83,6 @@ export class EntityService<T extends IEntity> {
     }
 
     protected handleError(error: HttpErrorResponse): Observable<any> {
-        console.log(error);
-
         let res = {
             status: error.status,
             message: 'Something went wrong, please try again later',

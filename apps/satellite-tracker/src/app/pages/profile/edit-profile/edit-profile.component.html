@@ -1,9 +1,12 @@
 <div class="component-container" *ngIf="user; else loading">
     <form #profileEditForm="ngForm" name="form" (ngSubmit)="onSubmit()">
         <div id="profile">
-            <h1 style="display: flex; margin-bottom: 8px">
-                <mat-icon style="align-self: center; margin-right: 10px">portrait</mat-icon> {{ user.username }}
-            </h1>
+            <div style="display: flex; justify-content: space-between">
+                <h1 style="display: flex; margin-bottom: 8px">
+                    <mat-icon style="align-self: center; margin-right: 10px">portrait</mat-icon> {{ user.username }}
+                </h1>
+                <button mat-stroked-button color="warn" type="button" (click)="deleteSelf()">Delete account</button>
+            </div>
             <div class="text-muted">
                 <p>
                     <i>
@@ -29,6 +32,7 @@
                     <h3 style="align-self: center; margin: 0">Location</h3>
                     <button
                         mat-icon-button
+                        type="button"
                         (click)="getLocation()"
                         #tooltip="matTooltip"
                         matTooltip="Use your device's location"
@@ -42,7 +46,7 @@
                         matInput
                         type="number"
                         name="latitude"
-                        [(ngModel)]="user.location!.coordinates!.latitude"
+                        [(ngModel)]="coordinates.latitude"
                         #latitude="ngModel"
                         min="-90"
                         max="90"
@@ -64,7 +68,7 @@
                         matInput
                         type="number"
                         name="longitude"
-                        [(ngModel)]="user.location!.coordinates!.longitude"
+                        [(ngModel)]="coordinates.longitude"
                         #longitude="ngModel"
                         min="-90"
                         max="90"
@@ -84,6 +88,9 @@
                 </mat-form-field>
                 <button mat-flat-button (click)="getLocation()" style="width: 100%" type="button">
                     Use your device's location
+                </button>
+                <button mat-flat-button (click)="removeLocation()" style="width: 100%" type="button" color="warn">
+                    Remove location
                 </button>
             </div>
             <div class="buttons" style="display: flex; justify-content: space-between; margin-top: 20px">

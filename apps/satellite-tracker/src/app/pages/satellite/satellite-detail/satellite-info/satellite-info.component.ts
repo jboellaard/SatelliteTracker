@@ -56,6 +56,10 @@ export class SatelliteInfoComponent {
                     this.satellite?.shapeOfBase,
                     this.satellite?.sizeOfBase
                 );
+                if (this.orbitService.guidelines) {
+                    this.orbitService.guidelines = false;
+                    this.orbitService.toggleGuidelines();
+                }
             }, 0);
         }
     }

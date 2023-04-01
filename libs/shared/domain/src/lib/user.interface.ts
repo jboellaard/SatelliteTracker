@@ -25,6 +25,7 @@ export interface AdminUserInfo extends IUserInfo {
 }
 
 export interface ILocation {
+    type?: string;
     coordinates?: {
         longitude: number;
         latitude: number;

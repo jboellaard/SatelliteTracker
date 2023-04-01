@@ -126,7 +126,29 @@ export class UserService {
     }
 
     async update(id: Id, updateUserDto: UpdateUserDto): Promise<APIResult<IUser>> {
-        const updatedUser = await this.userModel.findByIdAndUpdate(id, updateUserDto, { new: true }).exec();
+        if (!updateUserDto.location) updateUserDto.location = null;
+        const setFields = {};
+        const unsetFields = {};
+        for (const key in updateUserDto) {
+            if (updateUserDto[key] === null || updateUserDto[key] === undefined) {
+                unsetFields[key] = '';
+            } else {
+                setFields[key] = updateUserDto[key];
+            }
+        }
+        console.log(setFields);
+        console.log(unsetFields);
+        const updatedUser = await this.userModel
+            .findByIdAndUpdate(
+                id,
+                {
+                    $set: setFields,
+                    $unset: unsetFields,
+                },
+                { new: true }
+            )
+            .exec();
+        // console.log(updatedUser);
         return { status: HttpStatus.OK, result: updatedUser };
     }
 

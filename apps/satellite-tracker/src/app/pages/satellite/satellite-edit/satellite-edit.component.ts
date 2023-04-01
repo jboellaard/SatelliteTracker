@@ -92,6 +92,7 @@ export class SatelliteEditComponent implements OnInit, OnDestroy {
         dialogRef.afterClosed().subscribe((result) => {
             if (result) {
                 this.purposes.push(result);
+                this.satellite.purpose = result;
             }
         });
     }

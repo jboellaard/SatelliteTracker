@@ -13,13 +13,7 @@ import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
         </div>
         <div mat-dialog-actions style="justify-content: space-between; margin: 10px;">
             <button mat-flat-button (click)="onNoClick()">Cancel</button>
-            <button
-                mat-flat-button
-                color="primary"
-                [mat-dialog-close]="purpose"
-                cdkFocusInitial
-                [disabled]="!purpose || purpose == ''"
-            >
+            <button mat-flat-button color="primary" [mat-dialog-close]="purpose" [disabled]="!purpose || purpose == ''">
                 Add
             </button>
         </div>

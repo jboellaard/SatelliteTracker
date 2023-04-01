@@ -132,6 +132,7 @@ export class AuthService {
             this.snackBar.error('Session expired, please login again');
             return of(undefined);
         }
+        console.log('Refreshing token');
         return this.http
             .get<any>(`${environment.API_URL}token`, {
                 headers: { authorization: `Bearer ${refreshToken}` },

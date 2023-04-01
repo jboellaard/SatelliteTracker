@@ -81,13 +81,13 @@ describe('SatelliteInfoComponent', () => {
         };
 
         mockOrbitService = {
-            guideLines: true,
+            guidelines: true,
             showOrbit: true,
             realColor: true,
             realSize: true,
             zoom: 1,
             createOrbitScene: jest.fn(),
-            toggleGuideLines: jest.fn(),
+            toggleGuidelines: jest.fn(),
             toggleOrbit: jest.fn(),
             toggleSize: jest.fn(),
             toggleColor: jest.fn(),

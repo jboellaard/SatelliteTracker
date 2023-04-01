@@ -20,6 +20,7 @@ jobs:
             - name: Install npm dependencies
               run: |
                   npm ci
+
             - name: Run satellite-tracker unit tests
               run: |
                   npx nx run satellite-tracker:test
@@ -32,7 +33,7 @@ jobs:
                   wait-on: http://[::1]:4200
                   wait-on-timeout: 120
 
-            - name: 'Deploy to satellite-tracker to Netlify'
+            - name: 'Deploy satellite-tracker to Netlify'
               uses: jsmrcaga/action-netlify-deploy@v2.0.0
               with:
                   NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}

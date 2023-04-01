@@ -27,8 +27,15 @@ export class ProfileService {
         );
     }
 
-    updateSelf(user: IUser): Observable<IUser | undefined> {
+    updateSelf(user: IUserInfo): Observable<IUser | undefined> {
         return this.http.patch<APIResponse<IUser | undefined>>(this.url + 'self/info', user).pipe(
+            map((response) => response.result),
+            catchError((error) => this.handleError(error))
+        );
+    }
+
+    deleteSelf(): Observable<undefined> {
+        return this.http.delete<APIResponse<undefined>>(this.url + 'self').pipe(
             map((response) => response.result),
             catchError((error) => this.handleError(error))
         );

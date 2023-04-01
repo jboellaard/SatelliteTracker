@@ -128,6 +128,9 @@ export class OrbitEditComponent implements OnInit {
         return Math.round(minSemiMajorAxis);
     }
 
+    /*
+     * Change semimajor axis when eccentricity changes (if semimajor axis is too small)
+     */
     changeEccentricity() {
         if (this.satellite.orbit) {
             if (!this.satellite.orbit.eccentricity) this.satellite.orbit.eccentricity = 0;
