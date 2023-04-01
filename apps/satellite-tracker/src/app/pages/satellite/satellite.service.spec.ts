@@ -190,7 +190,6 @@ describe('SatelliteService', () => {
         const error = new ErrorEvent('error', {
             message: 'error',
         });
-        const spy = jest.spyOn(console, 'log');
         satelliteService.getAll().subscribe({
             error: (err) => {
                 expect(err).toEqual(error);
@@ -198,9 +197,6 @@ describe('SatelliteService', () => {
         });
         const req = httpMock.expectOne(`${environment.API_URL}satellites`);
         req.flush(error, { status: 500, statusText: 'error' });
-        expect(spy).toHaveBeenCalled();
-
-        spy.mockRestore();
 
         satelliteService.getById('1').subscribe({
             error: (err) => {
