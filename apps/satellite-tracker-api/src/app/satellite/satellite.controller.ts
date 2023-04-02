@@ -13,32 +13,32 @@ export class SatelliteController {
     @UseGuards(AccessJwtAuthGuard)
     @Post()
     async create(@Request() req: any, @Body() newSatellite: SatelliteDto): Promise<APIResult<ISatellite>> {
-        this.logger.log('POST satellites called');
+        this.logger.verbose('POST satellites called');
         newSatellite.createdBy = req.user.userId;
         return await this.satelliteService.create(req.user.username, newSatellite);
     }
 
     @Get()
     async findAll(): Promise<APIResult<ISatellite[]>> {
-        this.logger.log('GET satellites called');
+        this.logger.verbose('GET satellites called');
         return await this.satelliteService.findAll();
     }
 
     @Get('parts')
     async getAllSatelliteParts(): Promise<APIResult<ISatellitePart[]>> {
-        this.logger.log('GET satellites/parts called');
+        this.logger.verbose('GET satellites/parts called');
         return await this.satelliteService.getAllSatelliteParts();
     }
 
     @Get('parts/:id')
     async getSatellitePart(@Param('id') id: string): Promise<APIResult<ISatellitePart>> {
-        this.logger.log('GET satellites/parts/:id called');
+        this.logger.verbose('GET satellites/parts/:id called');
         return await this.satelliteService.getSatellitePart(id);
     }
 
     @Get(':id')
     async findOne(@Param('id') id: string): Promise<APIResult<ISatellite>> {
-        this.logger.log('GET satellites/:id called');
+        this.logger.verbose('GET satellites/:id called');
         return await this.satelliteService.findOne(id);
     }
 
@@ -49,14 +49,14 @@ export class SatelliteController {
         @Param('id') id: string,
         @Body() updateSatelliteDto: UpdateSatelliteDto
     ): Promise<APIResult<ISatellite>> {
-        this.logger.log('PATCH satellites/:id called');
+        this.logger.verbose('PATCH satellites/:id called');
         return await this.satelliteService.update(req.user.userId, id, updateSatelliteDto);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Delete(':id')
     async remove(@Request() req: any, @Param('id') id: string): Promise<APIResult<ISatellite>> {
-        this.logger.log('DELETE satellites/:id called');
+        this.logger.verbose('DELETE satellites/:id called');
         return await this.satelliteService.remove(req.user.userId, id);
     }
 
@@ -67,7 +67,7 @@ export class SatelliteController {
         @Param('id') id: string,
         @Body() orbit: OrbitDto
     ): Promise<APIResult<ISatellite>> {
-        this.logger.log('POST satellites/:id/orbit called');
+        this.logger.verbose('POST satellites/:id/orbit called');
         return await this.satelliteService.createOrbit(req.user.userId, id, orbit);
     }
 
@@ -78,34 +78,34 @@ export class SatelliteController {
         @Param('id') id: string,
         @Body() orbit: UpdateOrbitDto
     ): Promise<APIResult<ISatellite>> {
-        this.logger.log('PATCH satellites/:id/orbit called');
+        this.logger.verbose('PATCH satellites/:id/orbit called');
         return await this.satelliteService.updateOrbit(req.user.userId, id, orbit);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Delete(':id/orbit')
     async removeOrbit(@Request() req: any, @Param('id') id: string): Promise<APIResult<ISatellite>> {
-        this.logger.log('DELETE satellites/:id/orbit called');
+        this.logger.verbose('DELETE satellites/:id/orbit called');
         return await this.satelliteService.removeOrbit(req.user.userId, id);
     }
 
     @Get(':id/track')
     async getTrackers(@Param('id') id: string): Promise<APIResult<IUser[]>> {
-        this.logger.log('GET satellites/:id/track called');
+        this.logger.verbose('GET satellites/:id/track called');
         return await this.satelliteService.getTrackers(id);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Post(':id/track')
     async trackSatellite(@Request() req: any, @Param('id') id: string): Promise<APIResult<ISatellite[]>> {
-        this.logger.log('POST satellites/:id/track called');
+        this.logger.verbose('POST satellites/:id/track called');
         return await this.satelliteService.trackSatellite(req.user.username, id);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Delete(':id/track')
     async untrackSatellite(@Request() req: any, @Param('id') id: string): Promise<APIResult<ISatellite[]>> {
-        this.logger.log('DELETE satellites/:id/track called');
+        this.logger.verbose('DELETE satellites/:id/track called');
         return await this.satelliteService.untrackSatellite(req.user.username, id);
     }
 }

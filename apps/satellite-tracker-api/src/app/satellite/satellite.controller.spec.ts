@@ -3,18 +3,41 @@ import { SatelliteController } from './satellite.controller';
 import { SatelliteService } from './satellite.service';
 
 describe('SatelliteController', () => {
-  let controller: SatelliteController;
+    let controller: SatelliteController;
 
-  beforeEach(async () => {
-    const module: TestingModule = await Test.createTestingModule({
-      controllers: [SatelliteController],
-      providers: [SatelliteService],
-    }).compile();
+    let mockSatelliteService = {
+        create: jest.fn(),
+        findAll: jest.fn(),
+        findOne: jest.fn(),
+        update: jest.fn(),
+        remove: jest.fn(),
+        getSatellitesOfUserWithId: jest.fn(),
+        getSatellitesOfUserWithUsername: jest.fn(),
+        getAllSatelliteParts: jest.fn(),
+        getSatellitePart: jest.fn(),
+        createOrbit: jest.fn(),
+        updateOrbit: jest.fn(),
+        removeOrbit: jest.fn(),
+        getTrackers: jest.fn(),
+        trackSatellite: jest.fn(),
+        untrackSatellite: jest.fn(),
+    };
 
-    controller = module.get<SatelliteController>(SatelliteController);
-  });
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            controllers: [SatelliteController],
+            providers: [
+                {
+                    provide: SatelliteService,
+                    useValue: mockSatelliteService,
+                },
+            ],
+        }).compile();
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
-  });
+        controller = module.get<SatelliteController>(SatelliteController);
+    });
+
+    it('should be defined', () => {
+        expect(controller).toBeDefined();
+    });
 });

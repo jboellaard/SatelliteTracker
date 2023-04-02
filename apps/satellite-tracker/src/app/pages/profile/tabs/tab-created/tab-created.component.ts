@@ -41,13 +41,9 @@ export class TabCreatedComponent implements OnInit {
 
         this.userSub = this.profileService.currentUser$.subscribe((user) => {
             this.user = user;
-            console.log(user);
             if (user && this.profileService.created$.value == undefined) {
                 this.profileService.getCreated(user.username).subscribe();
-            } else {
-                console.log('no user');
             }
-            // this.profileService.getCreated(user.username).subscribe();
         });
 
         this.satelliteSub = this.profileService.created$.subscribe((created) => {

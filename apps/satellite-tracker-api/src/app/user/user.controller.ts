@@ -11,45 +11,45 @@ export class UserController {
 
     @Get(':username')
     async findOne(@Param('username') username: string): Promise<APIResult<IUser>> {
-        this.logger.log('GET users/:username called');
+        this.logger.verbose('GET users/:username called');
         return await this.userService.findOne(username);
     }
 
     @Get(':username/satellites')
     async getSatellites(@Param('username') username: string): Promise<APIResult<ISatellite[]>> {
-        this.logger.log('GET users/:username/satellites called');
+        this.logger.verbose('GET users/:username/satellites called');
         return await this.satelliteService.getSatellitesOfUserWithUsername(username);
     }
 
     @Get(':username/following')
     async getFollows(@Param('username') username: string): Promise<APIResult<IUserInfo[]>> {
-        this.logger.log('GET users/:username/follows called');
+        this.logger.verbose('GET users/:username/follows called');
         return await this.userService.getUserFollowing(username);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Post(':username/follow')
     async followUser(@Request() req: any, @Param('username') username: string): Promise<APIResult<IUserInfo[]>> {
-        this.logger.log('POST users/:username/follows called');
+        this.logger.verbose('POST users/:username/follows called');
         return await this.userService.followUser(req.user.username, username);
     }
 
     @UseGuards(AccessJwtAuthGuard)
     @Delete(':username/follow')
     async unfollowUser(@Request() req: any, @Param('username') username: string): Promise<APIResult<IUserInfo[]>> {
-        this.logger.log('DELETE users/:username/follows called');
+        this.logger.verbose('DELETE users/:username/follows called');
         return await this.userService.unfollowUser(req.user.username, username);
     }
 
     @Get(':username/followers')
     async getFollowers(@Param('username') username: string): Promise<APIResult<IUserInfo[]>> {
-        this.logger.log('GET users/:username/followers called');
+        this.logger.verbose('GET users/:username/followers called');
         return await this.userService.getUserFollowers(username);
     }
 
     @Get(':username/tracking')
     async getTracking(@Param('username') username: string): Promise<APIResult<ISatellite[]>> {
-        this.logger.log('GET users/:username/tracking called');
+        this.logger.verbose('GET users/:username/tracking called');
         return await this.userService.getUserTracking(username);
     }
 }

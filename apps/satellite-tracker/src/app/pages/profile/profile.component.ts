@@ -56,8 +56,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
             this.loggedInUserFollowing = following;
         });
         this.route.paramMap.subscribe((params) => {
-            console.log(this.user);
-            console.log(params);
             this.user = undefined;
             this.profileService.created$.next(undefined);
             this.profileService.tracking$.next(undefined);

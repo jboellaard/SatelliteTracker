@@ -32,7 +32,7 @@ export class AuthService {
         stsession.startTransaction();
         identitySession.startTransaction();
         const transaction = neo4jSession.beginTransaction();
-        this.logger.log(`Started transaction for creating user with username ${credentials.username}`);
+        this.logger.verbose(`Started transaction for creating user with username ${credentials.username}`);
         try {
             const userAttributes = { username: credentials.username, ...credentials.profileInfo };
             const user = new this.userModel(userAttributes);
@@ -62,13 +62,13 @@ export class AuthService {
 
             await transaction.commit();
             await Promise.all([stsession.commitTransaction(), identitySession.commitTransaction()]);
-            this.logger.log(`Created user`);
+            this.logger.verbose(`Created user`);
 
             return { status: HttpStatus.CREATED, result: user };
         } catch (error) {
             this.logger.error(error);
             await Promise.all([stsession.abortTransaction(), identitySession.abortTransaction()]);
-            this.logger.error(`Rolled back transaction`);
+            this.logger.error(`Something went wrong, rolling back transaction`);
             if (error.code === 11000) {
                 if (error.keyPattern.username) {
                     throw new HttpException('Username already exists.', HttpStatus.BAD_REQUEST);
@@ -81,7 +81,7 @@ export class AuthService {
             }
             throw new HttpException('Could not create user', HttpStatus.INTERNAL_SERVER_ERROR);
         } finally {
-            this.logger.log(`Closing create sessions`);
+            this.logger.verbose(`Closing create sessions`);
             await Promise.all([stsession.endSession(), identitySession.endSession(), neo4jSession.close()]);
         }
     }
@@ -91,7 +91,7 @@ export class AuthService {
 
         if (!identity || !(await compare(password, identity.hash)))
             throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-        this.logger.log(`User validated, generating tokens for user ${username}`);
+        this.logger.verbose(`User validated, generating tokens for user ${username}`);
         delete identity.hash;
         const payload = await this.getTokens(identity);
         return { status: HttpStatus.OK, result: payload };
@@ -101,7 +101,7 @@ export class AuthService {
         const identity = await this.identityModel.findOne({ username: username }).select('-hash').exec();
 
         if (!identity) throw new HttpException('Invalid credentials', HttpStatus.UNAUTHORIZED);
-        this.logger.log(`Generating new tokens for ${username}`);
+        this.logger.verbose(`Generating new tokens for ${username}`);
         const payload = await this.getTokens(identity);
         return { status: HttpStatus.OK, result: payload };
     }
@@ -154,7 +154,7 @@ export class AuthService {
     ): Promise<APIResult<{ user: UserIdentity; token: Token }>> {
         const identitySession = await this.identityConnection.startSession();
         identitySession.startTransaction();
-        this.logger.log(`Started transaction for updating user with username ${username}`);
+        this.logger.verbose(`Started transaction for updating user with username ${username}`);
         try {
             if (updatedCredentials.password) {
                 updatedCredentials.password = await hash(
@@ -212,19 +212,19 @@ export class AuthService {
         } catch (error) {
             this.logger.error(error);
             await identitySession.abortTransaction();
-            this.logger.error(`Rolled back transaction`);
+            this.logger.error(`Something went wrong, rolling back transaction`);
             if (error instanceof Error) {
                 throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
             }
             throw new HttpException('Could not update user', HttpStatus.INTERNAL_SERVER_ERROR);
         } finally {
-            this.logger.log(`Closing update session`);
+            this.logger.verbose(`Closing update session`);
             await identitySession.endSession();
         }
     }
 
     async delete(username: string): Promise<APIResult<IUser>> {
-        this.logger.log(`Removing user with username ${username} (including identity)`);
+        this.logger.verbose(`Removing user with username ${username} (including identity)`);
         const stsession = await this.stconnection.startSession();
         const identitySession = await this.identityConnection.startSession();
         const neo4jSession = this.neo4jService.getWriteSession();
@@ -232,7 +232,7 @@ export class AuthService {
         stsession.startTransaction();
         identitySession.startTransaction();
         const transaction = neo4jSession.beginTransaction();
-        this.logger.log(`Started transaction for deleting user with username ${username}`);
+        this.logger.verbose(`Started transaction for deleting user with username ${username}`);
 
         try {
             const user = await this.userModel.findOneAndDelete({ username: username }).session(stsession).exec();
@@ -251,18 +251,18 @@ export class AuthService {
             }
             await transaction.commit();
             await Promise.all([stsession.commitTransaction(), identitySession.commitTransaction()]);
-            this.logger.log(`Deleted user and identity`);
+            this.logger.verbose(`Deleted user and identity`);
             return { status: HttpStatus.OK, result: user };
         } catch (error) {
             this.logger.error(error);
             await Promise.all([stsession.abortTransaction(), identitySession.abortTransaction()]);
-            this.logger.error(`Rolled back transaction`);
+            this.logger.error(`Something went wrong, rolling back transaction`);
             if (error instanceof Error) {
                 throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
             }
             throw new HttpException('Could not delete user', HttpStatus.INTERNAL_SERVER_ERROR);
         } finally {
-            this.logger.log(`Closing delete sessions`);
+            this.logger.verbose(`Closing delete sessions`);
             await Promise.all([stsession.endSession(), identitySession.endSession(), neo4jSession.close()]);
         }
     }

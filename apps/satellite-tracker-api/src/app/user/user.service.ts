@@ -136,19 +136,9 @@ export class UserService {
                 setFields[key] = updateUserDto[key];
             }
         }
-        console.log(setFields);
-        console.log(unsetFields);
         const updatedUser = await this.userModel
-            .findByIdAndUpdate(
-                id,
-                {
-                    $set: setFields,
-                    $unset: unsetFields,
-                },
-                { new: true }
-            )
+            .findByIdAndUpdate(id, { $set: setFields, $unset: unsetFields }, { new: true })
             .exec();
-        // console.log(updatedUser);
         return { status: HttpStatus.OK, result: updatedUser };
     }
 

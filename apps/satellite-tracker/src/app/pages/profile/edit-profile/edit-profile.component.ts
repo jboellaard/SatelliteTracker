@@ -100,7 +100,6 @@ export class EditProfileComponent implements OnInit, OnDestroy {
             } else if (this.user.location && !this.coordinates.latitude && !this.coordinates.longitude) {
                 this.user.location = undefined;
             }
-            console.log(this.user);
             const dialogRef = this.dialog.open(AddEditDialogComponent, {
                 data: { message: 'Are you sure you want to update your information?' },
             });

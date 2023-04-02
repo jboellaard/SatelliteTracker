@@ -26,7 +26,7 @@ export class AuthInterceptor implements HttpInterceptor {
                 if (
                     error instanceof HttpErrorResponse &&
                     error.status === 401 &&
-                    !req.url.includes('refresh') &&
+                    !req.url.includes('token') &&
                     !req.url.includes('login') &&
                     !req.url.includes('register')
                 ) {

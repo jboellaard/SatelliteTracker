@@ -11,23 +11,24 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { APIResponseInterceptor } from './api-response.interceptor';
 import { RecommendationsModule } from './recommendations/recommendations.module';
 import { FeedModule } from './feed/feed.module';
+import { Neo4jScheme } from './neo4j/neo4j.config.interface';
 
 @Module({
     imports: [
         MongooseModule.forRootAsync({
             connectionName: `${process.env.MONGO_DATABASE}`,
             useFactory: () => ({
-                uri: `mongodb+srv://${process.env.MONGO_USR}:${process.env.MONGO_PWD}@${process.env.MONGO_HOST}/${process.env.MONGO_DATABASE}?retryWrites=true&w=majority&readPreference=primary&ssl=true`,
+                uri: `${process.env.MONGO_CONN}/${process.env.MONGO_DATABASE}${process.env.MONGO_OPTIONS}`,
             }),
         }),
         MongooseModule.forRootAsync({
             connectionName: `${process.env.MONGO_IDENTITYDB}`,
             useFactory: () => ({
-                uri: `mongodb+srv://${process.env.MONGO_USR}:${process.env.MONGO_PWD}@${process.env.MONGO_HOST}/${process.env.MONGO_IDENTITYDB}?retryWrites=true&w=majority&readPreference=primary&ssl=true`,
+                uri: `${process.env.MONGO_CONN}/${process.env.MONGO_IDENTITYDB}${process.env.MONGO_OPTIONS}`,
             }),
         }),
         Neo4jModule.forRootAsync({
-            scheme: 'neo4j+s',
+            scheme: process.env.NEO4J_SCHEME as Neo4jScheme,
             host: process.env.NEO4J_HOST,
             username: process.env.NEO4J_USR,
             password: process.env.NEO4J_PWD,
