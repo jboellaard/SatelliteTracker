@@ -56,10 +56,20 @@ export class SatelliteInfoComponent {
                     this.satellite?.shapeOfBase,
                     this.satellite?.sizeOfBase
                 );
+                this.orbitService.changeZoom(this.satellite!.orbit!);
                 if (this.orbitService.guidelines) {
                     this.orbitService.guidelines = false;
                     this.orbitService.toggleGuidelines();
                 }
+                if (
+                    this.satellite?.sizeOfBase! >=
+                    200000 * this.orbitService.scale * this.satellite!.orbit!.semiMajorAxis * 1.3
+                ) {
+                    this.orbitService.realSize = true;
+                } else {
+                    this.orbitService.realSize = false;
+                }
+                this.orbitService.toggleSize();
             }, 0);
         }
     }

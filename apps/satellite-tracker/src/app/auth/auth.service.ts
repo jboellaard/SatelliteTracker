@@ -86,7 +86,11 @@ export class AuthService {
             }),
             catchError((err) => {
                 if (err.status == 400 && err.error.message.includes('already exists')) {
-                    return of('This username is already taken, please choose a different username.');
+                    console.log(err.error.message);
+                    if (err.error.message.toLowerCase().includes('username'))
+                        return of('This username is already taken, please choose a different username.');
+                    if (err.error.message.toLowerCase().includes('email'))
+                        return of('This email is already taken, please choose a different email or continue without.');
                 }
                 return this.handleError(err);
             })

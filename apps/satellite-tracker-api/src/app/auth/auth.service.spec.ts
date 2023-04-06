@@ -1,4 +1,4 @@
-import { Test } from '@nestjs/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
 import { User, UserSchema } from '../user/schemas/user.schema';
 import { Satellite, SatelliteSchema } from '../satellite/schemas/satellite.schema';
@@ -12,6 +12,24 @@ import { RefreshJwtStrategy } from './guards/refresh-jwt.strategy';
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongoClient } from 'mongodb';
+
+class UserModel {
+    constructor() {}
+    save = jest.fn().mockResolvedValue({});
+    static create = jest.fn().mockResolvedValue({});
+}
+
+class SatelliteModel {
+    constructor() {}
+    save = jest.fn();
+    static create = jest.fn();
+}
+
+class IdentityModel {
+    constructor() {}
+    save = jest.fn();
+    static create = jest.fn();
+}
 
 describe('AuthService', () => {
     let service: AuthService;
@@ -72,20 +90,14 @@ describe('AuthService', () => {
     beforeAll(async () => {
         mongod = await MongoMemoryServer.create({ instance: { dbName: `${process.env.MONGO_DATABASE}` } });
         mongoc = await MongoClient.connect(mongod.getUri(), {});
-        // connection = (await mongoose.connect(mongod.getUri())).connection;
         mongodId = await MongoMemoryServer.create({ instance: { dbName: `${process.env.MONGO_IDENTITYDB}` } });
         mongocId = await MongoClient.connect(mongodId.getUri(), {});
-        // connectionId = (await mongoose.connect(mongodId.getUri())).connection;
-
-        // satelliteModel = connection.model('satellite', SatelliteSchema);
-        // userModel = connection.model('user', UserSchema);
-        // identityModel = connectionId.model('identity', IdentitySchema);
 
         satelliteModel = mongoc.db(`${process.env.MONGO_DATABASE}`).collection('satellite');
         userModel = mongoc.db(`${process.env.MONGO_DATABASE}`).collection('user');
         identityModel = mongocId.db(`${process.env.MONGO_IDENTITYDB}`).collection('identity');
 
-        const app = await Test.createTestingModule({
+        const app: TestingModule = await Test.createTestingModule({
             providers: [
                 AuthService,
                 {
@@ -110,15 +122,15 @@ describe('AuthService', () => {
                 },
                 {
                     provide: getModelToken('User', `${process.env.MONGO_DATABASE}`),
-                    useValue: userModel,
+                    useValue: UserModel,
                 },
                 {
                     provide: getModelToken('Satellite', `${process.env.MONGO_DATABASE}`),
-                    useValue: satelliteModel,
+                    useValue: SatelliteModel,
                 },
                 {
                     provide: getModelToken('Identity', `${process.env.MONGO_IDENTITYDB}`),
-                    useValue: identityModel,
+                    useValue: IdentityModel,
                 },
                 {
                     provide: getConnectionToken(`${process.env.MONGO_DATABASE}`),
@@ -144,82 +156,6 @@ describe('AuthService', () => {
         if (mongocId) await mongocId.close();
         if (mongodId) await mongodId.stop();
     });
-
-    // beforeAll(async () => {
-    //     const app = await Test.createTestingModule({
-    //         providers: [
-    //             AuthService,
-    //             {
-    //                 provide: AccessJwtStrategy,
-    //                 useValue: {
-    //                     validate: jest.fn().mockResolvedValue(user),
-    //                     constructor: jest.fn(),
-    //                 },
-    //             },
-    //             {
-    //                 provide: RefreshJwtStrategy,
-    //                 useValue: {
-    //                     validate: jest.fn().mockResolvedValue(user),
-    //                     constructor: jest.fn(),
-    //                 },
-    //             },
-    //             {
-    //                 provide: JwtService,
-    //                 useValue: {
-    //                     sign: jest.fn().mockReturnValue('token'),
-    //                 },
-    //             },
-    //             {
-    //                 provide: getModelToken('User', `${process.env.MONGO_DATABASE}`),
-    //                 useValue: {
-    //                     create: jest.fn().mockResolvedValue({ username: user.username }),
-    //                 },
-    //             },
-    //             {
-    //                 provide: getModelToken('Satellite', `${process.env.MONGO_DATABASE}`),
-    //                 useValue: mongoose.model('satellite', SatelliteSchema),
-    //             },
-    //             {
-    //                 provide: getModelToken('Identity', `${process.env.MONGO_IDENTITYDB}`),
-    //                 useValue: {
-    //                     create: jest.fn().mockResolvedValue(user),
-    //                 },
-    //             },
-    //             {
-    //                 provide: getConnectionToken(`${process.env.MONGO_DATABASE}`),
-    //                 useValue: {
-    //                     startSession: {
-    //                         startTransaction: jest.fn(),
-    //                         commitTransaction: jest.fn(),
-    //                         abortTransaction: jest.fn(),
-    //                         endSession: jest.fn(),
-    //                     },
-    //                 },
-    //             },
-    //             {
-    //                 provide: getConnectionToken(`${process.env.MONGO_IDENTITYDB}`),
-    //                 useValue: {
-    //                     startSession: {
-    //                         startTransaction: jest.fn(),
-    //                         commitTransaction: jest.fn(),
-    //                         abortTransaction: jest.fn(),
-    //                         endSession: jest.fn(),
-    //                     },
-    //                 },
-    //             },
-    //             {
-    //                 provide: Neo4jService,
-    //                 useValue: mockNeo4jService,
-    //             },
-    //         ],
-    //     }).compile();
-
-    //     service = app.get<AuthService>(AuthService);
-
-    //     satelliteModel = app.get<Model<Satellite>>(getModelToken('Satellite', `${process.env.MONGO_DATABASE}`));
-    //     userModel = app.get<Model<User>>(getModelToken('User', `${process.env.MONGO_DATABASE}`));
-    //     identityModel = app.get<Model<Identity>>(getModelToken('Identity', `${process.env.MONGO_IDENTITYDB}`));
-    // });
 
     it('should be defined', () => {
         expect(service).toBeDefined();
