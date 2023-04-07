@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { Identity, IdentitySchema } from '../auth/schemas/identity.schema';
-import { Satellite, SatelliteSchema, SatellitePart, SatellitePartSchema } from '../satellite/schemas/satellite.schema';
+import { Satellite, SatelliteSchema } from '../satellite/schemas/satellite.schema';
+import { SatellitePart, SatellitePartSchema } from '../satellite/schemas/satellite-part.schema';
 import { User, UserSchema } from '../user/schemas/user.schema';
 import { DbseedService } from './dbseed.service';
 

@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { FeedService } from './feed.service';
 import { FeedController } from './feed.controller';
-import { Satellite, SatellitePart, SatellitePartSchema, SatelliteSchema } from '../satellite/schemas/satellite.schema';
+import { Satellite, SatelliteSchema } from '../satellite/schemas/satellite.schema';
+import { SatellitePart, SatellitePartSchema } from '../satellite/schemas/satellite-part.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../user/schemas/user.schema';
 

@@ -86,7 +86,6 @@ export class AuthService {
             }),
             catchError((err) => {
                 if (err.status == 400 && err.error.message.includes('already exists')) {
-                    console.log(err.error.message);
                     if (err.error.message.toLowerCase().includes('username'))
                         return of('This username is already taken, please choose a different username.');
                     if (err.error.message.toLowerCase().includes('email'))
@@ -137,7 +136,7 @@ export class AuthService {
             this.snackBar.error('Session expired, please login again');
             return of(undefined);
         }
-        console.log('Refreshing token');
+        console.log('Refreshing access token');
         return this.http
             .get<any>(`${environment.API_URL}token`, {
                 headers: { authorization: `Bearer ${refreshToken}` },

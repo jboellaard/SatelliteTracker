@@ -4,7 +4,8 @@ import { SatelliteController } from './satellite.controller';
 import { UserService } from '../user/user.service';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../user/schemas/user.schema';
-import { Satellite, SatellitePart, SatellitePartSchema, SatelliteSchema } from './schemas/satellite.schema';
+import { Satellite, SatelliteSchema } from './schemas/satellite.schema';
+import { SatellitePart, SatellitePartSchema } from './schemas/satellite-part.schema';
 
 @Module({
     imports: [

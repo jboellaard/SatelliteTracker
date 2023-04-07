@@ -1,12 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthService } from './auth.service';
-import { User, UserSchema } from '../user/schemas/user.schema';
-import { Satellite, SatelliteSchema } from '../satellite/schemas/satellite.schema';
-import mongoose, { Model } from 'mongoose';
 import { getConnectionToken, getModelToken } from '@nestjs/mongoose';
-import { Identity, IdentitySchema } from './schemas/identity.schema';
-import { JwtModule, JwtService } from '@nestjs/jwt';
-import { UserService } from '../user/user.service';
+import { JwtService } from '@nestjs/jwt';
 import { AccessJwtStrategy } from './guards/access-jwt.strategy';
 import { RefreshJwtStrategy } from './guards/refresh-jwt.strategy';
 import { Neo4jService } from '../neo4j/neo4j.service';
@@ -38,10 +33,6 @@ describe('AuthService', () => {
     let mongoc: MongoClient;
     let mongodId: MongoMemoryServer;
     let mongocId: MongoClient;
-
-    let satelliteModel;
-    let userModel;
-    let identityModel;
 
     let mockNeo4jService = {
         getReadSession: jest.fn(() => {
@@ -92,10 +83,6 @@ describe('AuthService', () => {
         mongoc = await MongoClient.connect(mongod.getUri(), {});
         mongodId = await MongoMemoryServer.create({ instance: { dbName: `${process.env.MONGO_IDENTITYDB}` } });
         mongocId = await MongoClient.connect(mongodId.getUri(), {});
-
-        satelliteModel = mongoc.db(`${process.env.MONGO_DATABASE}`).collection('satellite');
-        userModel = mongoc.db(`${process.env.MONGO_DATABASE}`).collection('user');
-        identityModel = mongocId.db(`${process.env.MONGO_IDENTITYDB}`).collection('identity');
 
         const app: TestingModule = await Test.createTestingModule({
             providers: [

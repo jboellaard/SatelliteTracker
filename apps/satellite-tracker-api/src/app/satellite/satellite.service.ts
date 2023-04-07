@@ -1,7 +1,8 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { SatelliteDto, UpdateSatelliteDto } from './dto/satellite.dto';
 import { APIResult, Id, ISatellite, ISatellitePart, IUser } from 'shared/domain';
-import { Satellite, SatellitePart } from './schemas/satellite.schema';
+import { Satellite } from './schemas/satellite.schema';
+import { SatellitePart } from './schemas/satellite-part.schema';
 import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from '../user/schemas/user.schema';
 import mongoose, { Model } from 'mongoose';

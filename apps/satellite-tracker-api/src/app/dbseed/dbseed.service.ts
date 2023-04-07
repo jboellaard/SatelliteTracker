@@ -5,12 +5,8 @@ import { Model } from 'mongoose';
 import { Shape } from 'shared/domain';
 import { Identity, IdentityDocument } from '../auth/schemas/identity.schema';
 import { Neo4jService } from '../neo4j/neo4j.service';
-import {
-    Satellite,
-    SatelliteDocument,
-    SatellitePart,
-    SatellitePartDocument,
-} from '../satellite/schemas/satellite.schema';
+import { Satellite, SatelliteDocument } from '../satellite/schemas/satellite.schema';
+import { SatellitePart, SatellitePartDocument } from '../satellite/schemas/satellite-part.schema';
 import { User, UserDocument } from '../user/schemas/user.schema';
 
 @Injectable()
