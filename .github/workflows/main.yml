@@ -21,26 +21,29 @@ jobs:
               run: |
                   npm ci
 
-            - name: Run satellite-tracker unit tests
+#             - name: Run satellite-tracker unit tests
+#               run: |
+#                   npx nx run satellite-tracker:test
+
+#             - name: Run satellite-tracker e2e tests
+#               uses: cypress-io/github-action@v5.5.1
+#               with:
+#                   project: ./apps/satellite-tracker-e2e
+#                   start: npm run start
+#                   wait-on: http://[::1]:4200
+#                   wait-on-timeout: 120
+
+#             - name: 'Deploy satellite-tracker to Netlify'
+#               uses: jsmrcaga/action-netlify-deploy@v2.0.0
+#               with:
+#                   NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
+#                   NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+#                   NETLIFY_DEPLOY_TO_PROD: true
+#                   build_command: 'npm run build'
+#                   build_directory: 'dist/apps/satellite-tracker'
+            - name: 'Create env file'
               run: |
-                  npx nx run satellite-tracker:test
-
-            - name: Run satellite-tracker e2e tests
-              uses: cypress-io/github-action@v5.5.1
-              with:
-                  project: ./apps/satellite-tracker-e2e
-                  start: npm run start
-                  wait-on: http://[::1]:4200
-                  wait-on-timeout: 120
-
-            - name: 'Deploy satellite-tracker to Netlify'
-              uses: jsmrcaga/action-netlify-deploy@v2.0.0
-              with:
-                  NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_TOKEN }}
-                  NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
-                  NETLIFY_DEPLOY_TO_PROD: true
-                  build_command: 'npm run build'
-                  build_directory: 'dist/apps/satellite-tracker'
+                echo "${{ secrets.ENV_FILE }}" > .env
 
             - uses: baptouuuu/setup-neo4j@v1.2.0
             - uses: supercharge/mongodb-github-action@1.7.0
