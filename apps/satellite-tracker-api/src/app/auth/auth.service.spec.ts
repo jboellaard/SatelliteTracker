@@ -157,5 +157,6 @@ describe('AuthService', () => {
 
         const result = await service.registerUser(user);
         expect(result).toBeDefined();
+        expect(result).toHaveProperty('status', 201);
     });
 });

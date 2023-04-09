@@ -52,7 +52,8 @@
             "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
             "options": {
                 "jestConfig": "apps/satellite-tracker-api/jest.config.ts",
-                "passWithNoTests": true
+                "passWithNoTests": true,
+                "detectOpenHandles": true
             }
         }
     },

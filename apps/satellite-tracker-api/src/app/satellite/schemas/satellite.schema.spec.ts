@@ -74,11 +74,11 @@ describe('Satellite Schema', () => {
 
     afterAll(async () => {
         await disconnect();
-        await mongod.stop();
+        if (mongod) await mongod.stop();
     });
 
     afterEach(async () => {
-        await satelliteModel.deleteMany({});
+        if (satelliteModel) await satelliteModel.deleteMany({});
     });
 
     describe('validation and required fields', () => {

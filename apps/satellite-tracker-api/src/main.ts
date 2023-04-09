@@ -10,6 +10,7 @@ async function bootstrap() {
     app.setGlobalPrefix(globalPrefix);
     // app.useGlobalInterceptors(new APIResponseInterceptor());
     app.enableCors();
+    app.enableShutdownHooks();
 
     const port = process.env.PORT || 3333;
     await app.listen(port);
