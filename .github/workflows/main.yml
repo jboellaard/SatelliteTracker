@@ -49,6 +49,7 @@ jobs:
             - uses: supercharge/mongodb-github-action@1.7.0
               with:
                 mongodb-version: '4.2'
+                mongodb-replica-set: rs0
             - run: npx nx run satellite-tracker-api:test
 
             - name: Install Railway
