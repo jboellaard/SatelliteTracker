@@ -42,13 +42,11 @@ jobs:
                   build_command: 'npm run build'
                   build_directory: 'dist/apps/satellite-tracker'
 
-            - name: Run satellite-tracker-api tests
-              steps:
-                  - uses: baptouuuu/setup-neo4j@v1.2.0
-                  - uses: supercharge/mongodb-github-action@1.7.0
-                    with:
-                        mongodb-version: '4.2'
-                  - run: nx satellite-tracker-api:test
+            - uses: baptouuuu/setup-neo4j@v1.2.0
+            - uses: supercharge/mongodb-github-action@1.7.0
+              with:
+                mongodb-version: '4.2'
+            - run: npx nx run satellite-tracker-api:test
 
             - name: Install Railway
               run: npm i -g @railway/cli
