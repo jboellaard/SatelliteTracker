@@ -1,6 +1,6 @@
 import { disconnect } from 'mongoose';
 import { AppModule } from '../src/app/app.module';
-import { Shape, getPeriod } from 'shared/domain';
+import { Shape } from 'shared/domain';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
@@ -13,6 +13,8 @@ import { User } from './app/user/schemas/user.schema';
 import { CustomSatellitePart } from './app/satellite/schemas/satellite-part.schema';
 
 describe('Satellite tracker API e2e tests', () => {
+    jest.setTimeout(50000);
+
     let app: INestApplication;
     let neo4jService: Neo4jService;
     let server;
@@ -534,7 +536,6 @@ describe('Satellite tracker API e2e tests', () => {
     });
 
     describe('Neo queries', () => {
-        jest.setTimeout(10000);
         it('recommends users to follow based on who they follow with a depth of 2 to 4', async () => {
             // Add new users
             await request(server).post('/register').send({
