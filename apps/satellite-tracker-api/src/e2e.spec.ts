@@ -3,18 +3,23 @@
 //
 import mongoose, { disconnect } from 'mongoose';
 import { AppModule } from '../src/app/app.module';
-import { getPeriod } from 'shared/domain';
+import { Shape, getPeriod } from 'shared/domain';
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import * as request from 'supertest';
 import { MongoClient } from 'mongodb';
 import { Neo4jService } from './app/neo4j/neo4j.service';
 import { Neo4jModule } from './app/neo4j/neo4j.module';
+import * as bcrypt from 'bcrypt';
+import { Satellite } from './app/satellite/schemas/satellite.schema';
+import { Identity } from './app/auth/schemas/identity.schema';
+import { User } from './app/user/schemas/user.schema';
 
 describe('Satellite tracker API e2e tests', () => {
     let app: INestApplication;
     let neo4jService: Neo4jService;
     let users;
+    let identities;
     let satellites;
 
     let db;
@@ -40,10 +45,88 @@ describe('Satellite tracker API e2e tests', () => {
         );
         iddb = iddbConnection.db(process.env.MONGO_IDENTITYDB);
 
-        db.collection('users').deleteMany({});
-        db.collection('satellites').deleteMany({});
-        iddb.collection('identities').deleteMany({});
-        await neo4jService.write('MATCH (n) DETACH DELETE n', {});
+        await Promise.all([
+            db.collection('users').deleteMany({}),
+            db.collection('satellites').deleteMany({}),
+            iddb.collection('identities').deleteMany({}),
+            neo4jService.write('MATCH (n) DETACH DELETE n', {}),
+            neo4jService.write(
+                `CREATE CONSTRAINT unique_username IF NOT EXISTS FOR (u:User) REQUIRE u.username IS UNIQUE`,
+                {}
+            ),
+            neo4jService.write(
+                `CREATE CONSTRAINT unique_satellite IF NOT EXISTS FOR (s:Satellite) REQUIRE (s.satelliteName, s.createdBy) IS UNIQUE`,
+                {}
+            ),
+        ]);
+
+        const password = 'password';
+        users = await db.collection('users').insertMany([
+            {
+                username: 'user',
+                location: {
+                    type: 'Point',
+                    coordinates: [0, 0],
+                },
+                profileDescrition: 'description',
+            },
+            {
+                username: 'user2',
+            },
+            {
+                username: 'user3',
+            },
+            {
+                username: 'user4',
+            },
+        ] as User[]);
+        identities = await iddb.collection('identities').insertMany([
+            {
+                username: 'user',
+                hash: await bcrypt.hash(password, process.env.SALT_ROUNDS),
+            },
+            {
+                username: 'user2',
+                hash: await bcrypt.hash(password, process.env.SALT_ROUNDS),
+            },
+            {
+                username: 'user3',
+                hash: await bcrypt.hash(password, process.env.SALT_ROUNDS),
+            },
+            {
+                username: 'user4',
+                hash: await bcrypt.hash(password, process.env.SALT_ROUNDS),
+            },
+        ] as Identity[]);
+        satellites = await db.collection('satellites').insertMany([
+            {
+                satelliteName: 'satellite1',
+                description: 'description',
+                mass: 100,
+                sizeOfBase: 100,
+                colorOfBase: '#ffffff',
+                shapeOfBase: Shape.Cube,
+                createdBy: users[0]._id,
+            },
+            {
+                satelliteName: 'satellite2',
+                description: 'description',
+                mass: 100,
+                sizeOfBase: 100,
+                colorOfBase: '#ffffff',
+                shapeOfBase: Shape.Cube,
+                createdBy: users[0]._id,
+            },
+            {
+                satelliteName: 'satellite1',
+                description: 'description',
+                mass: 100,
+                sizeOfBase: 100,
+                colorOfBase: '#ffffff',
+                shapeOfBase: Shape.Cube,
+                createdBy: users[1]._id,
+            },
+        ] as Satellite[]);
     });
 
     beforeEach(async () => {});
