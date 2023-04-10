@@ -4,11 +4,9 @@ export const AuthNeoQueries = {
      *
      * returns: user
      */
-    addUser: 'MERGE (user:User {username: $username}) RETURN user',
+    addUser: 'CREATE (user:User {username: $username}) RETURN user',
     /** params: username */
-    removeUser:
-        'MATCH (a:User {username: $username}) \
-                OPTIONAL MATCH (a)-[:CREATED]->(s) DETACH DELETE a, s',
+    removeUser: 'MATCH (a:User {username: $username}) OPTIONAL MATCH (a)-[:CREATED]->(s) DETACH DELETE a, s',
     /**
      * params: username, newUsername
      *

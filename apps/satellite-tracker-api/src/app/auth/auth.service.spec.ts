@@ -9,19 +9,25 @@ import { MongoMemoryServer } from 'mongodb-memory-server';
 import { MongoClient } from 'mongodb';
 
 class UserModel {
-    constructor() {}
+    constructor() {
+        /* test constructor */
+    }
     save = jest.fn().mockResolvedValue({});
     static create = jest.fn().mockResolvedValue({});
 }
 
 class SatelliteModel {
-    constructor() {}
+    constructor() {
+        /* test constructor */
+    }
     save = jest.fn();
     static create = jest.fn();
 }
 
 class IdentityModel {
-    constructor() {}
+    constructor() {
+        /* test constructor */
+    }
     save = jest.fn();
     static create = jest.fn();
 }

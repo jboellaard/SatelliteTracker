@@ -9,6 +9,7 @@ import { AdminUserInfo, APIResult, IUser, Token, UserIdentity, UserRegistration 
 import { Neo4jService } from '../neo4j/neo4j.service';
 import { AuthNeoQueries } from './neo4j/auth.cypher';
 import { Satellite, SatelliteDocument } from '../satellite/schemas/satellite.schema';
+import { Neo4jError } from 'neo4j-driver';
 
 @Injectable()
 export class AuthService {
@@ -75,6 +76,11 @@ export class AuthService {
                 } else if (error.keyPattern.emailAddress) {
                     throw new HttpException('Email address already exists.', HttpStatus.BAD_REQUEST);
                 }
+            } else if (
+                error instanceof Neo4jError &&
+                error.code === 'Neo.ClientError.Schema.ConstraintValidationFailed'
+            ) {
+                throw new HttpException('Username already exists.', HttpStatus.BAD_REQUEST);
             }
             if (error instanceof Error) {
                 throw new HttpException(error.message, HttpStatus.BAD_REQUEST);
