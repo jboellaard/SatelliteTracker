@@ -53,7 +53,8 @@
             "options": {
                 "jestConfig": "apps/satellite-tracker-api/jest.config.ts",
                 "passWithNoTests": true,
-                "detectOpenHandles": true
+                "detectOpenHandles": true,
+                "verbose": true
             }
         }
     },

@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SatelliteController } from './satellite.controller';
 import { SatelliteService } from './satellite.service';
+import { Shape } from 'shared/domain';
 
-describe.skip('SatelliteController', () => {
+describe('SatelliteController', () => {
     let controller: SatelliteController;
 
     let mockSatelliteService = {
@@ -39,5 +40,13 @@ describe.skip('SatelliteController', () => {
 
     it('should be defined', () => {
         expect(controller).toBeDefined();
+    });
+
+    it('should call create', () => {
+        controller.create(
+            { user: { username: 'test', userId: '1' } },
+            { satelliteName: 'test', mass: 100, sizeOfBase: 100, shapeOfBase: Shape.Cube, colorOfBase: '#ffffff' }
+        );
+        expect(mockSatelliteService.create).toHaveBeenCalled();
     });
 });

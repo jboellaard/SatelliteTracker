@@ -27,7 +27,7 @@ export class FeedService {
                 createdBy: record.get('satellite').properties.createdBy,
             };
         });
-        // satellites = satellites.filter((satellite) => satellite.createdBy !== username);
+        /**  satellites = satellites.filter((satellite) => satellite.createdBy !== username); */
         const users = await this.userModel
             .find({ username: { $in: satellites.map((satellite) => satellite.createdBy) } })
             .exec();
@@ -178,7 +178,7 @@ export class FeedService {
                 createdBy: record.get('satellite').properties.createdBy,
             };
         });
-        // satellites = satellites.filter((satellite) => satellite.createdBy !== username);
+        /**  satellites = satellites.filter((satellite) => satellite.createdBy !== username);*/
         const users = await this.userModel
             .find({ username: { $in: satellites.map((satellite) => satellite.createdBy) } })
             .exec();
