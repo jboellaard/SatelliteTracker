@@ -94,9 +94,8 @@ SatelliteSchema.pre('validate', async function (next) {
                         part.satellitePart.dependsOn
                             .map((p) => p?.toString())
                             .includes(sp.satellitePart._id?.toString())
-                    ) {
+                    )
                         next();
-                    }
                 }
                 next(
                     new Error(

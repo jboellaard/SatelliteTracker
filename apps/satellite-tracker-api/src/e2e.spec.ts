@@ -11,15 +11,17 @@ import { MongoClient } from 'mongodb';
 import { Neo4jService } from './app/neo4j/neo4j.service';
 import { Neo4jModule } from './app/neo4j/neo4j.module';
 import * as bcrypt from 'bcrypt';
-import { Satellite } from './app/satellite/schemas/satellite.schema';
+import { Orbit, Satellite } from './app/satellite/schemas/satellite.schema';
 import { Identity } from './app/auth/schemas/identity.schema';
 import { User } from './app/user/schemas/user.schema';
+import { CustomSatellitePart } from './app/satellite/schemas/satellite-part.schema';
 
 describe('Satellite tracker API e2e tests', () => {
     let app: INestApplication;
     let neo4jService: Neo4jService;
     let users;
     let identities;
+    let satelliteParts;
     let satellites;
 
     let db;
@@ -48,6 +50,7 @@ describe('Satellite tracker API e2e tests', () => {
         await Promise.all([
             db.collection('users').deleteMany({}),
             db.collection('satellites').deleteMany({}),
+            db.collection('satelliteParts').deleteMany({}),
             iddb.collection('identities').deleteMany({}),
             neo4jService.write('MATCH (n) DETACH DELETE n', {}),
             neo4jService.write(
@@ -61,7 +64,7 @@ describe('Satellite tracker API e2e tests', () => {
         ]);
 
         const password = 'password';
-        users = await db.collection('users').insertMany([
+        await db.collection('users').insertMany([
             {
                 username: 'user',
                 location: {
@@ -80,25 +83,73 @@ describe('Satellite tracker API e2e tests', () => {
                 username: 'user4',
             },
         ] as User[]);
-        identities = await iddb.collection('identities').insertMany([
+        users = await db.collection('users').find({}).toArray();
+        await iddb.collection('identities').insertMany([
             {
                 username: 'user',
-                hash: await bcrypt.hash(password, process.env.SALT_ROUNDS),
+                hash: await bcrypt.hash(password, parseInt(`${process.env.SALT_ROUNDS}`, 10)),
+                user: users[0]._id,
             },
             {
                 username: 'user2',
-                hash: await bcrypt.hash(password, process.env.SALT_ROUNDS),
+                hash: await bcrypt.hash(password, parseInt(`${process.env.SALT_ROUNDS}`, 10)),
+                user: users[1]._id,
             },
             {
                 username: 'user3',
-                hash: await bcrypt.hash(password, process.env.SALT_ROUNDS),
+                hash: await bcrypt.hash(password, parseInt(`${process.env.SALT_ROUNDS}`, 10)),
+                user: users[2]._id,
             },
             {
                 username: 'user4',
-                hash: await bcrypt.hash(password, process.env.SALT_ROUNDS),
+                hash: await bcrypt.hash(password, parseInt(`${process.env.SALT_ROUNDS}`, 10)),
+                user: users[3]._id,
             },
         ] as Identity[]);
-        satellites = await db.collection('satellites').insertMany([
+        // identities = await iddb.collection('identities').find({}).toArray();
+        users.forEach((user) => {
+            neo4jService.write('MERGE u:User {username: $username} RETURN u', {
+                username: user.username,
+            });
+        });
+        await db.collection('satelliteParts').insertMany([
+            {
+                partName: 'part1',
+                description: 'description',
+                function: 'function',
+                material: 'material',
+            },
+            {
+                partName: 'part2',
+                description: 'description',
+                function: 'function',
+                material: 'material',
+            },
+        ]);
+        satelliteParts = await db.collection('satelliteParts').find({}).toArray();
+        await db.collection('satelliteParts').insertMany([
+            {
+                partName: 'part3',
+                description: 'description',
+                function: 'function',
+                material: 'material',
+                dependsOn: [satelliteParts[0]._id, satelliteParts[1]._id],
+            },
+            {
+                partName: 'part4',
+                description: 'description',
+                function: 'function',
+                material: 'material',
+                dependsOn: [satelliteParts[0]._id],
+            },
+        ]);
+        satelliteParts = await db.collection('satelliteParts').find({}).toArray();
+        await db
+            .collection('satelliteParts')
+            .updateOne({ _id: satelliteParts[0]._id }, { $set: { dependsOn: [satelliteParts[2]._id] } });
+        satelliteParts = await db.collection('satelliteParts').find({}).toArray();
+        console.log(satelliteParts);
+        await db.collection('satellites').insertMany([
             {
                 satelliteName: 'satellite1',
                 description: 'description',
@@ -107,6 +158,26 @@ describe('Satellite tracker API e2e tests', () => {
                 colorOfBase: '#ffffff',
                 shapeOfBase: Shape.Cube,
                 createdBy: users[0]._id,
+                satelliteParts: [
+                    {
+                        satellitePart: satelliteParts[0],
+                        quantity: 1,
+                        size: 1,
+                        color: '#ffffff',
+                    },
+                    {
+                        satellitePart: satelliteParts[1],
+                        quantity: 2,
+                        size: 2,
+                        color: '#ffffff',
+                    },
+                    {
+                        satellitePart: satelliteParts[2],
+                        quantity: 3,
+                        size: 3,
+                        color: '#ffffff',
+                    },
+                ] as CustomSatellitePart[],
             },
             {
                 satelliteName: 'satellite2',
@@ -127,6 +198,26 @@ describe('Satellite tracker API e2e tests', () => {
                 createdBy: users[1]._id,
             },
         ] as Satellite[]);
+        satellites = await db.collection('satellites').find({}).toArray();
+        console.log(satellites[0].satelliteParts);
+        satellites.forEach((satellite) => {
+            neo4jService.write(
+                'MATCH (u:User {username: $username}) CREATE (s:Satellite {satelliteName: $satelliteName, createdBy: $username }) MERGE (s)<-[:CREATED {createdAt: datetime($createdAt)}]-(u)',
+                {
+                    satelliteName: satellite.satelliteName,
+                    username: users.find((user) => user._id.equals(satellite.createdBy)).username,
+                    createdAt: new Date().toISOString(),
+                }
+            );
+        });
+        await db
+            .collection('users')
+            .updateOne({ _id: users[0]._id }, { $set: { satellites: [satellites[0]._id, satellites[1]._id] } });
+        await db.collection('users').updateOne({ _id: users[1]._id }, { $set: { satellites: [satellites[2]._id] } });
+
+        console.log(
+            (await db.collection('satellites').findOne({ _id: satellites[0]._id })).satelliteParts[0].satellitePart
+        );
     });
 
     beforeEach(async () => {});
@@ -253,7 +344,38 @@ describe('Satellite tracker API e2e tests', () => {
             expect(status).toBe(200);
             expect(body.result).toBeDefined();
             expect(body.result.satellites).toBeDefined();
-            expect(body.result.satellites.length).toBe(1);
+            expect(body.result.satellites.length).toBe(
+                satellites.filter((s) => s.createdBy.toString() === users[0]._id.toString()).length
+            );
+        });
+
+        it('should return a satellite with a populated "createdBy" and "satelliteParts" and their dependencies', async () => {
+            const { status, body } = await request(app.getHttpServer()).get(`/satellites/${satellites[0]._id}`);
+            expect(status).toBe(200);
+            expect(body.result).toBeDefined();
+            expect(body.result.createdBy).toBeDefined();
+            expect(body.result.createdBy).toBe(users[0].username);
+            expect(body.result.satelliteParts).toBeDefined();
+            expect(body.result.satelliteParts.length).toBe(3);
+            // console.log(body.result.satelliteParts);
+
+            // body.result.satelliteParts.forEach((body_sp) => {
+            //     console.log(body_sp);
+            //     const part = satelliteParts.find((sp) => sp._id.toString() === body_sp.satellitePart);
+            //     if (part.dependsOn) {
+            //         expect(body.result.satelliteParts[0].dependsOn).toEqual(part.dependsOn.map((d) => d.partName));
+            //     } else {
+            //         expect(body.result.satelliteParts[0].dependsOn).toBeUndefined();
+            //     }
+            // });
+        });
+
+        it('should not return any satelliteparts if a satellite has none', async () => {
+            const { status, body } = await request(app.getHttpServer()).get(`/satellites/${satellites[1]._id}`);
+            expect(status).toBe(200);
+            expect(body.result).toBeDefined();
+            expect(body.result.satelliteParts).toBeDefined();
+            expect(body.result.satelliteParts.length).toBe(0);
         });
     });
 
