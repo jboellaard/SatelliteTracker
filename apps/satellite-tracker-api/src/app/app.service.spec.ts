@@ -2,7 +2,7 @@ import { Test } from '@nestjs/testing';
 
 import { AppService } from './app.service';
 
-describe.skip('AppService', () => {
+describe('AppService', () => {
     let service: AppService;
 
     beforeAll(async () => {

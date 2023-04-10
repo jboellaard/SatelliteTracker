@@ -27,13 +27,13 @@ describe('Satellite tracker API e2e tests', () => {
 
     beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AppModule, Neo4jModule],
+            imports: [AppModule],
         }).compile();
-
-        neo4jService = moduleFixture.get<Neo4jService>(Neo4jService);
 
         app = moduleFixture.createNestApplication();
         await app.init();
+
+        neo4jService = app.get<Neo4jService>(Neo4jService);
 
         const dbConnection = await MongoClient.connect(
             `${process.env.MONGO_CONN}/${process.env.MONGO_DATABASE}${process.env.MONGO_OPTIONS}`
@@ -60,6 +60,14 @@ describe('Satellite tracker API e2e tests', () => {
                 {}
             ),
         ]);
+    });
+
+    beforeEach(async () => {
+        await db.collection('users').deleteMany({});
+        await db.collection('satellites').deleteMany({});
+        await db.collection('satelliteParts').deleteMany({});
+        await iddb.collection('identities').deleteMany({});
+        await neo4jService.write('MATCH (n) DETACH DELETE n', {});
 
         await db.collection('users').insertMany([
             {
@@ -197,7 +205,7 @@ describe('Satellite tracker API e2e tests', () => {
         satellites = await db.collection('satellites').find({}).toArray();
         satellites.forEach((satellite) => {
             neo4jService.write(
-                'MATCH (u:User {username: $username}) CREATE (s:Satellite {satelliteName: $satelliteName, createdBy: $username }) MERGE (s)<-[:CREATED {createdAt: datetime($createdAt)}]-(u)',
+                'MATCH (u:User {username: $username}) CREATE (s:Satellite {satelliteName: $satelliteName, createdBy: $username }) MERGE (s)<-[:CREATED {createdAt: datetime($createdAt)}]-(u) MERGE (u)-[:TRACKS {since: datetime()}]->(s)',
                 {
                     satelliteName: satellite.satelliteName,
                     username: users.find((user) => user._id.equals(satellite.createdBy)).username,
@@ -210,8 +218,6 @@ describe('Satellite tracker API e2e tests', () => {
             .updateOne({ _id: users[0]._id }, { $set: { satellites: [satellites[0]._id, satellites[1]._id] } });
         await db.collection('users').updateOne({ _id: users[1]._id }, { $set: { satellites: [satellites[2]._id] } });
     });
-
-    beforeEach(async () => {});
 
     afterAll(async () => {
         if (iddb) await iddb.dropDatabase();
@@ -361,14 +367,6 @@ describe('Satellite tracker API e2e tests', () => {
     describe('Auth guards and roles', () => {
         const adminUsername = 'admin';
         beforeEach(async () => {
-            await db.collection('users').deleteMany({});
-            await iddb.collection('identities').deleteMany({});
-
-            db.collection('users').insertMany(users.map((u) => ({ ...u, _id: undefined })));
-            iddb.collection('identities').insertMany(
-                identities.map((i) => ({ ...i, password: bcrypt.hashSync(password, 10), _id: undefined }))
-            );
-
             db.collection('users').insertOne({
                 username: 'admin',
             });
@@ -447,6 +445,206 @@ describe('Satellite tracker API e2e tests', () => {
     describe('Cypher query with property inside relationship, getMostRecentlyCreatedSatellites', () => {});
 
     describe('Cypher query with depth, getRecommendedUsers', () => {});
+
+    describe.only('Unique email or no email', () => {
+        it('should create an account if the user has a unique email address', async () => {
+            const { status, body } = await request(app.getHttpServer()).post('/register').send({
+                username: 'newuser',
+                emailAddress: 'mail@mail.com',
+                password: password,
+            });
+
+            expect(status).toBe(201);
+            expect(body.result).toBeDefined();
+            expect(body.result.username).toBe('newuser');
+
+            db.collection('users').findOne({ username: 'newuser' }, (err, result) => {
+                expect(result).toBeDefined();
+                expect(result.username).toBe('newuser');
+            });
+            iddb.collection('identities').findOne({ username: 'newuser' }, (err, result) => {
+                expect(result).toBeDefined();
+                expect(result.username).toBe('newuser');
+                expect(result.emailAddress).toBe('mail@mail.com');
+            });
+        });
+
+        it('should not create an account if the user has a non-unique email address', async () => {
+            const email = 'mail@mail.com';
+            db.collection('users').insertOne({
+                username: 'newuser',
+            });
+            iddb.collection('identities').insertOne({
+                username: 'newuser',
+                emailAddress: email,
+                hash: 'hash',
+            });
+
+            const { status, body } = await request(app.getHttpServer()).post('/register').send({
+                username: 'differentusername',
+                emailAddress: 'mail@mail.com',
+                password: password,
+            });
+
+            expect(status).toBe(400);
+            expect(body.message).toBe('Email address already exists.');
+
+            db.collection('users').findOne({ username: 'differentusername' }, (err, result) => {
+                expect(result).toBeNull();
+            });
+            iddb.collection('identities').findOne({ username: 'differentusername' }, (err, result) => {
+                expect(result).toBeNull();
+            });
+        });
+
+        it('should create an account if a user does not specify an email address', async () => {
+            const { status, body } = await request(app.getHttpServer()).post('/register').send({
+                username: 'newuser',
+                password: password,
+            });
+
+            expect(status).toBe(201);
+            expect(body.result).toBeDefined();
+            expect(body.result.username).toBe('newuser');
+
+            db.collection('users').findOne({ username: 'newuser' }, (err, result) => {
+                expect(result).toBeDefined();
+                expect(result.username).toBe('newuser');
+            });
+            iddb.collection('identities').findOne({ username: 'newuser' }, (err, result) => {
+                expect(result).toBeDefined();
+                expect(result.username).toBe('newuser');
+                expect(result.emailAddress).toBeUndefined();
+            });
+
+            const { status: status2, body: body2 } = await request(app.getHttpServer()).post('/register').send({
+                username: 'anotheruser',
+                password: password,
+            });
+
+            expect(status2).toBe(201);
+            expect(body2.result).toBeDefined();
+            expect(body2.result.username).toBe('anotheruser');
+
+            db.collection('users').findOne({ username: 'anotheruser' }, (err, result) => {
+                expect(result).toBeDefined();
+                expect(result.username).toBe('anotheruser');
+            });
+            iddb.collection('identities').findOne({ username: 'anotheruser' }, (err, result) => {
+                expect(result).toBeDefined();
+                expect(result.username).toBe('anotheruser');
+                expect(result.emailAddress).toBeUndefined();
+            });
+        });
+    });
+
+    describe('Neo queries', () => {
+        beforeEach(async () => {
+            // Add new users
+            await request(app.getHttpServer()).post('/register').send({
+                username: 'newuser',
+                password: password,
+            });
+            await request(app.getHttpServer()).post('/register').send({
+                username: 'newuser2',
+                password: password,
+            });
+            await request(app.getHttpServer()).post('/register').send({
+                username: 'newuser3',
+                password: password,
+            });
+            await request(app.getHttpServer()).post('/register').send({
+                username: 'newuser4',
+                password: password,
+            });
+            await request(app.getHttpServer()).post('/register').send({
+                username: 'newuser5',
+                password: password,
+            });
+            await request(app.getHttpServer()).post('/register').send({
+                username: 'newuser6',
+                password: password,
+            });
+        });
+
+        it.only('recommends users to follow based on who they follow with a depth of 1', async () => {
+            console.log('test');
+        });
+
+        it.only('recommends users to follow based on who they follow with a depth of 2 to 4', async () => {
+            console.log('test2');
+            // Creating following for previously made users
+            const { body: token } = await request(app.getHttpServer()).post('/login').send({
+                username: 'newuser',
+                password: password,
+            });
+            console.log(token);
+            const { status } = await request(app.getHttpServer())
+                .post('users/newuser2/follow')
+                .set('Authorization', `Bearer ${token.result.accessToken}`)
+                .send({});
+            expect(status).toBe(201);
+
+            console.log('test3');
+
+            const { body: token2 } = await request(app.getHttpServer()).post('/login').send({
+                username: 'newuser2',
+                password: password,
+            });
+
+            const { status: status2 } = await request(app.getHttpServer())
+                .post('users/newuser3/follow')
+                .set('Authorization', `Bearer ${token2.result.accessToken}`)
+                .send();
+            expect(status2).toBe(201);
+            const { status: status3 } = await request(app.getHttpServer())
+                .post('users/newuser4/follow')
+                .set('Authorization', `Bearer ${token2.result.accessToken}`)
+                .send();
+            expect(status3).toBe(201);
+
+            const { body: token3 } = await request(app.getHttpServer()).post('/login').send({
+                username: 'newuser3',
+                password: password,
+            });
+            const { status: status4 } = await request(app.getHttpServer())
+                .post('users/newuser5/follow')
+                .set('Authorization', `Bearer ${token3.result.accessToken}`)
+                .send();
+            expect(status4).toBe(201);
+
+            const { body: token4 } = await request(app.getHttpServer()).post('/login').send({
+                username: 'newuser5',
+                password: password,
+            });
+            const { status: status5 } = await request(app.getHttpServer())
+                .post('users/newuser6/follow')
+                .set('Authorization', `Bearer ${token4.result.accessToken}`)
+                .send();
+            expect(status5).toBe(201);
+
+            // Testing the to-follow endpoint
+            const { body: token5 } = await request(app.getHttpServer()).post('/login').send({
+                username: users[0].username,
+                password: password,
+            });
+            const { status: status6 } = await request(app.getHttpServer())
+                .post('users/newuser/follow')
+                .set('Authorization', `Bearer ${token5.result.accessToken}`)
+                .send();
+            expect(status6).toBe(201);
+
+            const { status: status7, body } = await request(app.getHttpServer())
+                .get('/to-follow')
+                .set('Authorization', `Bearer ${token5.result.accessToken}`);
+            expect(status7).toBe(200);
+            expect(body.result).toBeDefined();
+            expect(body.result.length).toBe(3);
+            expect(body.result[0].username).toBe('newuser3');
+            expect(body.result[1].username).toBe('newuser4');
+            expect(body.result[2].username).toBe('newuser5');
+        });
+    });
 
     it.skip('should return a satellite with a virtual property', async () => {
         const satellite = satellites.find((s) => s.satelliteName === 'International Space Station');
