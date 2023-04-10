@@ -1,7 +1,4 @@
-// testing jwt guards, tokens and role-based (returning items based on token username)
-
-//
-import mongoose, { disconnect } from 'mongoose';
+import { disconnect } from 'mongoose';
 import { AppModule } from '../src/app/app.module';
 import { Shape, getPeriod } from 'shared/domain';
 import { Test, TestingModule } from '@nestjs/testing';
@@ -11,7 +8,7 @@ import { MongoClient } from 'mongodb';
 import { Neo4jService } from './app/neo4j/neo4j.service';
 import { Neo4jModule } from './app/neo4j/neo4j.module';
 import * as bcrypt from 'bcrypt';
-import { Orbit, Satellite } from './app/satellite/schemas/satellite.schema';
+import { Satellite } from './app/satellite/schemas/satellite.schema';
 import { Identity } from './app/auth/schemas/identity.schema';
 import { User } from './app/user/schemas/user.schema';
 import { CustomSatellitePart } from './app/satellite/schemas/satellite-part.schema';
@@ -19,6 +16,7 @@ import { CustomSatellitePart } from './app/satellite/schemas/satellite-part.sche
 describe('Satellite tracker API e2e tests', () => {
     let app: INestApplication;
     let neo4jService: Neo4jService;
+    let password = 'password';
     let users;
     let identities;
     let satelliteParts;
@@ -63,7 +61,6 @@ describe('Satellite tracker API e2e tests', () => {
             ),
         ]);
 
-        const password = 'password';
         await db.collection('users').insertMany([
             {
                 username: 'user',
@@ -106,7 +103,7 @@ describe('Satellite tracker API e2e tests', () => {
                 user: users[3]._id,
             },
         ] as Identity[]);
-        // identities = await iddb.collection('identities').find({}).toArray();
+        identities = await iddb.collection('identities').find({}).toArray();
         users.forEach((user) => {
             neo4jService.write('MERGE u:User {username: $username} RETURN u', {
                 username: user.username,
@@ -316,22 +313,6 @@ describe('Satellite tracker API e2e tests', () => {
 
             neo4jService.write('MATCH (u:User {username: $username}) DETACH DELETE u', { username: 'newuser' });
         });
-
-        it.skip('should return a user', async () => {
-            const { status, body } = await request(app.getHttpServer()).get(`/users/${users[0].username}`);
-            expect(status).toBe(200);
-            expect(body.result).toBeDefined();
-        });
-
-        it.skip('should return a satellite with a virtual property', async () => {
-            const satellite = satellites.find((s) => s.satelliteName === 'International Space Station');
-            const { status, body } = await request(app.getHttpServer()).get(`/satellites/${satellite._id}`);
-            expect(status).toBe(200);
-            expect(body.result).toBeDefined();
-            expect(body.result.orbit.period).toBeDefined();
-            expect(body.result.orbit.period).toBe(getPeriod(body.result.orbit.semiMajorAxis * 1000) / (24 * 60 * 60));
-            expect(body.result.id).toBe(satellite._id.toString());
-        });
     });
 
     describe('Joining tables using populate', () => {
@@ -353,17 +334,19 @@ describe('Satellite tracker API e2e tests', () => {
             expect(body.result.createdBy).toBe(users[0].username);
             expect(body.result.satelliteParts).toBeDefined();
             expect(body.result.satelliteParts.length).toBe(3);
-            // console.log(body.result.satelliteParts);
 
-            // body.result.satelliteParts.forEach((body_sp) => {
-            //     console.log(body_sp);
-            //     const part = satelliteParts.find((sp) => sp._id.toString() === body_sp.satellitePart);
-            //     if (part.dependsOn) {
-            //         expect(body.result.satelliteParts[0].dependsOn).toEqual(part.dependsOn.map((d) => d.partName));
-            //     } else {
-            //         expect(body.result.satelliteParts[0].dependsOn).toBeUndefined();
-            //     }
-            // });
+            /** works in application but not in test */
+            /**
+               body.result.satelliteParts.forEach((body_sp) => {
+                    console.log(body_sp);
+                    const part = satelliteParts.find((sp) => sp._id.toString() === body_sp.satellitePart);
+                    if (part.dependsOn) {
+                        expect(body.result.satelliteParts[0].dependsOn).toEqual(part.dependsOn.map((d) => d.partName));
+                    } else {
+                        expect(body.result.satelliteParts[0].dependsOn).toBeUndefined();
+                    }
+                });
+             */
         });
 
         it('should not return any satelliteparts if a satellite has none', async () => {
@@ -375,11 +358,103 @@ describe('Satellite tracker API e2e tests', () => {
         });
     });
 
+    describe('Auth guards and roles', () => {
+        const adminUsername = 'admin';
+        beforeEach(async () => {
+            await db.collection('users').deleteMany({});
+            await iddb.collection('identities').deleteMany({});
+
+            db.collection('users').insertMany(users.map((u) => ({ ...u, _id: undefined })));
+            iddb.collection('identities').insertMany(
+                identities.map((i) => ({ ...i, password: bcrypt.hashSync(password, 10), _id: undefined }))
+            );
+
+            db.collection('users').insertOne({
+                username: 'admin',
+            });
+            const user = await db.collection('users').findOne({ username: 'admin' });
+            iddb.collection('identities').insertOne({
+                username: adminUsername,
+                hash: await bcrypt.hash(password, 10),
+                roles: ['user', 'admin'],
+                user: user,
+            });
+        });
+
+        it('should delete the logged in user', async () => {
+            const { body: token } = await request(app.getHttpServer()).post('/login').send({
+                username: users[0].username,
+                password: password,
+            });
+
+            const { status, body } = await request(app.getHttpServer())
+                .delete(`/self`)
+                .set('Authorization', `Bearer ${token.result.accessToken}`);
+            expect(status).toBe(200);
+            expect(body.result).toBeDefined();
+
+            db.collection('users')
+                .find({ username: users[0].username })
+                .toArray()
+                .then((result) => {
+                    expect(result.length).toBe(0);
+                });
+        });
+
+        it('should delete a user if the logged in user is an admin', async () => {
+            const { body: token } = await request(app.getHttpServer()).post('/login').send({
+                username: adminUsername,
+                password: password,
+            });
+
+            const { status, body } = await request(app.getHttpServer())
+                .delete(`/users/${users[0].username}`)
+                .set('Authorization', `Bearer ${token.result.accessToken}`);
+            expect(status).toBe(200);
+            expect(body.result).toBeDefined();
+
+            db.collection('users')
+                .find({ username: users[0].username })
+                .toArray()
+                .then((result) => {
+                    expect(result.length).toBe(0);
+                });
+        });
+
+        it('should not delete a user if it is not the logged in user or an admin', async () => {
+            const { body: token } = await request(app.getHttpServer()).post('/login').send({
+                username: users[1].username,
+                password: password,
+            });
+
+            const { status, body } = await request(app.getHttpServer())
+                .delete(`/users/${users[0].username}`)
+                .set('Authorization', `Bearer ${token.result.accessToken}`);
+            expect(status).toBe(403);
+            expect(body.message).toBe('Forbidden resource');
+
+            db.collection('users')
+                .find({ username: users[0].username })
+                .toArray()
+                .then((result) => {
+                    expect(result.length).toBe(1);
+                });
+        });
+    });
+
     describe('Mongo and Neo4j', () => {});
 
     describe('Cypher query with property inside relationship, getMostRecentlyCreatedSatellites', () => {});
 
     describe('Cypher query with depth, getRecommendedUsers', () => {});
 
-    describe('Auth guards and roles', () => {});
+    it.skip('should return a satellite with a virtual property', async () => {
+        const satellite = satellites.find((s) => s.satelliteName === 'International Space Station');
+        const { status, body } = await request(app.getHttpServer()).get(`/satellites/${satellite._id}`);
+        expect(status).toBe(200);
+        expect(body.result).toBeDefined();
+        expect(body.result.orbit.period).toBeDefined();
+        expect(body.result.orbit.period).toBe(getPeriod(body.result.orbit.semiMajorAxis * 1000) / (24 * 60 * 60));
+        expect(body.result.id).toBe(satellite._id.toString());
+    });
 });
