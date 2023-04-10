@@ -30,8 +30,14 @@ export class DbseedService implements OnModuleInit {
                     `CREATE CONSTRAINT unique_username IF NOT EXISTS FOR (u:User) REQUIRE u.username IS UNIQUE`,
                     {}
                 );
+                // await this.neo4jService.write(
+                //     `CREATE CONSTRAINT unique_satellite IF NOT EXISTS FOR (s:Satellite) REQUIRE (s.satelliteName, s.createdBy) IS NODE KEY`,
+                //     {}
+                // );
+
+                // node key is only supported in neo4j enterprise edition and cannot be used in a github workflow
                 await this.neo4jService.write(
-                    `CREATE CONSTRAINT unique_satellite IF NOT EXISTS FOR (s:Satellite) REQUIRE (s.satelliteName, s.createdBy) IS NODE KEY`,
+                    `CREATE CONSTRAINT unique_satellite IF NOT EXISTS FOR (s:Satellite) REQUIRE (s.satelliteName, s.createdBy) IS UNIQUE`,
                     {}
                 );
 

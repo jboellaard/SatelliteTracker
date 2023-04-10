@@ -68,16 +68,79 @@ describe('Satellite tracker API e2e tests', () => {
             expect(body.result.username).toBe('newuser');
 
             const createdUser = await db.collection('users').findOne({ username: user.username });
-            expect(user).toBeDefined();
-            expect(user.username).toBe('newuser');
+            expect(createdUser).toBeDefined();
+            expect(createdUser.username).toBe(user.username);
 
             neo4jService
                 .read('MATCH (u:User {username: $username}) RETURN u', { username: user.username })
                 .then((result) => {
                     expect(result.records.length).toBe(1);
                     result.records.map((record) => {
-                        expect(record.get('u').properties.username).toBe('newuser');
+                        expect(record.get('u').properties.username).toBe(user.username);
                     });
+                });
+        });
+
+        it('should not add a user if an error occurs in a mongo database', async () => {
+            const user = {
+                username: 'newuser',
+                password: 'password',
+            };
+            db.collection('users').insertOne({ username: 'newuser' });
+
+            const { status, body } = await request(app.getHttpServer()).post('/register').send(user);
+
+            expect(status).toBe(400);
+            expect(body.error).toBeDefined();
+            expect(body.error).toBe('Username already exists');
+
+            neo4jService
+                .read('MATCH (u:User {username: $username}) RETURN u', { username: user.username })
+                .then((result) => {
+                    expect(result.records.length).toBe(0);
+                });
+
+            db.collection('users').deleteOne({ username: 'newuser' });
+
+            iddb.collection('identities').insertOne({ username: 'newuser', hash: 'hash' });
+            const { status: status2, body: body2 } = await request(app.getHttpServer()).post('/register').send(user);
+
+            expect(status2).toBe(400);
+            expect(body2.error).toBeDefined();
+            expect(body2.error).toBe('Username already exists');
+
+            neo4jService
+                .read('MATCH (u:User {username: $username}) RETURN u', { username: user.username })
+                .then((result) => {
+                    expect(result.records.length).toBe(0);
+                });
+        });
+
+        it('should not add a user if an error occurs in a neo4j database', async () => {
+            const user = {
+                username: 'newuser',
+                password: 'password',
+            };
+
+            neo4jService.write('CREATE (u:User {username: $username})', { username: 'newuser' });
+
+            const { status, body } = await request(app.getHttpServer()).post('/register').send(user);
+
+            expect(status).toBe(400);
+            expect(body.error).toBeDefined();
+            expect(body.error).toBe('Username already exists');
+
+            db.collection('users')
+                .find({ username: user.username })
+                .toArray()
+                .then((result) => {
+                    expect(result.length).toBe(0);
+                });
+            iddb.collection('identities')
+                .find({ username: user.username })
+                .toArray()
+                .then((result) => {
+                    expect(result.length).toBe(0);
                 });
         });
 
