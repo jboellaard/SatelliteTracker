@@ -148,7 +148,6 @@ describe('Satellite tracker API e2e tests', () => {
             .collection('satelliteParts')
             .updateOne({ _id: satelliteParts[0]._id }, { $set: { dependsOn: [satelliteParts[2]._id] } });
         satelliteParts = await db.collection('satelliteParts').find({}).toArray();
-        console.log(satelliteParts);
         await db.collection('satellites').insertMany([
             {
                 satelliteName: 'satellite1',
@@ -199,7 +198,6 @@ describe('Satellite tracker API e2e tests', () => {
             },
         ] as Satellite[]);
         satellites = await db.collection('satellites').find({}).toArray();
-        console.log(satellites[0].satelliteParts);
         satellites.forEach((satellite) => {
             neo4jService.write(
                 'MATCH (u:User {username: $username}) CREATE (s:Satellite {satelliteName: $satelliteName, createdBy: $username }) MERGE (s)<-[:CREATED {createdAt: datetime($createdAt)}]-(u)',
@@ -214,10 +212,6 @@ describe('Satellite tracker API e2e tests', () => {
             .collection('users')
             .updateOne({ _id: users[0]._id }, { $set: { satellites: [satellites[0]._id, satellites[1]._id] } });
         await db.collection('users').updateOne({ _id: users[1]._id }, { $set: { satellites: [satellites[2]._id] } });
-
-        console.log(
-            (await db.collection('satellites').findOne({ _id: satellites[0]._id })).satelliteParts[0].satellitePart
-        );
     });
 
     beforeEach(async () => {});
@@ -256,9 +250,11 @@ describe('Satellite tracker API e2e tests', () => {
                     });
                 });
 
-            db.collection('users').deleteOne({ username: 'newuser' });
-            iddb.collection('identities').deleteOne({ username: 'newuser' });
-            neo4jService.write('MATCH (u:User {username: $username}) DETACH DELETE u', { username: user.username });
+            await Promise.all([
+                db.collection('users').deleteOne({ username: 'newuser' }),
+                iddb.collection('identities').deleteOne({ username: 'newuser' }),
+                neo4jService.write('MATCH (u:User {username: $username}) DETACH DELETE u', { username: user.username }),
+            ]);
         });
 
         it('should not add a user if an error occurs in a mongo database', async () => {
