@@ -46,6 +46,9 @@ jobs:
                 echo "${{ secrets.ENV_FILE }}" > .env
 
             - uses: baptouuuu/setup-neo4j@v1.2.0
+              with:
+                password: 'testpd'
+                tag: '5.1'
             - uses: supercharge/mongodb-github-action@1.7.0
               with:
                 mongodb-version: '4.2'
