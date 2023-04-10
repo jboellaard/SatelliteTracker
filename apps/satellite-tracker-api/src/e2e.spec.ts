@@ -40,8 +40,10 @@ describe('Satellite tracker API e2e tests', () => {
         );
         iddb = iddbConnection.db(process.env.MONGO_IDENTITYDB);
 
-        users = await db.collection('users').find().toArray();
-        satellites = await db.collection('satellites').find().toArray();
+        db.collection('users').deleteMany({});
+        db.collection('satellites').deleteMany({});
+        iddb.collection('identities').deleteMany({});
+        await neo4jService.write('MATCH (n) DETACH DELETE n', {});
     });
 
     beforeEach(async () => {});
@@ -162,7 +164,15 @@ describe('Satellite tracker API e2e tests', () => {
         });
     });
 
-    describe('Joining tables using populate', () => {});
+    describe('Joining tables using populate', () => {
+        it('should return a user with a populated satellites', async () => {
+            const { status, body } = await request(app.getHttpServer()).get(`/users/${users[0].username}`);
+            expect(status).toBe(200);
+            expect(body.result).toBeDefined();
+            expect(body.result.satellites).toBeDefined();
+            expect(body.result.satellites.length).toBe(1);
+        });
+    });
 
     describe('Mongo and Neo4j', () => {});
 
