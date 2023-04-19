@@ -32,6 +32,7 @@ import { OrbitEditComponent } from './pages/satellite/orbit-edit/orbit-edit.comp
 
 import { PageNotFoundComponent } from './shared/page-not-found/page-not-found.component';
 import { SatelliteInfoComponent } from './pages/satellite/satellite-detail/satellite-info/satellite-info.component';
+import { OrbitSimulationComponent } from './pages/satellite/orbit-simulation/orbit-simulation.component';
 
 const routes: Routes = [
     { path: 'home', pathMatch: 'full', redirectTo: 'feed' },
@@ -57,6 +58,7 @@ const routes: Routes = [
         ],
     },
     { path: 'about', pathMatch: 'full', component: AboutComponent },
+    { path: 'orbit-simulation', pathMatch: 'full', component: OrbitSimulationComponent },
     { path: 'login', pathMatch: 'full', component: LoginComponent },
     { path: 'register', pathMatch: 'full', component: RegisterComponent },
     { path: 'user-overview', pathMatch: 'full', canActivate: [AdminAuthGuard], component: UserListComponent },

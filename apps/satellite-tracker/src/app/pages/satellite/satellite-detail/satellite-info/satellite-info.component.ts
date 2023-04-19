@@ -46,15 +46,13 @@ export class SatelliteInfoComponent {
     }
 
     addOrbitScene() {
-        if (this.satellite?.orbit && this.satellite?.colorOfBase) {
+        if (this.satellite && this.satellite?.orbit && this.satellite?.colorOfBase) {
             setTimeout(() => {
                 let canvas = document.querySelector('#canvas-wrapper canvas');
                 this.orbitService.createOrbitScene(
                     canvas ? canvas : document.body,
                     this.satellite?.orbit!,
-                    this.satellite?.colorOfBase,
-                    this.satellite?.shapeOfBase,
-                    this.satellite?.sizeOfBase
+                    this.satellite!
                 );
                 this.orbitService.changeZoom(this.satellite!.orbit!);
                 if (this.orbitService.guidelines) {

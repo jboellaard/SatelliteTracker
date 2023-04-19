@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { getPeriod, IOrbit, Shape } from 'shared/domain';
+import { getPeriod, IOrbit, ISatellite, Shape } from 'shared/domain';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
@@ -17,6 +17,8 @@ export class OrbitService {
     ellipse = new THREE.Line();
     ellipseCurve = new THREE.EllipseCurve(0, 0, 1, 1, 0, 2 * Math.PI, false, 0);
     satelliteMesh = new THREE.Mesh();
+    sphereSatelliteMesh = new THREE.Mesh();
+    cubeSatelliteMesh = new THREE.Mesh();
     realSatelliteMesh = new THREE.Mesh();
     xLine = new THREE.Line(new THREE.BufferGeometry());
     yLine = new THREE.Line(new THREE.BufferGeometry());
@@ -44,9 +46,10 @@ export class OrbitService {
      * @param shape
      * @param size - size of the satellite in meters
      */
-    createOrbitScene(container: Element, orbit: IOrbit, color = '#ffffff', shape = Shape.Cube, size = 200000) {
-        size = size / 1000; // convert to km
-        this.realMeshColor = new THREE.MeshPhongMaterial({ color: color, shininess: 100 });
+    createOrbitScene(container: Element, orbit: IOrbit, satellite: ISatellite) {
+        const size = satellite.sizeOfBase / 1000; // convert to km
+        this.realMeshColor = new THREE.MeshPhongMaterial({ color: satellite.colorOfBase, shininess: 100 });
+        // this.realMeshColor.color = new THREE.Color(satellite.colorOfBase);
 
         const scene = new THREE.Scene();
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas: container });
@@ -75,7 +78,7 @@ export class OrbitService {
 
         this.createOrbit(orbit, scene);
         this.createGuidelines(scene);
-        this.createSatellite(scene, shape, size);
+        this.createSatellite(scene, satellite.shapeOfBase!, size);
 
         this.fitCameraToOrbit = function (newOrbit: IOrbit, zoom = 1) {
             let cameraPos = newOrbit.semiMajorAxis * this.scale;
@@ -323,7 +326,7 @@ export class OrbitService {
     }
 
     changeColorSatellite(color: string) {
-        this.realSatelliteMesh.material = new THREE.MeshBasicMaterial({
+        this.realMeshColor = new THREE.MeshPhongMaterial({
             color: color,
         });
     }

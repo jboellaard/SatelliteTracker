@@ -94,13 +94,7 @@ export class OrbitEditComponent implements OnInit {
     addOrbitScene() {
         setTimeout(() => {
             let canvas = document.querySelector('#canvas-wrapper canvas');
-            this.orbitService.createOrbitScene(
-                canvas ? canvas : document.body,
-                this.satellite.orbit!,
-                this.satellite.colorOfBase,
-                this.satellite.shapeOfBase,
-                this.satellite.sizeOfBase
-            );
+            this.orbitService.createOrbitScene(canvas ? canvas : document.body, this.satellite.orbit!, this.satellite);
             this.changeOrbitSize();
             if (this.orbitService.realSize) {
                 this.orbitService.realSize = false;

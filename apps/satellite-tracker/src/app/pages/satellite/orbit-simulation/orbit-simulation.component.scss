@@ -1,0 +1,42 @@
+@media only screen and (min-width: 1000px) {
+    #checkbox-wrapper {
+        float: none;
+        display: flex;
+        justify-content: space-between;
+        margin-left: -10px;
+    }
+
+    #zoom-slider-wrapper {
+        justify-content: center !important;
+        margin: auto !important;
+        width: 100% !important;
+    }
+
+    #zoom-slider-wrapper mat-slider.slider {
+        max-width: 100%;
+    }
+
+    .col-2 {
+        display: flex;
+        justify-content: space-between;
+        margin: 10px;
+        max-width: 100%;
+    }
+
+    .col-2 canvas {
+        min-height: 350px;
+    }
+
+    .col-2 #form-wrapper {
+        width: 40%;
+        min-width: 250px;
+    }
+
+    .col-2 #visual {
+        width: 58%;
+    }
+}
+
+#form-wrapper {
+    margin-top: 0px !important;
+}

@@ -2,8 +2,13 @@
 <div *ngIf="user" id="breadcrumbs">
     <app-breadcrumbs></app-breadcrumbs>
 </div>
-<div [ngClass]="{ 'page-content-with-dashboard': user && !hideSidebar('about'), 'page-content': !user }">
-    <div id="sidebar-wrapper" *ngIf="user && !hideSidebar('about')">
+<div
+    [ngClass]="{
+        'page-content-with-dashboard': user && !hideSidebar('about') && !hideSidebar('orbit-simulation'),
+        'page-content': !user
+    }"
+>
+    <div id="sidebar-wrapper" *ngIf="user && !hideSidebar('about') && !hideSidebar('orbit-simulation')">
         <app-sidebar></app-sidebar>
     </div>
     <div class="page-content-inner">

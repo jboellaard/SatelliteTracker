@@ -69,6 +69,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
+import { OrbitSimulationComponent } from './pages/satellite/orbit-simulation/orbit-simulation.component';
 
 const materialModules = [
     MatToolbarModule,
@@ -130,6 +131,7 @@ const materialModules = [
         EditProfileComponent,
         SatelliteTrackersComponent,
         SatelliteInfoComponent,
+        OrbitSimulationComponent,
     ],
     imports: [
         BrowserModule,

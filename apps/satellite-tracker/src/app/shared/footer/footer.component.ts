@@ -4,7 +4,12 @@ import { Component } from '@angular/core';
     selector: 'app-footer',
     template: `<footer>
         <p>&#169; 2023 - Satellite Tracker</p>
-        <button mat-button routerLink="/about" routerLinkActive="active" ariaCurrentWhenActive="page">About</button>
+        <div id="buttons">
+            <button mat-button routerLink="/orbit-simulation" routerLinkActive="active" ariaCurrentWhenActive="page">
+                Orbit Simulation
+            </button>
+            <button mat-button routerLink="/about" routerLinkActive="active" ariaCurrentWhenActive="page">About</button>
+        </div>
     </footer>`,
     styles: [
         `
@@ -16,7 +21,7 @@ import { Component } from '@angular/core';
                 background: #424242;
             }
 
-            button,
+            #buttons,
             p {
                 align-self: center;
             }
