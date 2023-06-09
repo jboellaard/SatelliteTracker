@@ -118,7 +118,7 @@
                     <div id="checkbox-wrapper">
                         <div>
                             <mat-checkbox
-                                [(ngModel)]="orbitService.guidelines"
+                                [(ngModel)]="orbitService.displayGuidelines"
                                 name="guidelines"
                                 (ngModelChange)="orbitService.toggleGuidelines()"
                                 color="'accent'"
@@ -134,16 +134,16 @@
                         </div>
                         <div>
                             <mat-checkbox
-                                [(ngModel)]="orbitService.realColor"
+                                [(ngModel)]="orbitService.displayRealColor"
                                 name="realColor"
                                 (ngModelChange)="orbitService.toggleColor()"
                                 color="'accent'"
                                 >Real color</mat-checkbox
                             >
                             <mat-checkbox
-                                [(ngModel)]="orbitService.realSize"
+                                [(ngModel)]="orbitService.displayRealSize"
                                 name="realSize"
-                                (ngModelChange)="orbitService.toggleSize()"
+                                (ngModelChange)="changeSizeSatellite()"
                                 color="'accent'"
                                 >Real size</mat-checkbox
                             >

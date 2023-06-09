@@ -12,7 +12,7 @@
                     >Show orbit</mat-checkbox
                 >
                 <mat-checkbox
-                    [(ngModel)]="orbitService.guidelines"
+                    [(ngModel)]="orbitService.displayGuidelines"
                     name="guidelines"
                     (ngModelChange)="orbitService.toggleGuidelines()"
                     color="'accent'"
@@ -20,16 +20,16 @@
                     >Add guidelines</mat-checkbox
                 >
                 <mat-checkbox
-                    [(ngModel)]="orbitService.realColor"
+                    [(ngModel)]="orbitService.displayRealColor"
                     name="realColorAndSize"
                     (ngModelChange)="orbitService.toggleColor()"
                     color="'accent'"
                     >Real color</mat-checkbox
                 >
                 <mat-checkbox
-                    [(ngModel)]="orbitService.realSize"
+                    [(ngModel)]="orbitService.displayRealSize"
                     name="realColorAndSize"
-                    (ngModelChange)="orbitService.toggleSize()"
+                    (ngModelChange)="changeSizeSatellite()"
                     color="'accent'"
                     >Real size</mat-checkbox
                 >
@@ -197,7 +197,13 @@
                 <!-- shape of base -->
                 <mat-form-field class="form-group" appearance="fill">
                     <mat-label for="shape">Shape of base</mat-label>
-                    <mat-select name="shape" [(ngModel)]="satellite!.shapeOfBase" #shape="ngModel" required>
+                    <mat-select
+                        name="shape"
+                        [(ngModel)]="satellite!.shapeOfBase"
+                        (ngModelChange)="changeShapeSatellite()"
+                        #shape="ngModel"
+                        required
+                    >
                         <mat-option *ngFor="let shape of shapes" [value]="shape">{{ shape }}</mat-option>
                     </mat-select>
                 </mat-form-field>
@@ -214,6 +220,7 @@
                         name="sizeOfBase"
                         class="form-control"
                         [(ngModel)]="satellite!.sizeOfBase"
+                        (ngModelChange)="changeSizeSatellite()"
                         #sizeOfBase="ngModel"
                         required
                         min="2"
@@ -243,24 +250,13 @@
                         value="#000000"
                         class="form-control"
                         [(ngModel)]="satellite!.colorOfBase"
+                        (ngModelChange)="changeColorSatellite()"
                         #colorB="ngModel"
                         [ngClass]="{
                             'is-invalid': colorB.invalid && colorB.touched
                         }"
                     />
                 </mat-form-field>
-            </div>
-
-            <div class="buttons">
-                <button
-                    mat-flat-button
-                    color="primary"
-                    type="submit"
-                    class="btn btn-primary"
-                    [disabled]="!satelliteEditForm.valid"
-                >
-                    Submit
-                </button>
             </div>
         </form>
     </div>

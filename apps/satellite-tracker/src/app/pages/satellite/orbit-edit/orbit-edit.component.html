@@ -12,7 +12,7 @@
                     >Show orbit</mat-checkbox
                 >
                 <mat-checkbox
-                    [(ngModel)]="orbitService.guidelines"
+                    [(ngModel)]="orbitService.displayGuidelines"
                     name="guidelines"
                     (ngModelChange)="orbitService.toggleGuidelines()"
                     color="'accent'"
@@ -20,16 +20,16 @@
                     >Add guidelines</mat-checkbox
                 >
                 <mat-checkbox
-                    [(ngModel)]="orbitService.realColor"
+                    [(ngModel)]="orbitService.displayRealColor"
                     name="realColorAndSize"
                     (ngModelChange)="orbitService.toggleColor()"
                     color="'accent'"
                     >Real color</mat-checkbox
                 >
                 <mat-checkbox
-                    [(ngModel)]="orbitService.realSize"
+                    [(ngModel)]="orbitService.displayRealSize"
                     name="realColorAndSize"
-                    (ngModelChange)="orbitService.toggleSize()"
+                    (ngModelChange)="changeSizeSatellite()"
                     color="'accent'"
                     >Real size</mat-checkbox
                 >

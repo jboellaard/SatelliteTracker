@@ -37,6 +37,7 @@ export class SatelliteInfoComponent {
                 if (this.satellite.satelliteParts && this.satellite.satelliteParts.length > 0) {
                     this.currentPart = this.satellite.satelliteParts[0];
                 }
+                this.changeSizeSatellite();
             }
         });
 
@@ -55,20 +56,25 @@ export class SatelliteInfoComponent {
                     this.satellite!
                 );
                 this.orbitService.changeZoom(this.satellite!.orbit!);
-                if (this.orbitService.guidelines) {
-                    this.orbitService.guidelines = false;
+                if (this.orbitService.displayGuidelines) {
+                    this.orbitService.displayGuidelines = false;
                     this.orbitService.toggleGuidelines();
                 }
                 if (
                     this.satellite?.sizeOfBase! >=
                     200000 * this.orbitService.scale * this.satellite!.orbit!.semiMajorAxis * 1.3
                 ) {
-                    this.orbitService.realSize = true;
+                    this.orbitService.displayRealSize = true;
                 } else {
-                    this.orbitService.realSize = false;
+                    this.orbitService.displayRealSize = false;
                 }
-                this.orbitService.toggleSize();
             }, 0);
+        }
+    }
+
+    changeSizeSatellite() {
+        if (this.satellite && this.satellite?.orbit) {
+            this.orbitService.changeSizeSatellite(this.satellite.sizeOfBase, this.satellite.orbit);
         }
     }
 

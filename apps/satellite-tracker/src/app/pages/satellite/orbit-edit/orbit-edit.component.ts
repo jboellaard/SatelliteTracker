@@ -79,6 +79,7 @@ export class OrbitEditComponent implements OnInit {
                             this.satellite.orbit = this.orbit;
                         }
                         this.addOrbitScene();
+                        this.changeSizeSatellite();
                     } else {
                         this.snackBar.error('Could not find a satellite with this id');
                         this.router.navigate(['../'], { relativeTo: this.route });
@@ -96,9 +97,8 @@ export class OrbitEditComponent implements OnInit {
             let canvas = document.querySelector('#canvas-wrapper canvas');
             this.orbitService.createOrbitScene(canvas ? canvas : document.body, this.satellite.orbit!, this.satellite);
             this.changeOrbitSize();
-            if (this.orbitService.realSize) {
-                this.orbitService.realSize = false;
-                this.orbitService.toggleSize();
+            if (this.orbitService.displayRealSize) {
+                this.orbitService.displayRealSize = false;
             }
             document
                 .querySelector('input#semimajoraxis')!
@@ -181,6 +181,12 @@ export class OrbitEditComponent implements OnInit {
     changeColorSatellite() {
         if (this.satellite.orbit) {
             this.orbitService.changeColorSatellite(this.satellite.colorOfBase);
+        }
+    }
+
+    changeSizeSatellite() {
+        if (this.satellite.orbit) {
+            this.orbitService.changeSizeSatellite(this.satellite.sizeOfBase, this.satellite.orbit);
         }
     }
 

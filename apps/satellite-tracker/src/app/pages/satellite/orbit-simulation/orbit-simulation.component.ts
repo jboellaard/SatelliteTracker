@@ -20,7 +20,7 @@ export class OrbitSimulationComponent {
         satelliteName: '',
         purpose: 'TBD',
         mass: 100,
-        sizeOfBase: 200,
+        sizeOfBase: 300000,
         colorOfBase: '#ffffff',
         shapeOfBase: Shape.Cube,
         orbit: this.orbit,
@@ -43,11 +43,10 @@ export class OrbitSimulationComponent {
         setTimeout(() => {
             let canvas = document.querySelector('#canvas-wrapper canvas');
             this.orbitService.createOrbitScene(canvas ? canvas : document.body, this.satellite.orbit!, this.satellite);
-            this.changeOrbitSize();
-            if (this.orbitService.realSize) {
-                this.orbitService.realSize = false;
-                this.orbitService.toggleSize();
+            if (this.orbitService.displayRealSize) {
+                this.orbitService.displayRealSize = false;
             }
+            this.changeOrbitSize();
             document
                 .querySelector('input#semimajoraxis')!
                 .setAttribute('max', this.orbitService.maxSMAEarth.toFixed(0));
@@ -117,6 +116,7 @@ export class OrbitSimulationComponent {
             this.satellite.orbit.period = this.getPeriodOrbit(this.satellite.orbit.semiMajorAxis);
             this.orbitService.changeEllipseGeometry(this.satellite.orbit);
             this.orbitService.changeEllipseRotation(this.satellite.orbit);
+            this.orbitService.changeSizeSatellite(this.satellite.sizeOfBase, this.satellite.orbit);
         }
     }
 
@@ -129,6 +129,18 @@ export class OrbitSimulationComponent {
     changeColorSatellite() {
         if (this.satellite.orbit) {
             this.orbitService.changeColorSatellite(this.satellite.colorOfBase);
+        }
+    }
+
+    changeSizeSatellite() {
+        if (this.satellite.orbit) {
+            this.orbitService.changeSizeSatellite(this.satellite.sizeOfBase, this.satellite.orbit);
+        }
+    }
+
+    changeShapeSatellite() {
+        if (this.satellite.orbit) {
+            this.orbitService.changeShapeSatellite(this.satellite.shapeOfBase!);
         }
     }
 

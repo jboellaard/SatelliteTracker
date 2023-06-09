@@ -16,10 +16,8 @@ export class OrbitService {
     ellipseObject = new THREE.Object3D();
     ellipse = new THREE.Line();
     ellipseCurve = new THREE.EllipseCurve(0, 0, 1, 1, 0, 2 * Math.PI, false, 0);
-    satelliteMesh = new THREE.Mesh();
     sphereSatelliteMesh = new THREE.Mesh();
     cubeSatelliteMesh = new THREE.Mesh();
-    realSatelliteMesh = new THREE.Mesh();
     xLine = new THREE.Line(new THREE.BufferGeometry());
     yLine = new THREE.Line(new THREE.BufferGeometry());
     zLine = new THREE.Line(new THREE.BufferGeometry());
@@ -33,10 +31,13 @@ export class OrbitService {
     fitCameraToOrbit: any;
     whiteMeshColor = new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 100 });
     realMeshColor = new THREE.MeshPhongMaterial({ color: 0xfffff, shininess: 100 });
-    guidelines = true;
-    realColor = true;
-    realSize = true;
+    visibleSize = 200;
+    realSize = 200;
+    displayGuidelines = true;
+    displayRealColor = true;
+    displayRealSize = true;
     showOrbit = true;
+    shape = Shape.Cube;
     zoom = 1;
 
     /**
@@ -47,9 +48,9 @@ export class OrbitService {
      * @param size - size of the satellite in meters
      */
     createOrbitScene(container: Element, orbit: IOrbit, satellite: ISatellite) {
-        const size = satellite.sizeOfBase / 1000; // convert to km
+        this.realSize = satellite.sizeOfBase / 1000; // convert to km
+        this.shape = satellite.shapeOfBase!;
         this.realMeshColor = new THREE.MeshPhongMaterial({ color: satellite.colorOfBase, shininess: 100 });
-        // this.realMeshColor.color = new THREE.Color(satellite.colorOfBase);
 
         const scene = new THREE.Scene();
         this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas: container });
@@ -78,7 +79,7 @@ export class OrbitService {
 
         this.createOrbit(orbit, scene);
         this.createGuidelines(scene);
-        this.createSatellite(scene, satellite.shapeOfBase!, size);
+        this.createSatellite(scene, orbit);
 
         this.fitCameraToOrbit = function (newOrbit: IOrbit, zoom = 1) {
             let cameraPos = newOrbit.semiMajorAxis * this.scale;
@@ -95,7 +96,12 @@ export class OrbitService {
             camera.far = cameraPos * 12 + 1100;
 
             // set size of satellite for visibility
-            this.satelliteMesh.scale.setScalar(cameraPos * 1.3);
+            this.cubeSatelliteMesh.scale.setScalar(
+                (this.displayRealSize ? this.realSize : this.visibleSize) * cameraPos * 1.4
+            );
+            this.sphereSatelliteMesh.scale.setScalar(
+                (this.displayRealSize ? this.realSize : this.visibleSize) * cameraPos * 1.5
+            );
 
             camera.lookAt(0, 0, 0);
             camera.updateProjectionMatrix();
@@ -103,6 +109,7 @@ export class OrbitService {
         };
 
         this.changeEllipseGeometry(orbit);
+        this.changeSizeSatellite(satellite.sizeOfBase, orbit);
 
         // set variables for animation loop
         const scale = this.scale;
@@ -170,8 +177,8 @@ export class OrbitService {
                 (1 - orbit.eccentricity ** 2);
 
             const pos = getPositionInOrbit(orbit, time);
-            this.satelliteMesh.position.set(pos.x, pos.y, pos.z);
-            this.realSatelliteMesh.position.set(pos.x, pos.y, pos.z);
+            this.cubeSatelliteMesh.position.set(pos.x, pos.y, pos.z);
+            this.sphereSatelliteMesh.position.set(pos.x, pos.y, pos.z);
 
             const perigeePos = getPositionInOrbit(orbit, 0);
             this.perigeeLine.geometry = new THREE.BufferGeometry().setFromPoints([perigeePos, center]);
@@ -249,27 +256,18 @@ export class OrbitService {
         this.toggleGuidelines();
     }
 
-    private createSatellite(scene: THREE.Scene, shape: Shape, size: number) {
-        if (shape === Shape.Cube) {
-            this.satelliteMesh = new THREE.Mesh(
-                new THREE.BoxGeometry(200 * this.scale, 200 * this.scale, 200 * this.scale),
-                this.realMeshColor
-            );
-            this.realSatelliteMesh = new THREE.Mesh(
-                new THREE.BoxGeometry(size * this.scale, size * this.scale, size * this.scale),
-                this.realMeshColor
-            );
-        } else if (shape === Shape.Sphere) {
-            this.satelliteMesh = new THREE.Mesh(new THREE.SphereGeometry(100 * this.scale, 32, 32), this.realMeshColor);
-            this.realSatelliteMesh = new THREE.Mesh(
-                new THREE.SphereGeometry((size * this.scale) / 2, 32, 32),
-                this.realMeshColor
-            );
-        }
+    private createSatellite(scene: THREE.Scene, orbit: IOrbit) {
+        this.cubeSatelliteMesh = new THREE.Mesh(
+            new THREE.BoxGeometry(this.scale, this.scale, this.scale),
+            this.realMeshColor
+        );
+        this.sphereSatelliteMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(0.5 * this.scale, 32, 32),
+            this.realMeshColor
+        );
 
-        scene.add(this.satelliteMesh);
-        scene.add(this.realSatelliteMesh);
-        this.toggleSize();
+        scene.add(this.cubeSatelliteMesh);
+        scene.add(this.sphereSatelliteMesh);
         this.toggleColor();
     }
 
@@ -329,24 +327,36 @@ export class OrbitService {
         this.realMeshColor = new THREE.MeshPhongMaterial({
             color: color,
         });
+        this.toggleColor();
     }
 
     toggleGuidelines() {
-        this.xLine.visible = this.guidelines;
-        this.yLine.visible = this.guidelines;
-        this.zLine.visible = this.guidelines;
-        this.equatorialPlane.visible = this.guidelines;
-        this.perigeeLine.visible = this.guidelines;
+        this.xLine.visible = this.displayGuidelines;
+        this.yLine.visible = this.displayGuidelines;
+        this.zLine.visible = this.displayGuidelines;
+        this.equatorialPlane.visible = this.displayGuidelines;
+        this.perigeeLine.visible = this.displayGuidelines;
     }
 
-    toggleSize() {
-        this.satelliteMesh.visible = !this.realSize;
-        this.realSatelliteMesh.visible = this.realSize;
+    changeSizeSatellite(newSize: number, orbit: IOrbit) {
+        this.realSize = newSize / 1000; // convert to km
+        this.fitCameraToOrbit(orbit, this.zoom);
+    }
+
+    changeShapeSatellite(shape: Shape) {
+        this.shape = shape;
+        if (this.shape === Shape.Cube) {
+            this.cubeSatelliteMesh.visible = true;
+            this.sphereSatelliteMesh.visible = false;
+        } else if (this.shape === Shape.Sphere) {
+            this.cubeSatelliteMesh.visible = false;
+            this.sphereSatelliteMesh.visible = true;
+        }
     }
 
     toggleColor() {
-        this.satelliteMesh.material = this.realColor ? this.realMeshColor : this.whiteMeshColor;
-        this.realSatelliteMesh.material = this.realColor ? this.realMeshColor : this.whiteMeshColor;
+        this.cubeSatelliteMesh.material = this.displayRealColor ? this.realMeshColor : this.whiteMeshColor;
+        this.sphereSatelliteMesh.material = this.displayRealColor ? this.realMeshColor : this.whiteMeshColor;
     }
 
     toggleOrbit() {
