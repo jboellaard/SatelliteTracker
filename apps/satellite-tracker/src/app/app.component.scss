@@ -23,15 +23,16 @@ app-footer {
     height: 100%;
 }
 
-@media only screen and (max-width: 1200px) {
-    .page-content-inner {
-        max-width: 100%;
-    }
-}
+// @media only screen and (max-width: 1200px) {
+//     .page-content-inner {
+//         max-width: 100%;
+//     }
+// }
 
 .page-content {
     flex: 1 1 auto;
     display: grid;
+    max-width: 100%;
 }
 
 app-sidebar {

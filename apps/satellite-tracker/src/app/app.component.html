@@ -5,7 +5,7 @@
 <div
     [ngClass]="{
         'page-content-with-dashboard': user && !hideSidebar('about') && !hideSidebar('orbit-simulation'),
-        'page-content': !user
+        'page-content': !user || hideSidebar('about') || hideSidebar('orbit-simulation')
     }"
 >
     <div id="sidebar-wrapper" *ngIf="user && !hideSidebar('about') && !hideSidebar('orbit-simulation')">
