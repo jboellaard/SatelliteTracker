@@ -29,23 +29,25 @@ export class OrbitService {
 
     camera = new THREE.PerspectiveCamera();
     fitCameraToOrbit: any;
+    scaleSatellite: any;
+
     whiteMeshColor = new THREE.MeshPhongMaterial({ color: 0xffffff, shininess: 100 });
     realMeshColor = new THREE.MeshPhongMaterial({ color: 0xfffff, shininess: 100 });
     visibleSize = 200;
     realSize = 200;
+    shape = Shape.Cube;
+    zoom = 1;
+    satelliteCameraScalar = 1;
+
     displayGuidelines = true;
     displayRealColor = true;
     displayRealSize = true;
     showOrbit = true;
-    shape = Shape.Cube;
-    zoom = 1;
 
     /**
      * @param container - HTML element to render the scene in
      * @param orbit
-     * @param color
-     * @param shape
-     * @param size - size of the satellite in meters
+     * @param satellite
      */
     createOrbitScene(container: Element, orbit: IOrbit, satellite: ISatellite) {
         this.realSize = satellite.sizeOfBase / 1000; // convert to km
@@ -81,6 +83,15 @@ export class OrbitService {
         this.createGuidelines(scene);
         this.createSatellite(scene, orbit);
 
+        this.scaleSatellite = function () {
+            this.cubeSatelliteMesh.scale.setScalar(
+                (this.displayRealSize ? this.realSize : this.visibleSize) * this.satelliteCameraScalar * 1.4
+            );
+            this.sphereSatelliteMesh.scale.setScalar(
+                (this.displayRealSize ? this.realSize : this.visibleSize) * this.satelliteCameraScalar * 1.5
+            );
+        };
+
         this.fitCameraToOrbit = function (newOrbit: IOrbit, zoom = 1) {
             let cameraPos = newOrbit.semiMajorAxis * this.scale;
             if (cameraPos < 1.5) cameraPos = 1.5;
@@ -96,12 +107,8 @@ export class OrbitService {
             camera.far = cameraPos * 12 + 1100;
 
             // set size of satellite for visibility
-            this.cubeSatelliteMesh.scale.setScalar(
-                (this.displayRealSize ? this.realSize : this.visibleSize) * cameraPos * 1.4
-            );
-            this.sphereSatelliteMesh.scale.setScalar(
-                (this.displayRealSize ? this.realSize : this.visibleSize) * cameraPos * 1.5
-            );
+            this.satelliteCameraScalar = cameraPos;
+            this.scaleSatellite();
 
             camera.lookAt(0, 0, 0);
             camera.updateProjectionMatrix();
@@ -340,18 +347,13 @@ export class OrbitService {
 
     changeSizeSatellite(newSize: number, orbit: IOrbit) {
         this.realSize = newSize / 1000; // convert to km
-        this.fitCameraToOrbit(orbit, this.zoom);
+        this.scaleSatellite();
     }
 
     changeShapeSatellite(shape: Shape) {
         this.shape = shape;
-        if (this.shape === Shape.Cube) {
-            this.cubeSatelliteMesh.visible = true;
-            this.sphereSatelliteMesh.visible = false;
-        } else if (this.shape === Shape.Sphere) {
-            this.cubeSatelliteMesh.visible = false;
-            this.sphereSatelliteMesh.visible = true;
-        }
+        this.cubeSatelliteMesh.visible = this.shape === Shape.Cube;
+        this.sphereSatelliteMesh.visible = this.shape === Shape.Sphere;
     }
 
     toggleColor() {
