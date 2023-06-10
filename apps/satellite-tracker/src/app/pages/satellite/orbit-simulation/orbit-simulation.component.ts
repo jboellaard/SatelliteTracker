@@ -5,7 +5,7 @@ import { OrbitService } from '../orbit-scene.service';
 @Component({
     selector: 'app-orbit-simulation',
     templateUrl: './orbit-simulation.component.html',
-    styleUrls: ['./orbit-simulation.component.scss', '../orbit-edit/orbit-edit.component.scss'],
+    styleUrls: ['./orbit-simulation.component.scss'],
 })
 export class OrbitSimulationComponent {
     orbit = {
