@@ -116,7 +116,7 @@ export class OrbitSimulationComponent {
             this.satellite.orbit.period = this.getPeriodOrbit(this.satellite.orbit.semiMajorAxis);
             this.orbitService.changeEllipseGeometry(this.satellite.orbit);
             this.orbitService.changeEllipseRotation(this.satellite.orbit);
-            this.orbitService.changeSizeSatellite(this.satellite.sizeOfBase, this.satellite.orbit);
+            this.changeSizeSatellite();
         }
     }
 
@@ -134,7 +134,7 @@ export class OrbitSimulationComponent {
 
     changeSizeSatellite() {
         if (this.satellite.orbit) {
-            this.orbitService.changeSizeSatellite(this.satellite.sizeOfBase, this.satellite.orbit);
+            this.orbitService.changeSizeSatellite(this.satellite.sizeOfBase);
         }
     }
 

@@ -85,10 +85,10 @@ export class OrbitService {
 
         this.scaleSatellite = function () {
             this.cubeSatelliteMesh.scale.setScalar(
-                (this.displayRealSize ? this.realSize : this.visibleSize) * this.satelliteCameraScalar * 1.4
+                this.displayRealSize ? this.realSize : this.visibleSize * 1.4 * this.satelliteCameraScalar
             );
             this.sphereSatelliteMesh.scale.setScalar(
-                (this.displayRealSize ? this.realSize : this.visibleSize) * this.satelliteCameraScalar * 1.5
+                this.displayRealSize ? this.realSize : this.visibleSize * 1.5 * this.satelliteCameraScalar
             );
         };
 
@@ -116,7 +116,7 @@ export class OrbitService {
         };
 
         this.changeEllipseGeometry(orbit);
-        this.changeSizeSatellite(satellite.sizeOfBase, orbit);
+        this.scaleSatellite();
 
         // set variables for animation loop
         const scale = this.scale;
@@ -276,6 +276,7 @@ export class OrbitService {
         scene.add(this.cubeSatelliteMesh);
         scene.add(this.sphereSatelliteMesh);
         this.toggleColor();
+        this.changeShapeSatellite(this.shape);
     }
 
     changeEllipseGeometry(orbit: IOrbit) {
@@ -345,7 +346,7 @@ export class OrbitService {
         this.perigeeLine.visible = this.displayGuidelines;
     }
 
-    changeSizeSatellite(newSize: number, orbit: IOrbit) {
+    changeSizeSatellite(newSize: number) {
         this.realSize = newSize / 1000; // convert to km
         this.scaleSatellite();
     }

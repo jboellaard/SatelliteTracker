@@ -79,7 +79,6 @@ export class OrbitEditComponent implements OnInit {
                             this.satellite.orbit = this.orbit;
                         }
                         this.addOrbitScene();
-                        this.changeSizeSatellite();
                     } else {
                         this.snackBar.error('Could not find a satellite with this id');
                         this.router.navigate(['../'], { relativeTo: this.route });
@@ -100,6 +99,7 @@ export class OrbitEditComponent implements OnInit {
             if (this.orbitService.displayRealSize) {
                 this.orbitService.displayRealSize = false;
             }
+            this.changeSizeSatellite();
             document
                 .querySelector('input#semimajoraxis')!
                 .setAttribute('max', this.orbitService.maxSMAEarth.toFixed(0));
@@ -186,7 +186,7 @@ export class OrbitEditComponent implements OnInit {
 
     changeSizeSatellite() {
         if (this.satellite.orbit) {
-            this.orbitService.changeSizeSatellite(this.satellite.sizeOfBase, this.satellite.orbit);
+            this.orbitService.changeSizeSatellite(this.satellite.sizeOfBase);
         }
     }
 
